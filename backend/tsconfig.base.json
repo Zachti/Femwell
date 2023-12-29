@@ -1,0 +1,25 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@backend/auth": ["libs/vault/api/src/index.ts"],
+      "@backend/config": ["libs/shared/config/src/index.ts"],
+      "@backend/configurable-module": ["libs/shared/utils/src/index.ts"],
+      "@backend/logger": ["libs/shared/logger/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}
