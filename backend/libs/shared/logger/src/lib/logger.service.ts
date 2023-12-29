@@ -6,7 +6,7 @@ import {
   LoggerModuleOptions,
   MODULE_OPTIONS_TOKEN,
 } from './loggerModuleDefinitions';
-import { commonConfig } from '../../../config/src/lib/common.config';
+import { commonConfig } from '@backend/config';
 
 @Injectable()
 export class LoggerService {
