@@ -2,7 +2,7 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { RegisterRequest } from './dto/registerRequest.entity';
 import { AuthenticateRequest } from './dto/authenticateRequest.entity';
 import { BadRequestException } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from '@backend/auth';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.entity';
 import { GraphQLVoid } from 'graphql-scalars';
 
