@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "nx build"
+    "build": "nx build",
+    "start:vault:dev": "nx run vault:serve:development"
   },
   "private": true,
   "dependencies": {

@@ -1,0 +1,25 @@
+FROM node:18.16-alpine as builder
+
+WORKDIR /home/node
+
+COPY package*.json /home/node/
+
+RUN npm install
+
+COPY . /home/node/
+
+RUN npm run build vault
+
+FROM node:18.16-alpine as vault
+
+WORKDIR /home/app
+
+COPY --from=builder /home/node/dist/apps/vault/package*.json /home/app/
+
+COPY --from=builder /home/node/dist/ /home/app/dist/
+
+RUN apk --no-cache add curl
+
+EXPOSE 3001
+
+CMD ["sh", "-c", "node dist/apps/vault/main.js"]
