@@ -1,23 +1,28 @@
-import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common'
-import { Request } from 'express'
+import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
+import { Request } from 'express';
 import { MimeTypes } from '../inetrfaces/interfaces';
-
 
 @Injectable()
 export class mimeTypePipe implements PipeTransform<Request, Promise<Request>> {
   constructor() {}
 
   async transform(request: Request): Promise<Request> {
-    const file = request.file
+    const file = request.file;
 
-    if (file && this.isNotValidMimeType(file.mimetype) ) {
-      throw new BadRequestException('Invalid file mimeType. Only PDF or JPG are allowed.')
+    if (file && this.isNotValidMimeType(file.mimetype)) {
+      throw new BadRequestException(
+        'Invalid file mimeType. Only PDF, JPG and PNG are allowed.',
+      );
     }
 
-    return request
+    return request;
   }
 
-  isNotValidMimeType(mimeType: string){
-    return mimeType !== MimeTypes.PDF && mimeType !== MimeTypes.JPG
+  isNotValidMimeType(mimeType: string) {
+    return (
+      mimeType !== MimeTypes.PDF &&
+      mimeType !== MimeTypes.JPG &&
+      mimeType !== MimeTypes.PNG
+    );
   }
 }

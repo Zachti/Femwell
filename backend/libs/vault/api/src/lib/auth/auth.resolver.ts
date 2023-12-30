@@ -21,7 +21,7 @@ export class AuthResolver {
   ) {
     try {
       return await this.authService.authenticateUser(authenticateRequest);
-    } catch (e) {
+    } catch (e: any) {
       throw new BadRequestException(e.message);
     }
   }
@@ -32,7 +32,7 @@ export class AuthResolver {
   ) {
     try {
       return await this.authService.confirmUser(confirmUserRequest);
-    } catch (e) {
+    } catch (e: any) {
       throw new BadRequestException(e.message);
     }
   }
