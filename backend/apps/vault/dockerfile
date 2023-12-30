@@ -18,8 +18,8 @@ COPY --from=builder /home/node/dist/apps/vault/package*.json /home/app/
 
 COPY --from=builder /home/node/dist/ /home/app/dist/
 
-RUN apk --no-cache add curl
+RUN npm ci --ignore-scripts
 
-EXPOSE 3001
+RUN apk --no-cache add curl
 
 CMD ["sh", "-c", "node dist/apps/vault/main.js"]
