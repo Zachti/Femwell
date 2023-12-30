@@ -9,8 +9,8 @@ export const CognitoProvider = {
   provide: CognitoToken,
   useFactory: () => {
     return new CognitoUserPool({
-      UserPoolId: process.env['COGNITO_USER_POOL_ID'],
-      ClientId: process.env['COGNITO_CLIENT_ID']
+      UserPoolId: process.env['COGNITO_USER_POOL_ID'] as string,
+      ClientId: process.env['COGNITO_CLIENT_ID'] as string,
     })
-  }
+  },
 }

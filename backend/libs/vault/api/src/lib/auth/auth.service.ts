@@ -4,7 +4,7 @@ import {
   CognitoUserAttribute,
   CognitoUser,
   AuthenticationDetails,
-  ICognitoUserData,
+  ICognitoUserData, ISignUpResult, CognitoUserSession,
 } from 'amazon-cognito-identity-js';
 import { Inject, Injectable } from '@nestjs/common';
 import { authConfig } from './config/authConfig';
@@ -24,7 +24,7 @@ export class AuthService {
     private readonly logger: LoggerService,
   ) {}
 
-  registerUser(registerRequest: RegisterRequest) {
+  registerUser(registerRequest: RegisterRequest): Promise<ISignUpResult> {
     const { name, email, password, phoneNumber } = registerRequest;
     this.logger.info(`${name} signed up.`);
     return new Promise((resolve, reject) => {
@@ -44,14 +44,14 @@ export class AuthService {
           if (!result) {
             reject(err);
           } else {
-            resolve(result.user);
+            resolve(result);
           }
         },
       );
     });
   }
 
-  authenticateUser(authenticateRequest: AuthenticateRequest) {
+  authenticateUser(authenticateRequest: AuthenticateRequest): Promise<CognitoUserSession> {
     const authDetails = new AuthenticationDetails({
       Username: authenticateRequest.name,
       Password: authenticateRequest.password,
@@ -82,7 +82,7 @@ export class AuthService {
     );
 
     return new Promise((resolve, reject) => {
-      user.confirmRegistration(confirmUserRequest.code, true, (err, result) => {
+      return user.confirmRegistration(confirmUserRequest.code, true, (err, result) => {
         if (err) reject(err);
         resolve(result);
       });

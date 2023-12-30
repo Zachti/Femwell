@@ -9,10 +9,10 @@ export const s3Provider = {
   provide: s3Token,
   useFactory: () => {
     return new S3({
-      region: process.env['AWS_S3_REGION'],
+      region: process.env['AWS_S3_REGION'] as string,
       credentials: {
-        secretAccessKey: process.env['AWS_SECRET_KEY'],
-        accessKeyId: process.env['AWS_ACCESS_KEY'],
+        secretAccessKey: process.env['AWS_SECRET_KEY'] as string,
+        accessKeyId: process.env['AWS_ACCESS_KEY'] as string,
       },
     });
   },
