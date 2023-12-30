@@ -29,6 +29,7 @@ export class UploadService {
     try {
       await Promise.resolve(result)
     }catch (e){
+      this.logger.error(`Fail uploading file: ${e.message}`)
       throw new InternalServerErrorException(e, 'Fail uploading file')
     }
     this.logger.info('file uploaded successfully.')
