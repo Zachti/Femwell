@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
-import { CognitoUserPool } from 'amazon-cognito-identity-js';
+import { CognitoProvider } from './providers/cognito.provider';
 
 @Module({
-  providers: [AuthResolver, AuthService, CognitoUserPool],
+  providers: [AuthResolver, AuthService, CognitoProvider],
 })
 export class AuthModule {}

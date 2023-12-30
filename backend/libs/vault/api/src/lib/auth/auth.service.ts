@@ -11,22 +11,22 @@ import { authConfig } from './config/authConfig';
 import { ConfigType } from '@nestjs/config';
 import { AuthenticateRequest } from './dto/authenticateRequest.entity';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.entity';
+import { LoggerService } from '@backend/logger';
+import { InjectCognitoToken } from './providers/cognito.provider';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectCognitoToken()
     private readonly userPool: CognitoUserPool,
     @Inject(authConfig.KEY)
     private readonly authCfg: ConfigType<typeof authConfig>,
-  ) {
-    this.userPool = new CognitoUserPool({
-      UserPoolId: this.authCfg.userPoolId,
-      ClientId: this.authCfg.clientId,
-    });
-  }
+    private readonly logger: LoggerService
+  ) {}
 
   registerUser(registerRequest: RegisterRequest) {
     const { name, email, password, phoneNumber } = registerRequest;
+    this.logger.info(`${name} signed up.`)
     return new Promise((resolve, reject) => {
       return this.userPool.signUp(
         email,
@@ -61,6 +61,7 @@ export class AuthService {
       Pool: this.userPool,
     };
     const user = new CognitoUser(userData);
+    this.logger.info(`${authenticateRequest.name} tries to log in.`)
     return new Promise((resolve, reject) => {
       return user.authenticateUser(authDetails, {
         onSuccess: (result) => resolve(result),
@@ -75,6 +76,8 @@ export class AuthService {
       Pool: this.userPool,
     };
     const user = new CognitoUser(userData);
+
+    this.logger.info(`${confirmUserRequest.email} confirmed his email and now has been verified.`)
 
     return new Promise((resolve, reject) => {
       user.confirmRegistration(confirmUserRequest.code, true, (err, result) => {
