@@ -8,3 +8,8 @@ export interface uploadResult {
   type: string
   error: number
 }
+export enum MimeTypes {
+  PDF = 'application/pdf',
+  JPG = 'image/jpeg'
+}
+
