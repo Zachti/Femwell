@@ -3,7 +3,7 @@ version: '3'
 services:
   vault:
     ports:
-      - '3001:3001'
+      - '3002:3002'
     build:
       context: './'
       dockerfile: './apps/vault/dockerfile'
@@ -15,6 +15,23 @@ services:
       - ./node_modules:/home/node
     env_file:
       - 'apps/vault/development/local.env'
+      - 'development/local-base.env'
+    networks:
+      - backend_network
+  heimdall:
+    ports:
+      - '3001:3001'
+    build:
+      context: './'
+      dockerfile: './apps/heimdall/dockerfile'
+      target: 'builder'
+    command: sh -c "npm run start:heimdall:dev"
+    restart: 'unless-stopped'
+    volumes:
+      - .:/home/node
+      - ./node_modules:/home/node
+    env_file:
+      - 'apps/heimdall/development/local.env'
       - 'development/local-base.env'
     networks:
       - backend_network
