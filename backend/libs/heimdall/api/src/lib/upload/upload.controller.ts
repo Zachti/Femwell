@@ -1,5 +1,5 @@
 import {
-  Controller, Inject,
+  Controller,
   MaxFileSizeValidator,
   NestInterceptor,
   ParseFilePipe,
@@ -10,21 +10,18 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
 import { mimeTypePipe } from '../pipes/mimeType.pipe';
-import { uploadConfig } from '@backend/heimdall';
-import { ConfigType } from '@nestjs/config';
+import { Multer } from 'multer';
 
 @Controller('upload')
 export class uploadController {
-  constructor(private readonly uploadService: UploadService,
-              @Inject(uploadConfig.KEY)
-  private readonly uploadCfg: ConfigType<typeof uploadConfig>) {
+  constructor(private readonly uploadService: UploadService) {
   }
   @Post()
-  @UseInterceptors(FileInterceptor('file') as NestInterceptor)
+  @UseInterceptors(FileInterceptor('file')as unknown as NestInterceptor)
   @UsePipes(new mimeTypePipe())
   async uploadFile(@UploadedFile(new ParseFilePipe({
     validators: [
-      new MaxFileSizeValidator({maxSize: Number(this.uploadCfg.maxFileSize)}) ,
+      new MaxFileSizeValidator({maxSize: Number(process.env['MAX_FILE_SIZE'] as string)}) ,
     ] })) file:Express.Multer.File) {
     return await this.uploadService.upload({key: file.originalname , data: file.buffer , mimeType:file.mimetype})
   }

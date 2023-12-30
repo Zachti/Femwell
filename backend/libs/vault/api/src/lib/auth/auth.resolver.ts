@@ -5,17 +5,18 @@ import { BadRequestException } from '@nestjs/common';
 import { AuthService } from '@backend/vault';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.entity';
 import { GraphQLVoid } from 'graphql-scalars';
+import { CognitoUserSession, ISignUpResult } from 'amazon-cognito-identity-js';
 
 @Resolver('auth')
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => GraphQLVoid)
+  @Mutation(() => Promise<ISignUpResult>)
   async register(@Args('registerRequest') registerRequest: RegisterRequest) {
     return await this.authService.registerUser(registerRequest);
   }
 
-  @Mutation(() => GraphQLVoid)
+  @Mutation(() => Promise<CognitoUserSession>)
   async login(
     @Args('authenticateRequest') authenticateRequest: AuthenticateRequest,
   ) {
