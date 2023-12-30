@@ -1,0 +1,25 @@
+FROM node:18.16-alpine as builder
+
+WORKDIR /home/node
+
+COPY package*.json /home/node/
+
+RUN npm install
+
+COPY . /home/node/
+
+RUN npm run build heimdall
+
+FROM node:18.16-alpine as heimdall
+
+WORKDIR /home/app
+
+COPY --from=builder /home/node/dist/apps/heimdall/package*.json /home/app/
+
+COPY --from=builder /home/node/dist/ /home/app/dist/
+
+RUN npm ci --ignore-scripts
+
+RUN apk --no-cache add curl
+
+CMD ["sh", "-c", "node dist/apps/heimdall/main.js"]

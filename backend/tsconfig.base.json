@@ -15,11 +15,11 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@backend/auth": ["libs/vault/api/src/index.ts"],
       "@backend/config": ["libs/shared/config/src/index.ts"],
       "@backend/configurable-module": ["libs/shared/utils/src/index.ts"],
+      "@backend/heimdall": ["libs/heimdall/api/src/index.ts"],
       "@backend/logger": ["libs/shared/logger/src/index.ts"],
-      "@backend/upload": ["libs/heimdall/api/src/index.ts"]
+      "@backend/vault": ["libs/vault/api/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -29,6 +29,10 @@
               {
                 "sourceTag": "scope:vault",
                 "onlyDependOnLibsWithTags": ["scope:vault", "scope:shared"]
+              },
+              {
+                "sourceTag": "scope:heimdall",
+                "onlyDependOnLibsWithTags": ["scope:heimdall", "scope:shared"]
               }
             ]
           }
