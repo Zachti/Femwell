@@ -1,4 +1,4 @@
-import { createConfigurableModule } from '../../../utils/src/lib/configurable-module/configurable-module.utils';
+import { createConfigurableModule } from '@backend/configurable-module';
 
 export interface LoggerModuleOptions {
   serviceName: string;
