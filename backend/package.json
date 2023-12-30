@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "build": "nx build",
-    "start:vault:dev": "nx run vault:serve:development"
+    "start:vault:dev": "nx run vault:serve:development",
+    "start:heimdall:dev": "nx run heimdall:serve:development"
   },
   "private": true,
   "dependencies": {
