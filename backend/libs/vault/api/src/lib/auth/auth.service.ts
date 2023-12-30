@@ -36,7 +36,7 @@ export class AuthService {
           new CognitoUserAttribute({ Name: 'email', Value: email }),
           new CognitoUserAttribute({
             Name: 'phone_number',
-            Value: phoneNumber,
+            Value: phoneNumber || '',
           }),
         ],
         [],
