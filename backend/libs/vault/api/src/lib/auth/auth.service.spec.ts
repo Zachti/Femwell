@@ -1,4 +1,4 @@
-import { authConfig, AuthService } from '@backend/vault';
+import { vaultConfig, AuthService } from '@backend/vault';
 import { CognitoUser } from 'amazon-cognito-identity-js';
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoggerService } from '@backend/logger';
@@ -22,8 +22,8 @@ describe('AuthService', () => {
         AuthService,
         mockCognitoTokenProvider,
         {
-          provide: authConfig.KEY,
-          useValue: authConfig,
+          provide: vaultConfig.KEY,
+          useValue: vaultConfig,
         },
         {
           provide: CognitoUser,

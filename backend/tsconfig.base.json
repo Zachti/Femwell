@@ -19,6 +19,7 @@
       "@backend/configurable-module": ["libs/shared/utils/src/index.ts"],
       "@backend/heimdall": ["libs/heimdall/api/src/index.ts"],
       "@backend/logger": ["libs/shared/logger/src/index.ts"],
+      "@backend/infrastructure": ["libs/shared/infrastructure/src/index.ts"],
       "@backend/vault": ["libs/vault/api/src/index.ts"]
     }
   },

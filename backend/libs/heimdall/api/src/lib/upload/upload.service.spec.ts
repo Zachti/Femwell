@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UploadService } from './upload.service';
-import { uploadConfig } from '@backend/heimdall';
+import { heimdallConfig } from '@backend/heimdall';
 import { LoggerService } from '@backend/logger';
 import { s3Token } from '../providers/s3.provider';
 
@@ -18,8 +18,8 @@ describe('UploadService', () => {
         UploadService,
         mockS3TokenProvider,
         {
-          provide: uploadConfig.KEY,
-          useValue: uploadConfig
+          provide: heimdallConfig.KEY,
+          useValue: heimdallConfig
         },
         {
           provide: LoggerService,

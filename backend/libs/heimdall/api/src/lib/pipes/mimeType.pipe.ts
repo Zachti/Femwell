@@ -7,14 +7,13 @@ export class mimeTypePipe implements PipeTransform<Request, Promise<Request>> {
   constructor() {}
 
   async transform(request: Request): Promise<Request> {
-    const file = request.file;
+    const file = request.file || null;
 
     if (file && this.isNotValidMimeType(file.mimetype)) {
       throw new BadRequestException(
         'Invalid file mimeType. Only PDF, JPG and PNG are allowed.',
       );
     }
-
     return request;
   }
 

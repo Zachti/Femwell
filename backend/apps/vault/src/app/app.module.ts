@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { DynamicConfigModule } from '@backend/config';
-import { authConfigObject, AuthModule } from '@backend/vault';
+import { vaultConfigObject, AuthModule } from '@backend/vault';
 import { LoggerModule } from '@backend/logger';
 
 @Module({
@@ -12,7 +12,7 @@ import { LoggerModule } from '@backend/logger';
     }),
     DynamicConfigModule.forRoot({
       isGlobal: true,
-      configObjects: [authConfigObject],
+      configObjects: [vaultConfigObject],
       validationOptions: { presence: 'required' },
     }),
     AuthModule,
