@@ -20,13 +20,14 @@ export class UploadService {
     const imagesFolder = randomUUID()
     const keyName = `${this.uploadCfg.baseFolderLocation}/${imagesFolder}/${file.key}`
     this.logger.info('uploading file to s3.')
+    const result = this.s3.upload({
+      Bucket: this.uploadCfg.awsBucket,
+      Key: keyName,
+      Body: file.data,
+      ContentType: file.mimeType
+    } as S3.Types.PutObjectRequest).promise()
     try {
-      await this.s3.upload({
-        Bucket: this.uploadCfg.awsBucket,
-        Key: keyName,
-        Body: file.data,
-        ContentType: file.mimeType
-      } as S3.Types.PutObjectRequest).promise()
+      await Promise.resolve(result)
     }catch (e){
       throw new InternalServerErrorException(e, 'Fail uploading file')
     }
