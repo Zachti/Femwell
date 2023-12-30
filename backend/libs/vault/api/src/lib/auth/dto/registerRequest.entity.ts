@@ -12,6 +12,6 @@ export class RegisterRequest {
   @Field(() => GraphQLString)
   email!: string;
 
-  @Field(() => GraphQLString)
-  phoneNumber!: string;
+  @Field(() => GraphQLString, { nullable: true })
+  phoneNumber?: string;
 }
