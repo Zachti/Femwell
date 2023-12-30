@@ -33,9 +33,10 @@ export class UploadService {
       } as S3.Types.PutObjectRequest)
       .promise();
     try {
-      await Promise.resolve(result);
-    } catch (e) {
-      throw new InternalServerErrorException(e, 'Fail uploading file');
+      await Promise.resolve(result)
+    }catch (e){
+      this.logger.error(`Fail uploading file: ${e.message}`)
+      throw new InternalServerErrorException(e, 'Fail uploading file')
     }
     this.logger.info('file uploaded successfully.');
     return {
