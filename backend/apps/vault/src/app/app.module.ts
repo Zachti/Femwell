@@ -4,6 +4,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { DynamicConfigModule } from '@backend/config';
 import { vaultConfigObject, AuthModule } from '@backend/vault';
 import { LoggerModule } from '@backend/logger';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -17,6 +18,15 @@ import { LoggerModule } from '@backend/logger';
     }),
     AuthModule,
     LoggerModule.forRoot({ serviceName: 'vault' }),
+    ThrottlerModule.forRoot({
+          throttlers: [
+            {
+              name: 'vault',
+              limit: 20,
+              ttl: 600000
+            }
+          ]
+    }),
   ],
 })
 export class VaultCoreModule {}

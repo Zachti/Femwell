@@ -6,6 +6,7 @@ import { AuthService } from '@backend/vault';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.entity';
 import { GraphQLVoid } from 'graphql-scalars';
 import { CognitoUserSession, ISignUpResult } from 'amazon-cognito-identity-js';
+import { RateLimit } from '@backend/infrastructure';
 
 @Resolver('auth')
 export class AuthResolver {
@@ -17,6 +18,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => Promise<CognitoUserSession>)
+  @RateLimit({errorMessage: 'Too many login attempts. Please try again later.'})
   async login(
     @Args('authenticateRequest') authenticateRequest: AuthenticateRequest,
   ) {
