@@ -14,12 +14,14 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
     } = this.reflector.getAllAndOverride<RateLimitDecoratorOptions>(RATE_LIMIT_KEY, [
       context.getHandler(),
       context.getClass()
-    ])
+    ]);
+    _limit = limit?? _limit;
+    _ttl = ttl?? _ttl;
     const ctx = GqlExecutionContext.create(context).getContext();
     const suffix = ctx.req.id;
     const key = this.generateKey(context, suffix, throttler.name);
-    const { totalHits } = await this.storageService.increment(key, ttl);
-    if (totalHits >= limit) {
+    const { totalHits } = await this.storageService.increment(key, _ttl);
+    if (totalHits >= _limit) {
       throw new ThrottlerException(errorMessage);
     }
     return true;
