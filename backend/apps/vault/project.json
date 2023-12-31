@@ -15,11 +15,13 @@
         "target": "node",
         "compiler": "tsc",
         "outputPath": "dist/apps/vault",
+        "generatePackageJson": true,
         "main": "apps/vault/src/main.ts",
         "tsConfig": "apps/vault/tsconfig.app.json",
         "assets": [
           "apps/vault/src/assets"
         ],
+        "isolatedConfig": true,
         "webpackConfig": "apps/vault/webpack.config.js"
       },
       "configurations": {

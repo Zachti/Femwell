@@ -12,9 +12,11 @@
         "target": "node",
         "compiler": "tsc",
         "outputPath": "dist/apps/heimdall",
+        "generatePackageJson": true,
         "main": "apps/heimdall/src/main.ts",
         "tsConfig": "apps/heimdall/tsconfig.app.json",
         "assets": ["apps/heimdall/src/assets"],
+        "isolatedConfig": true,
         "webpackConfig": "apps/heimdall/webpack.config.js"
       },
       "configurations": {

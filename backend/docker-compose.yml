@@ -5,7 +5,7 @@ services:
     ports:
       - '3002:3002'
     build:
-      context: './'
+      context: ./
       dockerfile: './apps/vault/dockerfile'
       target: 'builder'
     command: sh -c "npm run start:vault:dev"
@@ -22,7 +22,7 @@ services:
     ports:
       - '3003:3003'
     build:
-      context: './'
+      context: ./
       dockerfile: './apps/heimdall/dockerfile'
       target: 'builder'
     command: sh -c "npm run start:heimdall:dev"
