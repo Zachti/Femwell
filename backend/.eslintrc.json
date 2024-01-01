@@ -33,6 +33,10 @@
               {
                 "sourceTag": "scope:heimdall",
                 "onlyDependOnLibsWithTags": ["scope:heimdall", "scope:shared"]
+              },
+              {
+                "sourceTag": "scope:wolverine",
+                "onlyDependOnLibsWithTags": ["scope:wolverine", "scope:shared"]
               }
             ]
           }
