@@ -1,9 +1,9 @@
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { RegisterRequest } from './dto/registerRequest.entity';
-import { AuthenticateRequest } from './dto/authenticateRequest.entity';
+import { RegisterRequest } from './dto/registerRequest.input';
+import { AuthenticateRequest } from './dto/authenticateRequest.input';
 import { BadRequestException } from '@nestjs/common';
 import { AuthService } from '@backend/vault';
-import { ConfirmUserRequest } from './dto/confirmUserRequest.entity';
+import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { GraphQLVoid } from 'graphql-scalars';
 import { CognitoUserSession, ISignUpResult } from 'amazon-cognito-identity-js';
 import { RateLimit } from '@backend/infrastructure';

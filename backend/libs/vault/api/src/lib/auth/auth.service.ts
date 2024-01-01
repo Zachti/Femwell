@@ -1,4 +1,4 @@
-import { RegisterRequest } from './dto/registerRequest.entity';
+import { RegisterRequest } from './dto/registerRequest.input';
 import {
   CognitoUserPool,
   CognitoUserAttribute,
@@ -9,8 +9,8 @@ import {
 import { Inject, Injectable } from '@nestjs/common';
 import { vaultConfig } from '../config/vaultConfig';
 import { ConfigType } from '@nestjs/config';
-import { AuthenticateRequest } from './dto/authenticateRequest.entity';
-import { ConfirmUserRequest } from './dto/confirmUserRequest.entity';
+import { AuthenticateRequest } from './dto/authenticateRequest.input';
+import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { LoggerService } from '@backend/logger';
 import { InjectCognitoToken } from './providers/cognito.provider';
 
