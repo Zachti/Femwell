@@ -21,7 +21,6 @@
         "assets": [
           "apps/vault/src/assets"
         ],
-        "isolatedConfig": true,
         "webpackConfig": "apps/vault/webpack.config.js"
       },
       "configurations": {

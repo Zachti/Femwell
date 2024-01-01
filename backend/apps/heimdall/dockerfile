@@ -1,4 +1,4 @@
-FROM node:18.16-alpine as builder
+FROM node:18.17-alpine as builder
 
 WORKDIR /home/node
 
@@ -10,7 +10,7 @@ COPY . /home/node/
 
 RUN npm run build heimdall
 
-FROM node:18.16-alpine as heimdall
+FROM node:18.17-alpine as heimdall
 
 WORKDIR /home/app
 
