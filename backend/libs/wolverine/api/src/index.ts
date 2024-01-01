@@ -1,1 +1,1 @@
-export * from './lib/questionnaire.module';
+export * from './lib/config/wolverine.config';
