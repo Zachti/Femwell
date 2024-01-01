@@ -12,7 +12,6 @@
     "target": "es2015",
     "module": "esnext",
     "lib": ["es2020", "dom"],
-    "types": ["node", "Multer"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
