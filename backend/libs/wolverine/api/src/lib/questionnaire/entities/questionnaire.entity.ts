@@ -25,7 +25,6 @@ export class Questionnaire {
       responses: data.responses.S,
     }
   }
-
   static createDynamoDBObjectFromInstance(input: CreateQuestionnaireInput, responsesId: string): Record<string,AttributeValue> {
     return {
       id: {
