@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
 import { DynamicConfigModule } from '@backend/config';
 import { vaultConfigObject, AuthModule } from '@backend/vault';
 import { LoggerModule } from '@backend/logger';
@@ -8,8 +8,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
-    GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver: ApolloDriver,
+    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
+      driver: ApolloFederationDriver,
     }),
     DynamicConfigModule.forRoot({
       isGlobal: true,

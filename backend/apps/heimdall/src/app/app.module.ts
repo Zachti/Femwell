@@ -13,7 +13,6 @@ import { heimdallConfigObject } from '@backend/heimdall';
       configObjects: [heimdallConfigObject, awsConfigObject],
       validationOptions: { presence: 'required' },
     }),
-
   ],
 })
 export class HeimdallCoreModule {}

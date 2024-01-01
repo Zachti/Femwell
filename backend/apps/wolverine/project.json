@@ -1,0 +1,53 @@
+{
+  "name": "wolverine",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/wolverine/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "defaultConfiguration": "production",
+      "options": {
+        "target": "node",
+        "compiler": "tsc",
+        "outputPath": "dist/apps/wolverine",
+        "main": "apps/wolverine/src/main.ts",
+        "tsConfig": "apps/wolverine/tsconfig.app.json",
+        "assets": ["apps/wolverine/src/assets"],
+        "webpackConfig": "apps/wolverine/webpack.config.js"
+      },
+      "configurations": {
+        "development": {},
+        "production": {}
+      }
+    },
+    "serve": {
+      "executor": "@nx/js:node",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "wolverine:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "wolverine:build:development"
+        },
+        "production": {
+          "buildTarget": "wolverine:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint",
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/wolverine/jest.config.ts"
+      }
+    }
+  },
+  "tags": ["scope:wolverine"]
+}
