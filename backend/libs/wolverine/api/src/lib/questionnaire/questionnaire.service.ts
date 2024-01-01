@@ -1,26 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateQuestionnaireInput } from './dto/createQuestionnaire.input';
-import { UpdateQuestionnaireInput } from './dto/update-questionnaire.input';
-
+import { QuestionnaireRepository } from './repository/Questionnaire.repository';
 @Injectable()
 export class QuestionnaireService {
-  create(createQuestionnaireInput: CreateQuestionnaireInput) {
-    return 'This action adds a new questionnaire';
+  constructor(private readonly questionnaireRepository: QuestionnaireRepository) {
+  }
+  create(input: CreateQuestionnaireInput) {
+    return this.questionnaireRepository.create(input);
   }
 
   findAll() {
-    return `This action returns all questionnaire`;
+    return this.questionnaireRepository.findAll();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} questionnaire`;
-  }
-
-  update(id: number, updateQuestionnaireInput: UpdateQuestionnaireInput) {
-    return `This action updates a #${id} questionnaire`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} questionnaire`;
+  findOne(id: string) {
+    return this.questionnaireRepository.findOne(id);
   }
 }
