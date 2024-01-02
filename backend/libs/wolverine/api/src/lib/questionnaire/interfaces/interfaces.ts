@@ -3,7 +3,3 @@ export interface QuestionnaireDBObject {
   username: string;
   responses: string[];
 }
-// export interface QandA {
-//   question: string;
-//   answer: string;
-// }

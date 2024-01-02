@@ -6,11 +6,9 @@ import {
   GetItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { Questionnaire } from '../entities/questionnaire.entity';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateQuestionnaireInput } from '../dto/createQuestionnaire.input';
-// import { QuestionAnswer } from '../entities/questionAnswers.entity';
 import { TablesName } from '../enums/tablesName.enum';
-import { QuestionnaireDBObject } from '../interfaces/interfaces';
 
 @Injectable()
 export class QuestionnaireRepository {
@@ -21,10 +19,9 @@ export class QuestionnaireRepository {
         TableName: TablesName.Questionnaire,
       }),
     );
-    const questionnaireInstances = res.Items?.map((item) =>
+    return res.Items?.map((item) =>
       Questionnaire.createInstanceFromDynamoDBObject(item),
-    );
-    return questionnaireInstances ?? [];
+    ) ?? [];
   }
 
   async findOne(id: string): Promise<Questionnaire> {
@@ -38,10 +35,8 @@ export class QuestionnaireRepository {
         },
       }),
     );
-    if (!res.Item) throw new Error('Questionnaire not found');
-    const QuestionnaireDBObject =
-      Questionnaire.createInstanceFromDynamoDBObject(res.Item);
-    return QuestionnaireDBObject;
+    if (!res.Item) throw new BadRequestException('Questionnaire not found');
+    return Questionnaire.createInstanceFromDynamoDBObject(res.Item);
   }
 
   async create(input: CreateQuestionnaireInput): Promise<Questionnaire> {
@@ -53,42 +48,12 @@ export class QuestionnaireRepository {
         Item: dynamoDBObject,
       }),
     );
-    const questionnaire = new Questionnaire();
 
-    if (dynamoDBObject['id'] && dynamoDBObject['id'].S) {
-      questionnaire.id = dynamoDBObject['id'].S;
-    } else {
-      throw new Error('DynamoDBObject creation failed');
-    }
-
-    questionnaire.username = input.username;
-    questionnaire.responses = input.responses;
-    return questionnaire;
+    if (!dynamoDBObject['id'].S) throw new InternalServerErrorException('Failed to create Questionnaire object in DynamoDB.');
+    return {
+      id: dynamoDBObject['id'].S!,
+      username: input.username,
+      responses: input.responses
+    };
   }
-
-  // async getResponseByIds(ids: string[]) {
-  //   return ids.map(async (id: string) => {
-  //     const result = await this.client.send(
-  //       new GetItemCommand({
-  //         TableName: TablesName.Responses,
-  //         Key: {
-  //           id: {
-  //             S: id,
-  //           },
-  //         },
-  //       }),
-  //     );
-  //     return QuestionAnswer.createInstanceFromDynamoDBObject(result.Item);
-  //   });
-  // }
-
-  // private async getAllQuestionnaireResponses(
-  //   instance: QuestionnaireDBObject,
-  // ): Promise<QuestionAnswer[]> {
-  //   const responseIds = instance.responses
-  //     .split(',')
-  //     .map((id: string) => id.trim());
-  //   const QandA = await this.getResponseByIds(responseIds);
-  //   return QandA as unknown as QuestionAnswer[];
-  // }
 }

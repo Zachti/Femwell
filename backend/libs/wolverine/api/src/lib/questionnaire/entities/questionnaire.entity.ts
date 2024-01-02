@@ -1,6 +1,5 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
-// import { QuestionAnswer } from './questionAnswers.entity';
 import { GraphQLUUID } from 'graphql-scalars';
 import { CreateQuestionnaireInput } from '../dto/createQuestionnaire.input';
 import { v4 as uuidv4 } from 'uuid';
