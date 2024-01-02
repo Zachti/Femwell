@@ -9,11 +9,9 @@ export class QuestionnaireService {
   create(input: CreateQuestionnaireInput): Promise<Questionnaire> {
     return this.questionnaireRepository.create(input);
   }
-
   findAll(): Promise<Questionnaire[]> {
     return this.questionnaireRepository.findAll();
   }
-
    findOne(id: string): Promise<Questionnaire> {
     return this.questionnaireRepository.findOne(id);
   }
