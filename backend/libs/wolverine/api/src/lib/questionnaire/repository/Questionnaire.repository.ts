@@ -35,7 +35,7 @@ export class QuestionnaireRepository {
         },
       }),
     );
-    if (!res.Item) throw new BadRequestException('Questionnaire not found');
+    if (!res.Item) throw new BadRequestException('No Questionnaire found with the specified ID in the database.');
     return Questionnaire.createInstanceFromDynamoDBObject(res.Item);
   }
 
