@@ -1,4 +1,4 @@
-export enum TablesName{
+export enum TablesName {
   Questionnaire = 'Questionnaire',
-  Responses = 'Responses'
+  //Responses = 'Responses'
 }
