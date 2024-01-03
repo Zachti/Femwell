@@ -42,6 +42,17 @@ export class AuthResolver {
     }
   }
 
+  @Mutation(() => String)
+  async sendConfirmationCode(
+    @Args('email', { type: () => String }) email: string,
+  ) {
+    try {
+      return await this.authService.sendConfirmationCode(email);
+    } catch (e: any) {
+      throw new BadRequestException(e.message);
+    }
+  }
+
   @Mutation(() => GraphQLVoid)
   async delete(
     @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,

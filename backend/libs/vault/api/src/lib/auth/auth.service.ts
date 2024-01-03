@@ -99,16 +99,48 @@ export class AuthService {
     });
   }
 
-  async deleteUser(confirmUserRequest: ConfirmUserRequest) {
-    const params = {
-      UserPoolId: 'your-user-pool-id',
-      Username: username,
+  sendConfirmationCode(email: string): Promise<string> {
+    const userData = {
+      Username: email,
+      Pool: this.userPool,
     };
 
-    try {
-      await this.cognito.adminDeleteUser(params).promise();
-    } catch (error) {
-      throw new Error(`Failed to delete user: ${error.message}`);
-    }
+    const cognitoUser = new CognitoUser(userData);
+    return new Promise((resolve, reject) => {
+      cognitoUser.getAttributeVerificationCode('email', {
+        onSuccess: () => {
+          resolve('Verification code sent');
+        },
+        onFailure: (err) => {
+          reject(err);
+        },
+      });
+    });
+  }
+
+  async deleteUser(confirmUserRequest: ConfirmUserRequest) {
+    const userData = {
+      Username: confirmUserRequest.email,
+      Pool: this.userPool,
+    };
+
+    const cognitoUser = new CognitoUser(userData);
+    return new Promise((resolve, reject) => {
+      cognitoUser.verifyAttribute('email', confirmUserRequest.code, {
+        onSuccess: () => {
+          cognitoUser.deleteUser((err) => {
+            if (err) {
+              reject(err);
+            } else {
+              this.logger.info(`${confirmUserRequest.email} account deleted.`);
+              resolve('Account deleted');
+            }
+          });
+        },
+        onFailure: (err) => {
+          reject(err);
+        },
+      });
+    });
   }
 }
