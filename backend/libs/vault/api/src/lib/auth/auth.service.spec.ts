@@ -4,8 +4,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { LoggerService } from '@backend/logger';
 import { CognitoToken } from './providers/cognito.provider';
 
-
-
 describe('AuthService', () => {
   let service: AuthService;
   let newUser: CognitoUser;
