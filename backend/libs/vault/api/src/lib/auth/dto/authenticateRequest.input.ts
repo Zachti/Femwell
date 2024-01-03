@@ -4,7 +4,7 @@ import { GraphQLString } from 'graphql/type';
 @InputType()
 export class AuthenticateRequest {
   @Field(() => GraphQLString)
-  name!: string;
+  username!: string;
 
   @Field(() => GraphQLString)
   password!: string;

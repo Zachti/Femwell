@@ -20,9 +20,8 @@ export class UploadService {
     private readonly logger: LoggerService,
   ) {}
 
-  async upload(file: uploadFile): Promise<uploadResult> {
-    const imagesFolder = randomUUID();
-    const keyName = `${this.heimdallCfg.baseFolderLocation}/${imagesFolder}/${file.key}`;
+  async upload(file: uploadFile, username: string): Promise<uploadResult> {
+    const keyName = `${this.heimdallCfg.baseFolderLocation}/${username}/${file.key}`;
     this.logger.info('uploading file to s3.');
     const result = this.s3
       .upload({
@@ -33,15 +32,15 @@ export class UploadService {
       } as S3.Types.PutObjectRequest)
       .promise();
     try {
-      await Promise.resolve(result)
-    }catch (e: any){
-      this.logger.error(`Fail uploading file: ${e.message}`)
-      throw new InternalServerErrorException(e, 'Fail uploading file')
+      await Promise.resolve(result);
+    } catch (e: any) {
+      this.logger.error(`Fail uploading file: ${e.message}`);
+      throw new InternalServerErrorException(e, 'Fail uploading file');
     }
     this.logger.info('file uploaded successfully.');
     return {
       type: file.mimeType,
-      id: `${imagesFolder}/${file.key}`,
+      id: `${username}/${file.key}`,
       error: 0,
     } as uploadResult;
   }
