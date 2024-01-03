@@ -2,16 +2,13 @@ import { Module } from '@nestjs/common';
 import { LoggerModule } from '@backend/logger';
 import { awsConfigObject, DynamicConfigModule } from '@backend/config';
 import { wolverineConfigObject } from '@backend/wolverine';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
 import { HealthModule } from '@backend/infrastructure';
 import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
+import { GraphqlCoreModule } from '@backend/wolverine';
 
 @Module({
   imports: [
-    GraphQLModule.forRoot<ApolloFederationDriverConfig>({
-      driver: ApolloFederationDriver,
-    }),
+    GraphqlCoreModule,
     LoggerModule.forRoot({ serviceName: 'wolverine' }),
     DynamicConfigModule.forRoot({
       isGlobal: true,
@@ -20,6 +17,5 @@ import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
     }),
     HealthModule.forRoot(WolverineHealthIndicatorsProvider),
   ],
-  providers: [],
 })
 export class WolverineCoreModule {}

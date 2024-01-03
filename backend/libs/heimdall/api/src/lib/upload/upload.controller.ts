@@ -11,7 +11,6 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
 import { mimeTypePipe } from '../pipes/mimeType.pipe';
-import { Roles, Role } from '@backend/infrastructure';
 import 'multer';
 import { Auth } from '../auth/auth.decorator';
 import { RequestWithPayload } from '../auth/types';
@@ -21,7 +20,6 @@ import { uploadResult } from '../inetrfaces/interfaces';
 export class uploadController {
   constructor(private readonly uploadService: UploadService) {}
   @Post()
-  @Roles([Role.User, Role.Padulla, Role.Premium])
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(new mimeTypePipe())
   @Auth()
