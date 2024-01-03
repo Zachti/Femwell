@@ -5,12 +5,10 @@ import {
   CognitoUser,
   AuthenticationDetails,
   ICognitoUserData,
-  ISignUpResult,
   CognitoUserSession,
 } from 'amazon-cognito-identity-js';
 import { Inject, Injectable } from '@nestjs/common';
 import { vaultConfig } from '../config/vaultConfig';
-import { ConfigType } from '@nestjs/config';
 import { AuthenticateRequest } from './dto/authenticateRequest.input';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { LoggerService } from '@backend/logger';
@@ -23,11 +21,10 @@ export class AuthService {
     @InjectCognitoToken()
     private readonly userPool: CognitoUserPool,
     @Inject(vaultConfig.KEY)
-    private readonly vaultCfg: ConfigType<typeof vaultConfig>,
     private readonly logger: LoggerService,
   ) {}
 
-  registerUser(registerRequest: RegisterRequest): Promise<ISignUpResult> {
+  registerUser(registerRequest: RegisterRequest): Promise<CognitoUser> {
     const { username, email, password, phoneNumber } = registerRequest;
     this.logger.info(`${username} signed up.`);
     return new Promise((resolve, reject) => {
@@ -48,7 +45,7 @@ export class AuthService {
           if (!result) {
             reject(err);
           } else {
-            resolve(result);
+            resolve(result.user);
           }
         },
       );
@@ -66,29 +63,29 @@ export class AuthService {
       Username: authenticateRequest.username,
       Pool: this.userPool,
     };
-    const user = new CognitoUser(userData);
+    const cognitoUser = new CognitoUser(userData);
     this.logger.info(`${authenticateRequest.username} tries to log in.`);
     return new Promise((resolve, reject) => {
-      return user.authenticateUser(authDetails, {
+      return cognitoUser.authenticateUser(authDetails, {
         onSuccess: (result) => resolve(result),
         onFailure: (err) => reject(err),
       });
     });
   }
 
-  confirmUser(confirmUserRequest: ConfirmUserRequest) {
+  confirmUser(confirmUserRequest: ConfirmUserRequest): Promise<CognitoUser> {
     const userData: ICognitoUserData = {
       Username: confirmUserRequest.email,
       Pool: this.userPool,
     };
-    const user = new CognitoUser(userData);
+    const cognitoUser = new CognitoUser(userData);
 
     this.logger.info(
       `${confirmUserRequest.email} confirmed his email and now has been verified.`,
     );
 
     return new Promise((resolve, reject) => {
-      return user.confirmRegistration(
+      cognitoUser.confirmRegistration(
         confirmUserRequest.code,
         true,
         (err, result) => {
@@ -96,6 +93,7 @@ export class AuthService {
           resolve(result);
         },
       );
+      return cognitoUser;
     });
   }
 
@@ -107,7 +105,7 @@ export class AuthService {
 
     const cognitoUser = new CognitoUser(userData);
     return new Promise((resolve, reject) => {
-      cognitoUser.getAttributeVerificationCode('email', {
+      return cognitoUser.getAttributeVerificationCode('email', {
         onSuccess: () => {
           resolve('Verification code sent');
         },
@@ -118,7 +116,7 @@ export class AuthService {
     });
   }
 
-  async deleteUser(confirmUserRequest: ConfirmUserRequest) {
+  async deleteUser(confirmUserRequest: ConfirmUserRequest): Promise<string> {
     const userData = {
       Username: confirmUserRequest.email,
       Pool: this.userPool,
@@ -126,7 +124,7 @@ export class AuthService {
 
     const cognitoUser = new CognitoUser(userData);
     return new Promise((resolve, reject) => {
-      cognitoUser.verifyAttribute('email', confirmUserRequest.code, {
+      return cognitoUser.verifyAttribute('email', confirmUserRequest.code, {
         onSuccess: () => {
           cognitoUser.deleteUser((err) => {
             if (err) {

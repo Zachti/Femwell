@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import * as Joi from 'joi';
+import Joi from 'joi';
 
 export const vaultConfig = registerAs('vault', () => ({
   userPoolId: process.env['COGNITO_USER_POOL_ID'],

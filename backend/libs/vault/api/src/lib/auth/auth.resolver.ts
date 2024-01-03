@@ -4,20 +4,20 @@ import { AuthenticateRequest } from './dto/authenticateRequest.input';
 import { BadRequestException } from '@nestjs/common';
 import { AuthService } from '@backend/vault';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
-import { GraphQLVoid } from 'graphql-scalars';
-import { CognitoUserSession, ISignUpResult } from 'amazon-cognito-identity-js';
+import { CognitoUser, CognitoUserSession } from 'amazon-cognito-identity-js';
 import { RateLimit } from '@backend/infrastructure';
+import { GraphQLString } from 'graphql/type';
 
 @Resolver('auth')
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => Promise<ISignUpResult>)
+  @Mutation(() => CognitoUser)
   async register(@Args('registerRequest') registerRequest: RegisterRequest) {
     return await this.authService.registerUser(registerRequest);
   }
 
-  @Mutation(() => Promise<CognitoUserSession>)
+  @Mutation(() => CognitoUserSession)
   @RateLimit({
     errorMessage: 'Too many login attempts. Please try again later.',
   })
@@ -31,7 +31,7 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(() => GraphQLVoid)
+  @Mutation(() => CognitoUser)
   async confirm(
     @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,
   ) {
@@ -42,7 +42,7 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(() => String)
+  @Mutation(() => GraphQLString)
   async sendConfirmationCode(
     @Args('email', { type: () => String }) email: string,
   ) {
@@ -53,7 +53,7 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(() => GraphQLVoid)
+  @Mutation(() => GraphQLString)
   async delete(
     @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,
   ) {
