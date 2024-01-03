@@ -25,7 +25,7 @@ export class AuthService {
   ) {}
 
   registerUser(registerRequest: RegisterRequest): Promise<ISignUpResult> {
-    const { name, email, password, phoneNumber } = registerRequest;
+    const { name, email, password, phoneNumber , role } = registerRequest;
     this.logger.info(`${name} signed up.`);
     return new Promise((resolve, reject) => {
       return this.userPool.signUp(
@@ -34,6 +34,7 @@ export class AuthService {
         [
           new CognitoUserAttribute({ Name: 'name', Value: name }),
           new CognitoUserAttribute({ Name: 'email', Value: email }),
+          new CognitoUserAttribute({ Name: 'role', Value: role }),
           new CognitoUserAttribute({
             Name: 'phone_number',
             Value: phoneNumber || '',
