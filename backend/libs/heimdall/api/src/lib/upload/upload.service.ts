@@ -7,8 +7,7 @@ import { ConfigType } from '@nestjs/config';
 import { heimdallConfig } from '@backend/heimdall';
 import { S3 } from 'aws-sdk';
 import { InjectS3Token } from '../providers/s3.provider';
-import { uploadFile, uploadResult } from '../inetrfaces/interfaces';
-import { randomUUID } from 'node:crypto';
+import { UploadFile, UploadResult } from '../inetrfaces/interfaces';
 import { LoggerService } from '@backend/logger';
 
 @Injectable()
@@ -20,7 +19,7 @@ export class UploadService {
     private readonly logger: LoggerService,
   ) {}
 
-  async upload(file: uploadFile, username: string): Promise<uploadResult> {
+  async upload(file: UploadFile, username: string): Promise<UploadResult> {
     const keyName = `${this.heimdallCfg.baseFolderLocation}/${username}/${file.key}`;
     this.logger.info('uploading file to s3.');
     const result = this.s3
@@ -42,6 +41,6 @@ export class UploadService {
       type: file.mimeType,
       id: `${username}/${file.key}`,
       error: 0,
-    } as uploadResult;
+    } as UploadResult;
   }
 }

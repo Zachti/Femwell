@@ -1,9 +1,9 @@
-export interface uploadFile {
+export interface UploadFile {
   key: string;
   data: Buffer;
   mimeType: string;
 }
-export interface uploadResult {
+export interface UploadResult {
   id: string;
   type: string;
   error: number;

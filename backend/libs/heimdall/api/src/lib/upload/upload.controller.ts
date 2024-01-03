@@ -14,7 +14,7 @@ import { mimeTypePipe } from '../pipes/mimeType.pipe';
 import 'multer';
 import { Auth } from '../auth/auth.decorator';
 import { RequestWithPayload } from '../auth/types';
-import { uploadResult } from '../inetrfaces/interfaces';
+import { UploadResult } from '../inetrfaces/interfaces';
 
 @Controller('upload')
 export class uploadController {
@@ -35,7 +35,7 @@ export class uploadController {
       }),
     )
     file: Express.Multer.File,
-  ): Promise<uploadResult> {
+  ): Promise<UploadResult> {
     return await this.uploadService.upload(
       {
         key: file.originalname,
