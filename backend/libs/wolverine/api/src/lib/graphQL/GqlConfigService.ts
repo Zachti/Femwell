@@ -5,21 +5,10 @@ import { GqlOptionsFactory } from '@nestjs/graphql';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { Request } from 'express';
 import { LoggerService } from '@backend/logger';
 import { commonConfig } from '@backend/config';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
-
-export interface Context {
-  logger: LoggerService
-  requestContext: RequestContext
-  request: Request
-}
-
-export interface RequestContext {
-  username: string
-  requestId: string
-}
+import { RequestContext, Context } from './interfaces';
 
 @Injectable()
 export class GqlConfigService implements GqlOptionsFactory<ApolloFederationDriverConfig> {
