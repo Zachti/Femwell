@@ -3,6 +3,10 @@ import { UploadModule } from '@backend/heimdall';
 import { LoggerModule } from '@backend/logger';
 import { awsConfigObject, DynamicConfigModule } from '@backend/config';
 import { heimdallConfigObject } from '@backend/heimdall';
+import { HealthModule } from '@backend/infrastructure';
+import {
+  HeimdallHealthIndicatorsProvider
+} from '@backend/heimdall';
 
 @Module({
   imports: [
@@ -13,6 +17,7 @@ import { heimdallConfigObject } from '@backend/heimdall';
       configObjects: [heimdallConfigObject, awsConfigObject],
       validationOptions: { presence: 'required' },
     }),
+    HealthModule.forRoot(HeimdallHealthIndicatorsProvider)
   ],
 })
 export class HeimdallCoreModule {}
