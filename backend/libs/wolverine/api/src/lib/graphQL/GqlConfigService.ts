@@ -1,5 +1,5 @@
 import { ApolloFederationDriverConfig } from '@nestjs/apollo';
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { GqlOptionsFactory } from '@nestjs/graphql';
 import { randomUUID } from 'crypto';
@@ -7,7 +7,6 @@ import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { Request } from 'express';
 import { LoggerService } from '@backend/logger';
-import { Role } from '@backend/infrastructure'
 import { commonConfig } from '@backend/config';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 
@@ -19,7 +18,6 @@ export interface Context {
 
 export interface RequestContext {
   username: string
-  role: Role
   requestId: string
 }
 
@@ -54,7 +52,6 @@ export class GqlConfigService implements GqlOptionsFactory<ApolloFederationDrive
     const requestContext = expressContext.req.headers['context'] as string
     const jwt = expressContext.req.headers['authorization'] as string
     if (!requestContext && jwt) {
-      try {
         const verifier = CognitoJwtVerifier.create({
           userPoolId: process.env['COGNITO_USER_POOL']!,
           tokenUse: 'access',
@@ -63,13 +60,8 @@ export class GqlConfigService implements GqlOptionsFactory<ApolloFederationDrive
         const user = await verifier.verify(jwt);
         return {
           username: user.username,
-          role: user['role'] as Role,
           requestId,
         }
-      } catch (e) {
-        throw new UnauthorizedException('Unauthorized: Invalid token');
-      }
-
     }
     return JSON.parse(requestContext)
   }
