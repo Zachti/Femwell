@@ -1,5 +1,6 @@
 import { LoggerService } from '@backend/logger';
 import { Request } from 'express';
+import { CognitoAccessTokenPayload } from 'aws-jwt-verify/jwt-model';
 
 export interface Context {
   logger: LoggerService
@@ -8,6 +9,6 @@ export interface Context {
 }
 
 export interface RequestContext {
-  username: string
+  userPayload: CognitoAccessTokenPayload
   requestId: string
 }

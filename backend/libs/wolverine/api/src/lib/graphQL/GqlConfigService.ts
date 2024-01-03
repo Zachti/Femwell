@@ -1,5 +1,5 @@
 import { ApolloFederationDriverConfig } from '@nestjs/apollo';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { GqlOptionsFactory } from '@nestjs/graphql';
 import { randomUUID } from 'crypto';
@@ -25,34 +25,34 @@ export class GqlConfigService implements GqlOptionsFactory<ApolloFederationDrive
       context: this.createContext.bind(this),
       playground: false,
       csrfPrevention: false,
-    }
+    };
   }
 
   private async createContext(expressContext: any): Promise<Context> {
-    const requestContext = await this.getRequestContext(expressContext)
+    const requestContext = await this.getRequestContext(expressContext);
     return {
       requestContext,
       logger: this.loggerService,
       request: expressContext.req,
-    }
+    };
   }
 
   private async getRequestContext(expressContext: any): Promise<RequestContext> {
-    const requestId = expressContext.req['id'] || randomUUID()
-    const requestContext = expressContext.req.headers['context'] as string
-    const jwt = expressContext.req.headers['authorization'] as string
-    if (!requestContext && jwt) {
+    const requestId = expressContext.req['id'] || randomUUID();
+    const requestContext = expressContext.req.headers['context'] as string;
+    const jwt = expressContext.req.headers['authorization'] as string;
+    if (requestContext)  return JSON.parse(requestContext);
+    if (jwt) {
         const verifier = CognitoJwtVerifier.create({
           userPoolId: this.awsCfg.userPoolId!,
           tokenUse: 'access',
           clientId: this.awsCfg.clientId?? null
         });
-        const user = await verifier.verify(jwt);
         return {
-          username: user.username,
+          userPayload: await verifier.verify(jwt),
           requestId,
         }
     }
-    return JSON.parse(requestContext)
+   throw new UnauthorizedException('Unauthorized: Invalid token');
   }
 }
