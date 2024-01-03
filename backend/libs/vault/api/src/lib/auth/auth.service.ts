@@ -4,7 +4,9 @@ import {
   CognitoUserAttribute,
   CognitoUser,
   AuthenticationDetails,
-  ICognitoUserData, ISignUpResult, CognitoUserSession,
+  ICognitoUserData,
+  ISignUpResult,
+  CognitoUserSession,
 } from 'amazon-cognito-identity-js';
 import { Inject, Injectable } from '@nestjs/common';
 import { vaultConfig } from '../config/vaultConfig';
@@ -12,6 +14,7 @@ import { ConfigType } from '@nestjs/config';
 import { AuthenticateRequest } from './dto/authenticateRequest.input';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { LoggerService } from '@backend/logger';
+import { Role } from '@backend/infrastructure';
 import { InjectCognitoToken } from './providers/cognito.provider';
 
 @Injectable()
@@ -25,16 +28,16 @@ export class AuthService {
   ) {}
 
   registerUser(registerRequest: RegisterRequest): Promise<ISignUpResult> {
-    const { name, email, password, phoneNumber , role } = registerRequest;
-    this.logger.info(`${name} signed up.`);
+    const { username, email, password, phoneNumber } = registerRequest;
+    this.logger.info(`${username} signed up.`);
     return new Promise((resolve, reject) => {
       return this.userPool.signUp(
         email,
         password,
         [
-          new CognitoUserAttribute({ Name: 'name', Value: name }),
+          new CognitoUserAttribute({ Name: 'username', Value: username }),
           new CognitoUserAttribute({ Name: 'email', Value: email }),
-          new CognitoUserAttribute({ Name: 'role', Value: role }),
+          new CognitoUserAttribute({ Name: 'role', Value: Role.User }),
           new CognitoUserAttribute({
             Name: 'phone_number',
             Value: phoneNumber || '',
@@ -52,17 +55,19 @@ export class AuthService {
     });
   }
 
-  authenticateUser(authenticateRequest: AuthenticateRequest): Promise<CognitoUserSession> {
+  authenticateUser(
+    authenticateRequest: AuthenticateRequest,
+  ): Promise<CognitoUserSession> {
     const authDetails = new AuthenticationDetails({
-      Username: authenticateRequest.name,
+      Username: authenticateRequest.username,
       Password: authenticateRequest.password,
     });
     const userData: ICognitoUserData = {
-      Username: authenticateRequest.name,
+      Username: authenticateRequest.username,
       Pool: this.userPool,
     };
     const user = new CognitoUser(userData);
-    this.logger.info(`${authenticateRequest.name} tries to log in.`);
+    this.logger.info(`${authenticateRequest.username} tries to log in.`);
     return new Promise((resolve, reject) => {
       return user.authenticateUser(authDetails, {
         onSuccess: (result) => resolve(result),
@@ -83,9 +88,58 @@ export class AuthService {
     );
 
     return new Promise((resolve, reject) => {
-      return user.confirmRegistration(confirmUserRequest.code, true, (err, result) => {
-        if (err) reject(err);
-        resolve(result);
+      return user.confirmRegistration(
+        confirmUserRequest.code,
+        true,
+        (err, result) => {
+          if (err) reject(err);
+          resolve(result);
+        },
+      );
+    });
+  }
+
+  sendConfirmationCode(email: string): Promise<string> {
+    const userData = {
+      Username: email,
+      Pool: this.userPool,
+    };
+
+    const cognitoUser = new CognitoUser(userData);
+    return new Promise((resolve, reject) => {
+      cognitoUser.getAttributeVerificationCode('email', {
+        onSuccess: () => {
+          resolve('Verification code sent');
+        },
+        onFailure: (err) => {
+          reject(err);
+        },
+      });
+    });
+  }
+
+  async deleteUser(confirmUserRequest: ConfirmUserRequest) {
+    const userData = {
+      Username: confirmUserRequest.email,
+      Pool: this.userPool,
+    };
+
+    const cognitoUser = new CognitoUser(userData);
+    return new Promise((resolve, reject) => {
+      cognitoUser.verifyAttribute('email', confirmUserRequest.code, {
+        onSuccess: () => {
+          cognitoUser.deleteUser((err) => {
+            if (err) {
+              reject(err);
+            } else {
+              this.logger.info(`${confirmUserRequest.email} account deleted.`);
+              resolve('Account deleted');
+            }
+          });
+        },
+        onFailure: (err) => {
+          reject(err);
+        },
       });
     });
   }

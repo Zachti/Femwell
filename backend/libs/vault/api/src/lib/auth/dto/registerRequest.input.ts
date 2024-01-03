@@ -5,13 +5,13 @@ import { Role } from '@backend/infrastructure';
 @InputType()
 export class RegisterRequest {
   @Field(() => GraphQLString)
-  name!: string;
-
-  @Field(() => GraphQLString)
-  password!: string;
+  username!: string;
 
   @Field(() => GraphQLString)
   email!: string;
+
+  @Field(() => GraphQLString)
+  password!: string;
 
   @Field(() => Role)
   role!: Role;
