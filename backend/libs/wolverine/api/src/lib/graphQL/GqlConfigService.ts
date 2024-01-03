@@ -41,16 +41,18 @@ export class GqlConfigService implements GqlOptionsFactory<ApolloFederationDrive
     const requestId = expressContext.req['id'] || randomUUID();
     const requestContext = expressContext.req.headers['context'] as string;
     const jwt = expressContext.req.headers['authorization'] as string;
-    return requestContext ?
-      JSON.parse(requestContext)
-      : jwt ? {
-          userPayload : CognitoJwtVerifier.create({
+    if (requestContext)  return JSON.parse(requestContext);
+    if (jwt) {
+        const verifier = CognitoJwtVerifier.create({
           userPoolId: this.awsCfg.userPoolId!,
           tokenUse: 'access',
           clientId: this.awsCfg.clientId?? null
-        }).verify(jwt),
-        requestId,
+        });
+        return {
+          userPayload: await verifier.verify(jwt),
+          requestId,
         }
-      : Promise.reject(new UnauthorizedException('Unauthorized: Invalid token'));
+    }
+   throw new UnauthorizedException('Unauthorized: Invalid token');
   }
 }
