@@ -4,6 +4,9 @@ import { awsConfigObject, DynamicConfigModule } from '@backend/config';
 import { wolverineConfigObject } from '@backend/wolverine';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
+import { HealthModule } from '@backend/infrastructure';
+import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
+
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
@@ -14,7 +17,9 @@ import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/ap
       isGlobal: true,
       configObjects: [wolverineConfigObject, awsConfigObject],
       validationOptions: { presence: 'required' },
-    }),],
+    }),
+    HealthModule.forRoot(WolverineHealthIndicatorsProvider),
+  ],
   providers: [],
 })
 export class WolverineCoreModule {}
