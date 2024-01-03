@@ -6,7 +6,7 @@ import { randomUUID } from 'crypto';
 import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { LoggerService } from '@backend/logger';
-import { commonConfig } from '@backend/config';
+import { awsConfig, commonConfig } from '@backend/config';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { RequestContext, Context } from './interfaces';
 
@@ -14,6 +14,7 @@ import { RequestContext, Context } from './interfaces';
 export class GqlConfigService implements GqlOptionsFactory<ApolloFederationDriverConfig> {
   constructor(
     @Inject(commonConfig.KEY) private readonly configService: ConfigType<typeof commonConfig>,
+    @Inject(awsConfig.KEY) private readonly awsCfg: ConfigType<typeof awsConfig>,
     private readonly loggerService: LoggerService,
   ) {}
   createGqlOptions(): Omit<ApolloFederationDriverConfig, 'driver'> {
@@ -42,9 +43,9 @@ export class GqlConfigService implements GqlOptionsFactory<ApolloFederationDrive
     const jwt = expressContext.req.headers['authorization'] as string
     if (!requestContext && jwt) {
         const verifier = CognitoJwtVerifier.create({
-          userPoolId: process.env['COGNITO_USER_POOL']!,
+          userPoolId: this.awsCfg.userPoolId!,
           tokenUse: 'access',
-          clientId: null
+          clientId: this.awsCfg.clientId?? null
         });
         const user = await verifier.verify(jwt);
         return {

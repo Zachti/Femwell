@@ -1,11 +1,15 @@
-import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException, Inject } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
-import * as process from 'process';
 import { CognitoAccessTokenPayload } from 'aws-jwt-verify/jwt-model';
+import { ConfigType } from '@nestjs/config';
+import { awsConfig } from '@backend/config';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+
+  constructor( @Inject(awsConfig.KEY)
+               private readonly awsCfg: ConfigType<typeof awsConfig>,) {}
 
   canActivate(
     context: ExecutionContext,
@@ -17,9 +21,9 @@ export class AuthGuard implements CanActivate {
   private async validateJwt(jwt: string): Promise<CognitoAccessTokenPayload>{
     try {
       const verifier = CognitoJwtVerifier.create({
-        userPoolId: process.env['COGNITO_USER_POOL']!,
+        userPoolId: this.awsCfg.userPoolId!,
         tokenUse: 'access',
-        clientId: null
+        clientId: this.awsCfg.clientId?? null
       });
       return await verifier.verify(jwt);
     } catch (e) {
