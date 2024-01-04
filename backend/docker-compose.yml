@@ -35,6 +35,23 @@ services:
       - 'development/local-base.env'
     networks:
       - backend_network
+  wolverine:
+    ports:
+      - '3001:3001'
+    build:
+      context: ./
+      dockerfile: './apps/wolverine/dockerfile'
+      target: 'builder'
+    command: sh -c "npm run start:wolverine:dev"
+    restart: 'unless-stopped'
+    volumes:
+      - .:/home/node
+      - ./node_modules:/home/node
+    env_file:
+      - 'apps/wolverine/development/local.env'
+      - 'development/local-base.env'
+    networks:
+      - backend_network
 
 networks:
   backend_network:
