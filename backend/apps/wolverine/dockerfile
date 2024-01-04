@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . /home/node/
 
-RUN npm run build vault
+RUN npm run build wolverine
 
 FROM node:18.17-alpine as wolverine
 
