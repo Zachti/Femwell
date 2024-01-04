@@ -6,7 +6,9 @@ import { HEALTH_INDICATORS_PROVIDER } from './constants';
 
 @Module({})
 export class HealthModule {
-  static forRoot(indicatorsProvider: Type<HealthIndicatorsProvider>): DynamicModule {
+  static forRoot(
+    indicatorsProvider: Type<HealthIndicatorsProvider>,
+  ): DynamicModule {
     return {
       module: HealthModule,
       providers: [
@@ -17,6 +19,6 @@ export class HealthModule {
       ],
       imports: [TerminusModule.forRoot({ errorLogStyle: 'json' })],
       controllers: [HealthController],
-    }
+    };
   }
 }

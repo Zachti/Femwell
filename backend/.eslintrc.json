@@ -37,6 +37,10 @@
               {
                 "sourceTag": "scope:wolverine",
                 "onlyDependOnLibsWithTags": ["scope:wolverine", "scope:shared"]
+              },
+              {
+                "sourceTag": "scope:denden",
+                "onlyDependOnLibsWithTags": ["scope:denden", "scope:shared"]
               }
             ]
           }

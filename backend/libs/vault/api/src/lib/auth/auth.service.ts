@@ -44,19 +44,21 @@ export class AuthService {
           if (!result) {
             reject(err);
           } else {
-              result.user.getSession((err: null, session: CognitoUserSession) => {
-                if (err) {reject(err);}
-                resolve( {
-                  isValid: session.isValid(),
-                  refreshToken: session.getRefreshToken().getToken(),
-                  jwt: session.getAccessToken().getJwtToken(),
+            result.user.getSession((err: null, session: CognitoUserSession) => {
+              if (err) {
+                reject(err);
+              }
+              resolve({
+                isValid: session.isValid(),
+                refreshToken: session.getRefreshToken().getToken(),
+                jwt: session.getAccessToken().getJwtToken(),
               });
             });
-            }
-          })
+          }
         },
       );
-    };
+    });
+  }
 
   authenticateUser(
     authenticateRequest: AuthenticateRequest,
@@ -74,11 +76,11 @@ export class AuthService {
     return new Promise((resolve, reject) => {
       return cognitoUser.authenticateUser(authDetails, {
         onSuccess: (result) =>
-          resolve( {
-          isValid: result.isValid(),
-          refreshToken: result.getRefreshToken().getToken(),
-          jwt: result.getAccessToken().getJwtToken(),
-        }),
+          resolve({
+            isValid: result.isValid(),
+            refreshToken: result.getRefreshToken().getToken(),
+            jwt: result.getAccessToken().getJwtToken(),
+          }),
         onFailure: (err) => reject(err),
       });
     });
@@ -102,8 +104,10 @@ export class AuthService {
         (err, result) => {
           if (err) reject(err);
           result.user.getSession((err: null, session: CognitoUserSession) => {
-            if (err) {reject(err);}
-            resolve( {
+            if (err) {
+              reject(err);
+            }
+            resolve({
               isValid: session.isValid(),
               refreshToken: session.getRefreshToken().getToken(),
               jwt: session.getAccessToken().getJwtToken(),

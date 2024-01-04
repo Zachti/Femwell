@@ -52,6 +52,23 @@ services:
       - 'development/local-base.env'
     networks:
       - backend_network
+  denden:
+    ports:
+      - '3004:3004'
+    build:
+      context: ./
+      dockerfile: './apps/denden/dockerfile'
+      target: 'builder'
+    command: sh -c "npm run start:denden:dev"
+    restart: 'unless-stopped'
+    volumes:
+      - .:/home/node
+      - ./node_modules:/home/node
+    env_file:
+      - 'apps/denden/development/local.env'
+      - 'development/local-base.env'
+    networks:
+      - backend_network
 
 networks:
   backend_network:

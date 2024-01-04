@@ -12,8 +12,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { UploadService } from './upload.service';
 import { mimeTypePipe } from '../pipes/mimeType.pipe';
 import 'multer';
-import { Auth } from '../auth/auth.decorator';
-import { RequestWithPayload } from '../auth/types';
+import { Auth, RequestWithPayload } from '@backend/auth';
 import { UploadResult } from '../inetrfaces/interfaces';
 
 @Controller('upload')

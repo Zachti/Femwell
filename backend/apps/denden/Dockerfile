@@ -1,0 +1,27 @@
+FROM node:18.16.1-alpine as builder
+
+WORKDIR /home/node
+
+COPY package*.json /home/node/
+
+RUN npm install
+
+COPY . /home/node/
+
+RUN npm run build denden
+
+FROM node:18.16.1-alpine as denden
+
+WORKDIR /home/app
+
+COPY --from=builder /home/node/dist/apps/denden/package*.json /home/app/
+
+COPY --from=builder /home/node/dist/ /home/app/dist/
+
+RUN npm ci --ignore-scripts
+
+RUN apk --no-cache add curl
+
+RUN npm install @nx/nx-linux-x64-gnu
+
+CMD ["sh", "-c", "node dist/apps/denden/main.js"]

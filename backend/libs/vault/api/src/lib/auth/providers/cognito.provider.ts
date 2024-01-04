@@ -3,9 +3,9 @@ import { CognitoUserPool } from 'amazon-cognito-identity-js';
 import { awsConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
 
-export const InjectCognitoToken = () => Inject(CognitoToken)
+export const InjectCognitoToken = () => Inject(CognitoToken);
 
-export const CognitoToken = Symbol('COGNITO_TOKEN')
+export const CognitoToken = Symbol('COGNITO_TOKEN');
 
 export const CognitoProvider: Provider = {
   provide: CognitoToken,
@@ -13,7 +13,7 @@ export const CognitoProvider: Provider = {
     return new CognitoUserPool({
       UserPoolId: config.userPoolId!,
       ClientId: config.clientId!,
-    })
+    });
   },
-inject: [awsConfig.KEY]
-}
+  inject: [awsConfig.KEY],
+};

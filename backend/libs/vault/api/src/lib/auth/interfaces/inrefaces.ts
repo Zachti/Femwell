@@ -1,5 +1,5 @@
 export interface userSession {
-  isValid: boolean
-  refreshToken: string,
-  jwt: string,
+  isValid: boolean;
+  refreshToken: string;
+  jwt: string;
 }

@@ -11,17 +11,24 @@ import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { RequestContext, Context } from './interfaces';
 
 @Injectable()
-export class GqlConfigService implements GqlOptionsFactory<ApolloFederationDriverConfig> {
+export class GqlConfigService
+  implements GqlOptionsFactory<ApolloFederationDriverConfig>
+{
   constructor(
-    @Inject(commonConfig.KEY) private readonly configService: ConfigType<typeof commonConfig>,
-    @Inject(awsConfig.KEY) private readonly awsCfg: ConfigType<typeof awsConfig>,
+    @Inject(commonConfig.KEY)
+    private readonly configService: ConfigType<typeof commonConfig>,
+    @Inject(awsConfig.KEY)
+    private readonly awsCfg: ConfigType<typeof awsConfig>,
     private readonly loggerService: LoggerService,
   ) {}
   createGqlOptions(): Omit<ApolloFederationDriverConfig, 'driver'> {
     return {
       introspection: !this.configService.isLiveEnv,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
-      autoSchemaFile: { path: join(process.cwd(), 'apps/wv/src/graphQL/schema.gql'), federation: 2 },
+      autoSchemaFile: {
+        path: join(process.cwd(), 'apps/wv/src/graphQL/schema.gql'),
+        federation: 2,
+      },
       context: this.createContext.bind(this),
       playground: false,
       csrfPrevention: false,
@@ -37,22 +44,24 @@ export class GqlConfigService implements GqlOptionsFactory<ApolloFederationDrive
     };
   }
 
-  private async getRequestContext(expressContext: any): Promise<RequestContext> {
+  private async getRequestContext(
+    expressContext: any,
+  ): Promise<RequestContext> {
     const requestId = expressContext.req['id'] || randomUUID();
     const requestContext = expressContext.req.headers['context'] as string;
     const jwt = expressContext.req.headers['authorization'] as string;
-    if (requestContext)  return JSON.parse(requestContext);
+    if (requestContext) return JSON.parse(requestContext);
     if (jwt) {
-        const verifier = CognitoJwtVerifier.create({
-          userPoolId: this.awsCfg.userPoolId!,
-          tokenUse: 'access',
-          clientId: this.awsCfg.clientId?? null
-        });
-        return {
-          userPayload: await verifier.verify(jwt),
-          requestId,
-        }
+      const verifier = CognitoJwtVerifier.create({
+        userPoolId: this.awsCfg.userPoolId!,
+        tokenUse: 'access',
+        clientId: this.awsCfg.clientId ?? null,
+      });
+      return {
+        userPayload: await verifier.verify(jwt),
+        requestId,
+      };
     }
-   throw new UnauthorizedException('Unauthorized: Invalid token');
+    throw new UnauthorizedException('Unauthorized: Invalid token');
   }
 }

@@ -1,8 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import Joi from 'joi';
 
-export const wolverineConfig =
-  registerAs('wolverine', () => ({}));
+export const wolverineConfig = registerAs('wolverine', () => ({}));
 
 const wolverineConfigurationValidationSchema = Joi.object({});
 

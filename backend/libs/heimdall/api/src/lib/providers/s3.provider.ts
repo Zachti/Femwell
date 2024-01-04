@@ -11,7 +11,7 @@ export const s3Provider: Provider = {
   provide: s3Token,
   useFactory: (config: ConfigType<typeof awsConfig>) => {
     return new S3({
-      region: config.s3Region! ,
+      region: config.region!,
       credentials: {
         secretAccessKey: config.secretKey!,
         accessKeyId: config.accessKey!,

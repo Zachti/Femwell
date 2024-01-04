@@ -9,7 +9,7 @@ import { QuestionnaireRepository } from './repository/Questionnaire.repository';
     QuestionnaireResolver,
     QuestionnaireService,
     DynamoDBProvider,
-    QuestionnaireRepository
-  ]
+    QuestionnaireRepository,
+  ],
 })
 export class QuestionnaireModule {}

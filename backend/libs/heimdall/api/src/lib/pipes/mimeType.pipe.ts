@@ -2,7 +2,6 @@ import { PipeTransform, Injectable, BadRequestException } from '@nestjs/common';
 import { Request } from 'express';
 import { MimeTypes } from '../inetrfaces/interfaces';
 
-
 @Injectable()
 export class mimeTypePipe implements PipeTransform<Request, Promise<Request>> {
   constructor() {}

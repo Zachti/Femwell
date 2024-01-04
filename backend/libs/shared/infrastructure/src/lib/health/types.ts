@@ -1,5 +1,5 @@
-import { HealthIndicatorFunction } from '@nestjs/terminus/dist/health-indicator'
+import { HealthIndicatorFunction } from '@nestjs/terminus/dist/health-indicator';
 
 export interface HealthIndicatorsProvider {
-  getIndicators(): Promise<Array<HealthIndicatorFunction>>
+  getIndicators(): Promise<Array<HealthIndicatorFunction>>;
 }

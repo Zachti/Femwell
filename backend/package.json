@@ -6,7 +6,9 @@
     "build": "nx build",
     "start:vault:dev": "nx run vault:serve:development",
     "start:heimdall:dev": "nx run heimdall:serve:development",
-    "start:wolverine:dev": "nx run wolverine:serve:development"
+    "start:wolverine:dev": "nx run wolverine:serve:development",
+    "start:denden:dev": "nx run denden:serve:development",
+    "format": "prettier --write \"libs/**/*/src/**/*.ts\" \"apps/**/src/*.ts\""
   },
   "private": true,
   "dependencies": {

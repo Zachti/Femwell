@@ -6,7 +6,11 @@ import {
   GetItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { Questionnaire } from '../entities/questionnaire.entity';
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { CreateQuestionnaireInput } from '../dto/createQuestionnaire.input';
 import { TablesName } from '../enums/tablesName.enum';
 
@@ -19,9 +23,11 @@ export class QuestionnaireRepository {
         TableName: TablesName.Questionnaire,
       }),
     );
-    return res.Items?.map((item) =>
-      Questionnaire.createInstanceFromDynamoDBObject(item),
-    ) ?? [];
+    return (
+      res.Items?.map((item) =>
+        Questionnaire.createInstanceFromDynamoDBObject(item),
+      ) ?? []
+    );
   }
 
   async findOne(id: string): Promise<Questionnaire> {
@@ -35,7 +41,10 @@ export class QuestionnaireRepository {
         },
       }),
     );
-    if (!res.Item) throw new BadRequestException('No Questionnaire found with the specified ID in the database.');
+    if (!res.Item)
+      throw new BadRequestException(
+        'No Questionnaire found with the specified ID in the database.',
+      );
     return Questionnaire.createInstanceFromDynamoDBObject(res.Item);
   }
 
@@ -49,11 +58,14 @@ export class QuestionnaireRepository {
       }),
     );
 
-    if (!dynamoDBObject['id'].S) throw new InternalServerErrorException('Failed to create Questionnaire object in DynamoDB.');
+    if (!dynamoDBObject['id'].S)
+      throw new InternalServerErrorException(
+        'Failed to create Questionnaire object in DynamoDB.',
+      );
     return {
       id: dynamoDBObject['id'].S!,
       username: input.username,
-      responses: input.responses
+      responses: input.responses,
     };
   }
 }

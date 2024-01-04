@@ -12,7 +12,7 @@ describe('AuthService', () => {
     useValue: {
       signUp: jest.fn(() => ({ promise: jest.fn() })),
     },
-  }
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

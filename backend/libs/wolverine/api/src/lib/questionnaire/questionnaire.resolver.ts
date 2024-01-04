@@ -8,7 +8,10 @@ import { GraphQLUUID } from 'graphql-scalars';
 export class QuestionnaireResolver {
   constructor(private readonly questionnaireService: QuestionnaireService) {}
   @Mutation(() => Questionnaire)
-  async createQuestionnaire(@Args('createQuestionnaireInput') createQuestionnaireInput: CreateQuestionnaireInput) {
+  async createQuestionnaire(
+    @Args('createQuestionnaireInput')
+    createQuestionnaireInput: CreateQuestionnaireInput,
+  ) {
     return await this.questionnaireService.create(createQuestionnaireInput);
   }
   @Query(() => [Questionnaire], { name: 'questionnaire' })

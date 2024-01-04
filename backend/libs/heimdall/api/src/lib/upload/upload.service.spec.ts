@@ -11,7 +11,7 @@ describe('UploadService', () => {
     useValue: {
       upload: jest.fn(() => ({ promise: jest.fn() })),
     },
-  }
+  };
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -19,14 +19,14 @@ describe('UploadService', () => {
         mockS3TokenProvider,
         {
           provide: heimdallConfig.KEY,
-          useValue: heimdallConfig
+          useValue: heimdallConfig,
         },
         {
           provide: LoggerService,
           useValue: {
             info: jest.fn(),
           },
-        }
+        },
       ],
     }).compile();
 

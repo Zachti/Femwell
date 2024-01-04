@@ -20,7 +20,7 @@ export class AuthResolver {
       jwt: signUpResult.jwt,
       refreshToken: signUpResult.refreshToken,
       isValid: signUpResult.isValid,
-    }
+    };
   }
 
   @Mutation(() => AuthUser)
@@ -37,7 +37,7 @@ export class AuthResolver {
         jwt: res.jwt,
         refreshToken: res.refreshToken,
         isValid: res.isValid,
-      }
+      };
     } catch (e: any) {
       throw new BadRequestException(e.message);
     }
@@ -54,7 +54,7 @@ export class AuthResolver {
         jwt: res.jwt,
         refreshToken: res.refreshToken,
         isValid: res.isValid,
-      }
+      };
     } catch (e: any) {
       throw new BadRequestException(e.message);
     }
