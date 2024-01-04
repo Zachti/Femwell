@@ -1,23 +1,21 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloFederationDriver, ApolloFederationDriverConfig } from '@nestjs/apollo';
-import { DynamicConfigModule } from '@backend/config';
+import { awsConfigObject, DynamicConfigModule } from '@backend/config';
 import { vaultConfigObject, AuthModule } from '@backend/vault';
 import { LoggerModule } from '@backend/logger';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { join } from 'path';
 
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloFederationDriverConfig>({
       driver: ApolloFederationDriver,
-      plugins: [ApolloServerPluginLandingPageLocalDefault()],
       autoSchemaFile: { path: join(process.cwd(), 'apps/vt/src/graphQL/schema.gql'), federation: 2 },
     }),
     DynamicConfigModule.forRoot({
       isGlobal: true,
-      configObjects: [vaultConfigObject],
+      configObjects: [vaultConfigObject, awsConfigObject],
       validationOptions: { presence: 'required' },
     }),
     AuthModule,

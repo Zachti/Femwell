@@ -4,10 +4,10 @@ import { GraphQLString } from 'graphql/type';
 @InputType()
 export class RegisterRequest {
   @Field(() => GraphQLString)
-  username!: string;
+  name!: string; // Pay attention please this field is not the username!
 
   @Field(() => GraphQLString)
-  email!: string;
+  email!: string; // this field will be the username!
 
   @Field(() => GraphQLString)
   password!: string;

@@ -4,20 +4,26 @@ import { AuthenticateRequest } from './dto/authenticateRequest.input';
 import { BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
-import { CognitoUser, CognitoUserSession } from 'amazon-cognito-identity-js';
 import { RateLimit } from '@backend/infrastructure';
 import { GraphQLString } from 'graphql/type';
+import { AuthUser } from '../authUser/authUser.entity';
 
-@Resolver('auth')
+@Resolver(() => AuthUser)
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
-  @Mutation(() => CognitoUser)
+  @Mutation(() => AuthUser)
   async register(@Args('registerRequest') registerRequest: RegisterRequest) {
-    return await this.authService.registerUser(registerRequest);
+    const signUpResult = await this.authService.registerUser(registerRequest);
+    return {
+      username: registerRequest.email,
+      jwt: signUpResult.jwt,
+      refreshToken: signUpResult.refreshToken,
+      isValid: signUpResult.isValid,
+    }
   }
 
-  @Mutation(() => CognitoUserSession)
+  @Mutation(() => AuthUser)
   @RateLimit({
     errorMessage: 'Too many login attempts. Please try again later.',
   })
@@ -25,18 +31,30 @@ export class AuthResolver {
     @Args('authenticateRequest') authenticateRequest: AuthenticateRequest,
   ) {
     try {
-      return await this.authService.authenticateUser(authenticateRequest);
+      const res = await this.authService.authenticateUser(authenticateRequest);
+      return {
+        username: authenticateRequest.username,
+        jwt: res.jwt,
+        refreshToken: res.refreshToken,
+        isValid: res.isValid,
+      }
     } catch (e: any) {
       throw new BadRequestException(e.message);
     }
   }
 
-  @Mutation(() => CognitoUser)
+  @Mutation(() => AuthUser)
   async confirm(
     @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,
   ) {
     try {
-      return await this.authService.confirmUser(confirmUserRequest);
+      const res = await this.authService.confirmUser(confirmUserRequest);
+      return {
+        email: confirmUserRequest.email,
+        jwt: res.jwt,
+        refreshToken: res.refreshToken,
+        isValid: res.isValid,
+      }
     } catch (e: any) {
       throw new BadRequestException(e.message);
     }

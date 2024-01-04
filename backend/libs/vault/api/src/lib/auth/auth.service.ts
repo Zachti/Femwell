@@ -13,6 +13,7 @@ import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { LoggerService } from '@backend/logger';
 import { Role } from '@backend/infrastructure';
 import { InjectCognitoToken } from './providers/cognito.provider';
+import { userSession } from './interfaces/inrefaces';
 
 @Injectable()
 export class AuthService {
@@ -22,15 +23,15 @@ export class AuthService {
     private readonly logger: LoggerService,
   ) {}
 
-  registerUser(registerRequest: RegisterRequest): Promise<CognitoUser> {
-    const { username, email, password, phoneNumber } = registerRequest;
-    this.logger.info(`${username} signed up.`);
+  registerUser(registerRequest: RegisterRequest): Promise<userSession> {
+    const { name, email, password, phoneNumber } = registerRequest;
+    this.logger.info(`${name} signed up.`);
     return new Promise((resolve, reject) => {
       return this.userPool.signUp(
         email,
         password,
         [
-          new CognitoUserAttribute({ Name: 'username', Value: username }),
+          new CognitoUserAttribute({ Name: 'name', Value: name }),
           new CognitoUserAttribute({ Name: 'email', Value: email }),
           new CognitoUserAttribute({ Name: 'role', Value: Role.User }),
           new CognitoUserAttribute({
@@ -43,16 +44,23 @@ export class AuthService {
           if (!result) {
             reject(err);
           } else {
-            resolve(result.user);
-          }
+              result.user.getSession((err: null, session: CognitoUserSession) => {
+                if (err) {reject(err);}
+                resolve( {
+                  isValid: session.isValid(),
+                  refreshToken: session.getRefreshToken().getToken(),
+                  jwt: session.getAccessToken().getJwtToken(),
+              });
+            });
+            }
+          })
         },
       );
-    });
-  }
+    };
 
   authenticateUser(
     authenticateRequest: AuthenticateRequest,
-  ): Promise<CognitoUserSession> {
+  ): Promise<userSession> {
     const authDetails = new AuthenticationDetails({
       Username: authenticateRequest.username,
       Password: authenticateRequest.password,
@@ -65,13 +73,18 @@ export class AuthService {
     this.logger.info(`${authenticateRequest.username} tries to log in.`);
     return new Promise((resolve, reject) => {
       return cognitoUser.authenticateUser(authDetails, {
-        onSuccess: (result) => resolve(result),
+        onSuccess: (result) =>
+          resolve( {
+          isValid: result.isValid(),
+          refreshToken: result.getRefreshToken().getToken(),
+          jwt: result.getAccessToken().getJwtToken(),
+        }),
         onFailure: (err) => reject(err),
       });
     });
   }
 
-  confirmUser(confirmUserRequest: ConfirmUserRequest): Promise<CognitoUser> {
+  confirmUser(confirmUserRequest: ConfirmUserRequest): Promise<userSession> {
     const userData: ICognitoUserData = {
       Username: confirmUserRequest.email,
       Pool: this.userPool,
@@ -88,10 +101,16 @@ export class AuthService {
         true,
         (err, result) => {
           if (err) reject(err);
-          resolve(result);
+          result.user.getSession((err: null, session: CognitoUserSession) => {
+            if (err) {reject(err);}
+            resolve( {
+              isValid: session.isValid(),
+              refreshToken: session.getRefreshToken().getToken(),
+              jwt: session.getAccessToken().getJwtToken(),
+            });
+          });
         },
       );
-      return cognitoUser;
     });
   }
 
