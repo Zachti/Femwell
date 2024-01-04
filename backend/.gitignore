@@ -38,4 +38,9 @@ testem.log
 .DS_Store
 Thumbs.db
 
+#local
 .nx
+
+# auto schema files
+apps/wv
+apps/vt
