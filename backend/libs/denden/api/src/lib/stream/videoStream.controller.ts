@@ -7,7 +7,7 @@ import { Auth } from '@backend/auth';
 import { VideoStreamService } from './videoStream.service';
 
 @Controller('video')
-export class videoStreamController {
+export class VideoStreamController {
   constructor(private readonly videoStreamService: VideoStreamService) {}
   @Get()
   @Auth()

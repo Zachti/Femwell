@@ -1,7 +1,7 @@
 {
   "name": "denden",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "denden/src",
+  "sourceRoot": "apps/denden/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -11,11 +11,12 @@
       "options": {
         "target": "node",
         "compiler": "tsc",
-        "outputPath": "dist/denden",
-        "main": "denden/src/main.ts",
-        "tsConfig": "denden/tsconfig.app.json",
-        "assets": ["denden/src/assets"],
-        "webpackConfig": "denden/webpack.config.js"
+        "outputPath": "dist/apps/denden",
+        "generatePackageJson": true,
+        "main": "apps/denden/src/main.ts",
+        "tsConfig": "apps/denden/tsconfig.app.json",
+        "assets": ["apps/denden/src/assets"],
+        "webpackConfig": "apps/denden/webpack.config.js"
       },
       "configurations": {
         "development": {},
@@ -45,7 +46,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "denden/jest.config.ts"
+        "jestConfig": "apps/denden/jest.config.ts"
       }
     }
   },
