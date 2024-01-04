@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
-import { heimdallConfig } from '@backend/heimdall';
+import { heimdallConfig } from '../config/heimdall.config';
 import { S3 } from 'aws-sdk';
 import { InjectS3Token } from '../providers/s3.provider';
 import { UploadFile, UploadResult } from '../inetrfaces/interfaces';
