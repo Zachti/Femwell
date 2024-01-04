@@ -7,8 +7,7 @@ import {
   ICognitoUserData,
   CognitoUserSession,
 } from 'amazon-cognito-identity-js';
-import { Inject, Injectable } from '@nestjs/common';
-import { vaultConfig } from '../config/vaultConfig';
+import { Injectable } from '@nestjs/common';
 import { AuthenticateRequest } from './dto/authenticateRequest.input';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { LoggerService } from '@backend/logger';
@@ -20,7 +19,6 @@ export class AuthService {
   constructor(
     @InjectCognitoToken()
     private readonly userPool: CognitoUserPool,
-    @Inject(vaultConfig.KEY)
     private readonly logger: LoggerService,
   ) {}
 

@@ -5,7 +5,7 @@ import { DynamicConfigModule } from '@backend/config';
 import { vaultConfigObject, AuthModule } from '@backend/vault';
 import { LoggerModule } from '@backend/logger';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/dist/esm/plugin/landingPage/default';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { join } from 'path';
 
 @Module({

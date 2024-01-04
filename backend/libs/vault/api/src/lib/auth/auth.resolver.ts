@@ -2,7 +2,7 @@ import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { RegisterRequest } from './dto/registerRequest.input';
 import { AuthenticateRequest } from './dto/authenticateRequest.input';
 import { BadRequestException } from '@nestjs/common';
-import { AuthService } from '@backend/vault';
+import { AuthService } from './auth.service';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { CognitoUser, CognitoUserSession } from 'amazon-cognito-identity-js';
 import { RateLimit } from '@backend/infrastructure';
