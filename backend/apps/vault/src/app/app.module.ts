@@ -33,4 +33,4 @@ import { join } from 'path';
     }),
   ],
 })
-export class VaultCoreModule {}
+export class VaultMainModule {}

@@ -4,10 +4,10 @@
  */
 
 import { NestFactory } from '@nestjs/core';
-import { HeimdallCoreModule } from './app/app.module';
+import { HeimdallMainModule } from './app/app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(HeimdallCoreModule);
+  const app = await NestFactory.create(HeimdallMainModule);
   const port = process.env.PORT || 3000;
   await app.listen(port);
 }

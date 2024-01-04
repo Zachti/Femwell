@@ -4,10 +4,10 @@
  */
 
 import { NestFactory } from '@nestjs/core';
-import { WolverineCoreModule } from './app/app.module';
+import { WolverineMainModule } from './app/app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(WolverineCoreModule);
+  const app = await NestFactory.create(WolverineMainModule);
   const port = process.env.PORT || 3000;
   await app.listen(port);
 }

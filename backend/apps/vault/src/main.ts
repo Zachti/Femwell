@@ -4,10 +4,10 @@
  */
 
 import { NestFactory } from '@nestjs/core';
-import { VaultCoreModule } from './app/app.module';
+import { VaultMainModule } from './app/app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(VaultCoreModule);
+  const app = await NestFactory.create(VaultMainModule);
   const port = process.env.PORT || 3000;
   await app.listen(port);
 }

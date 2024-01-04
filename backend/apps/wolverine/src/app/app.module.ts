@@ -18,4 +18,4 @@ import { GraphqlCoreModule } from '@backend/wolverine';
     HealthModule.forRoot(WolverineHealthIndicatorsProvider),
   ],
 })
-export class WolverineCoreModule {}
+export class WolverineMainModule {}

@@ -20,4 +20,4 @@ import {
     HealthModule.forRoot(HeimdallHealthIndicatorsProvider)
   ],
 })
-export class HeimdallCoreModule {}
+export class HeimdallMainModule {}
