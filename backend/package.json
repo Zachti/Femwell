@@ -10,8 +10,10 @@
   },
   "private": true,
   "dependencies": {
+    "@apollo/subgraph": "^2.6.2",
     "@aws-sdk/client-dynamodb": "^3.484.0",
     "@nestjs/apollo": "12.0.11",
+    "@nestjs/axios": "^3.0.1",
     "@nestjs/common": "10.0.2",
     "@nestjs/config": "3.0.0",
     "@nestjs/core": "10.0.2",
