@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { HealthIndicatorFunction } from '@nestjs/terminus';
+import { HealthIndicatorFunction, HttpHealthIndicator } from '@nestjs/terminus';
 import { HealthIndicatorsProvider } from '@backend/infrastructure';
-import { DynamoDBHealthIndicator } from './indicators/dynamoDB.indicator';
 
 @Injectable()
 export class WolverineHealthIndicatorsProvider implements HealthIndicatorsProvider {
-  constructor(private db: DynamoDBHealthIndicator) {}
+  constructor(private readonly http: HttpHealthIndicator) {}
 
   async getIndicators(): Promise<Array<HealthIndicatorFunction>> {
-    return [() => this.db.isHealthy('dynamoDB')]
+    return [() => this.http.pingCheck('dynamoDB', process.env["AWS_DYNAMO_DB_ENDPOINT"]!)]
   }
 }

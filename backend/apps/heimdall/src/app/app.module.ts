@@ -4,9 +4,7 @@ import { LoggerModule } from '@backend/logger';
 import { awsConfigObject, DynamicConfigModule } from '@backend/config';
 import { heimdallConfigObject } from '@backend/heimdall';
 import { HealthModule } from '@backend/infrastructure';
-import {
-  HeimdallHealthIndicatorsProvider
-} from '@backend/heimdall';
+import { HeimdallHealthIndicatorsProvider } from '@backend/heimdall';
 
 @Module({
   imports: [
