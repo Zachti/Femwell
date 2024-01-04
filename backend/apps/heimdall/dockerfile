@@ -1,4 +1,4 @@
-FROM node:18.17-alpine as builder
+FROM node:18.16.1-alpine as builder
 
 WORKDIR /home/node
 
@@ -10,7 +10,7 @@ COPY . /home/node/
 
 RUN npm run build heimdall
 
-FROM node:18.17-alpine as heimdall
+FROM node:18.16.1-alpine as heimdall
 
 WORKDIR /home/app
 
@@ -21,5 +21,7 @@ COPY --from=builder /home/node/dist/ /home/app/dist/
 RUN npm ci --ignore-scripts
 
 RUN apk --no-cache add curl
+
+RUN npm install @nx/nx-linux-x64-gnu
 
 CMD ["sh", "-c", "node dist/apps/heimdall/main.js"]
