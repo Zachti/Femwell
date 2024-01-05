@@ -1,8 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { Auth } from '@backend/auth';
 import { VideoStreamService } from './videoStream.service';
 
