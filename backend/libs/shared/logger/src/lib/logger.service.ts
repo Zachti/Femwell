@@ -51,8 +51,8 @@ export class LoggerService {
     this.logger.warn(message);
   }
 
-  debug(message: string): void {
-    this.logger.debug(message);
+  debug(message: string, metadata?: Record<any, any>): void {
+    this.logger.debug(message, metadata);
   }
 
   info(message: string): void {

@@ -7,20 +7,27 @@ import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { RateLimit } from '@backend/infrastructure';
 import { GraphQLString } from 'graphql/type';
 import { AuthUser } from '../authUser/authUser.entity';
+import { AuditService, InjectAuditService } from '@backend/auditService';
 
 @Resolver(() => AuthUser)
 export class AuthResolver {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    @InjectAuditService('auth') private readonly auditService: AuditService,
+  ) {}
 
   @Mutation(() => AuthUser)
   async register(@Args('registerRequest') registerRequest: RegisterRequest) {
     const signUpResult = await this.authService.registerUser(registerRequest);
-    return {
+    const user = {
+      id: signUpResult.id,
       username: registerRequest.email,
       jwt: signUpResult.jwt,
       refreshToken: signUpResult.refreshToken,
       isValid: signUpResult.isValid,
     };
+    await this.sendAuditLog(user, 'registration');
+    return user;
   }
 
   @Mutation(() => AuthUser)
@@ -33,6 +40,7 @@ export class AuthResolver {
     try {
       const res = await this.authService.authenticateUser(authenticateRequest);
       return {
+        id: res.id,
         username: authenticateRequest.username,
         jwt: res.jwt,
         refreshToken: res.refreshToken,
@@ -50,6 +58,7 @@ export class AuthResolver {
     try {
       const res = await this.authService.confirmUser(confirmUserRequest);
       return {
+        id: res.id,
         email: confirmUserRequest.email,
         jwt: res.jwt,
         refreshToken: res.refreshToken,
@@ -63,7 +72,7 @@ export class AuthResolver {
   @Mutation(() => GraphQLString)
   async sendConfirmationCode(
     @Args('email', { type: () => String }) email: string,
-  ) {
+  ): Promise<string> {
     try {
       return await this.authService.sendConfirmationCode(email);
     } catch (e: any) {
@@ -74,11 +83,31 @@ export class AuthResolver {
   @Mutation(() => GraphQLString)
   async delete(
     @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,
-  ) {
+  ): Promise<string> {
     try {
       return await this.authService.deleteUser(confirmUserRequest);
     } catch (e: any) {
       throw new BadRequestException(e.message);
     }
+  }
+
+  private async sendAuditLog(
+    user: AuthUser,
+    eventType: string,
+  ): Promise<string> {
+    return this.auditService.auditEvent({
+      trigger: {
+        id: { type: 'email', value: user.username },
+        type: 'External',
+      },
+      subject: {
+        type: 'auth',
+        id: `${user.id}`,
+        event: {
+          type: eventType,
+          metaData: { user },
+        },
+      },
+    });
   }
 }

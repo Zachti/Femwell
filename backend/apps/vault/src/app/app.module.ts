@@ -4,11 +4,13 @@ import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
-import { awsConfigObject, DynamicConfigModule } from '@backend/config';
+import { awsConfig, awsConfigObject, DynamicConfigModule } from '@backend/config';
 import { vaultConfigObject, AuthModule } from '@backend/vault';
 import { LoggerModule } from '@backend/logger';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { join } from 'path';
+import { AuditModule } from '@backend/auditService';
+import { ConfigType } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -34,6 +36,12 @@ import { join } from 'path';
           ttl: 600000,
         },
       ],
+    }),
+    AuditModule.forRootAsync({
+      useFactory: (config: ConfigType<typeof awsConfig>) => {
+        return { streamARN: config.streamARN }
+      },
+      inject: [awsConfig.KEY],
     }),
   ],
 })

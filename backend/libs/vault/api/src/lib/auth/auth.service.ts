@@ -49,6 +49,7 @@ export class AuthService {
                 reject(err);
               }
               resolve({
+                id: session.getIdToken().decodePayload()['identities'].userId,
                 isValid: session.isValid(),
                 refreshToken: session.getRefreshToken().getToken(),
                 jwt: session.getAccessToken().getJwtToken(),
@@ -77,6 +78,7 @@ export class AuthService {
       return cognitoUser.authenticateUser(authDetails, {
         onSuccess: (result) =>
           resolve({
+            id: result.getIdToken().decodePayload()['identities'].userId,
             isValid: result.isValid(),
             refreshToken: result.getRefreshToken().getToken(),
             jwt: result.getAccessToken().getJwtToken(),
@@ -108,6 +110,7 @@ export class AuthService {
               reject(err);
             }
             resolve({
+              id: session.getIdToken().decodePayload()['identities'].userId,
               isValid: session.isValid(),
               refreshToken: session.getRefreshToken().getToken(),
               jwt: session.getAccessToken().getJwtToken(),
