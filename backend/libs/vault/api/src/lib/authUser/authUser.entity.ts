@@ -5,6 +5,9 @@ import { GraphQLJWT } from 'graphql-scalars';
 @ObjectType()
 export class AuthUser {
   @Field(() => GraphQLString)
+  id!: string;
+
+  @Field(() => GraphQLString)
   username!: string;
 
   @Field(() => GraphQLJWT)

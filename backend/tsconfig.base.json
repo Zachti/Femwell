@@ -16,14 +16,15 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@backend/auditService": ["libs/shared/audit/src/index.ts"],
       "@backend/auth": ["libs/shared/auth/src/index.ts"],
       "@backend/config": ["libs/shared/config/src/index.ts"],
       "@backend/configurable-module": ["libs/shared/utils/src/index.ts"],
+      "@backend/denden": ["libs/denden/api/src/index.ts"],
       "@backend/heimdall": ["libs/heimdall/api/src/index.ts"],
       "@backend/infrastructure": ["libs/shared/infrastructure/src/index.ts"],
       "@backend/logger": ["libs/shared/logger/src/index.ts"],
       "@backend/vault": ["libs/vault/api/src/index.ts"],
-      "@backend/denden": ["libs/denden/api/src/index.ts"],
       "@backend/wolverine": ["libs/wolverine/api/src/index.ts"]
     }
   },

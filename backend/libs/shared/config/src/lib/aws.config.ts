@@ -7,6 +7,8 @@ export const awsConfig = registerAs('aws', () => ({
   secretKey: process.env['AWS_SECRET_KEY'],
   userPoolId: process.env['COGNITO_USER_POOL_ID'],
   clientId: process.env['COGNITO_CLIENT_ID'],
+  kinesisEndpoint: process.env['KINESIS_ENDPOINT'],
+  streamARN: process.env['STREAM_ARN'],
 }));
 
 const awsConfigurationValidationSchema = Joi.object({
@@ -14,6 +16,8 @@ const awsConfigurationValidationSchema = Joi.object({
   AWS_ACCESS_KEY: Joi.string().required(),
   AWS_SECRET_KEY: Joi.string().required(),
   COGNITO_USER_POOL_ID: Joi.string().required(),
+  KINESIS_ENDPOINT: Joi.string().required(),
+  STREAM_ARN: Joi.string().required(),
   COGNITO_CLIENT_ID: Joi.string(),
 });
 
