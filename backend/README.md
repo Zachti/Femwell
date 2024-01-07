@@ -24,7 +24,35 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Welcome to the femwell server!
+This repository houses a robust and modularized server architecture built with NestJS and Nx, delivering a comprehensive solution to handle various functionalities via four distinct microservices.
+
+# Microservices:
+
+Denden:
+Responsible for streaming video content from S3 buckets to clients.
+
+Heimdall:
+Manages secure file uploads to the S3 bucket.
+
+Vault:
+Handles user authentication, registration, login, and security-related operations.
+
+Wolverine:
+Serves as the main service for user interactions, managing new user questionnaires, live chat, and the community hub.
+
+Technologies Used
+Nx Monorepo:
+Efficient monorepo tool for streamlined development and maintenance.
+
+NestJS Framework:
+Provides scalability and maintainability to the server architecture.
+
+AWS Ecosystem:
+Utilizes AWS services, including DynamoDB, S3, Cognito, CloudFront, and Kinesis for database management, storage, authentication, content delivery, and real-time data streaming, respectively.
+
+AWS EC2 Containers:
+Containerized deployment on AWS EC2 for optimal performance, scalability, and reliability.
 
 ## Installation
 
