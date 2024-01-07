@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleDestroy } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { Format } from 'logform';
 import * as winston from 'winston';
@@ -9,7 +9,7 @@ import {
 import { commonConfig } from '@backend/config';
 
 @Injectable()
-export class LoggerService {
+export class LoggerService implements OnModuleDestroy{
   private readonly _logger: winston.Logger;
 
   constructor(
@@ -72,6 +72,15 @@ export class LoggerService {
       };
     }
     this.logger.error(message);
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    await new Promise((resolve) => {
+      this.logger.once('finish', () => {
+        this.logger.end()
+        return resolve(null)
+      })
+    })
   }
 
   private get logger(): winston.Logger {
