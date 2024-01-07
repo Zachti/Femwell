@@ -24,6 +24,14 @@ export class LoggerService implements OnModuleDestroy{
         environment: this.config.nodeEnv,
       },
       level: moduleOptions.logLevel || this.config.logLevel,
+      levels: {
+        error: 0,
+        warn: 1,
+        info: 2,
+        http: 3,
+        debug: 4,
+        silly: 5,
+      },
       transports: [new winston.transports.Console()],
       format: this.getEnvFormat(),
     });
