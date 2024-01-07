@@ -15,13 +15,13 @@ import { awsConfig } from '@backend/config';
     AuditService,
     {
       provide: 'AUDIT_STORE_PROVIDER',
-      useFactory: (awsCfg: ConfigType<typeof awsConfig>) => {
+      useFactory: (config: ConfigType<typeof awsConfig>) => {
         return new Kinesis({
-          region: awsCfg.region,
-          endpoint: awsCfg.kinesisEndpoint,
+          region: config.region,
+          endpoint: config.kinesisEndpoint,
           credentials: new Credentials({
-            accessKeyId: awsCfg.accessKey!,
-            secretAccessKey: awsCfg.secretKey!,
+            accessKeyId: config.accessKey!,
+            secretAccessKey: config.secretKey!,
           }),
         });
       },
