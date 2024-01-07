@@ -1,13 +1,13 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { GraphQLString, GraphQLBoolean } from 'graphql/type';
-import { GraphQLJWT } from 'graphql-scalars';
+import { GraphQLEmailAddress, GraphQLJWT } from 'graphql-scalars';
 
 @ObjectType()
 export class AuthUser {
   @Field(() => GraphQLString)
   id!: string;
 
-  @Field(() => GraphQLString)
+  @Field(() => GraphQLEmailAddress)
   username!: string;
 
   @Field(() => GraphQLJWT)

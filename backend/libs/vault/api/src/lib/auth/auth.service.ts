@@ -1,4 +1,5 @@
 import { RegisterRequest } from './dto/registerRequest.input';
+import { DeleteUserRequest } from './dto/deleteUserRequest.input';
 import {
   CognitoUserPool,
   CognitoUserAttribute,
@@ -7,17 +8,22 @@ import {
   ICognitoUserData,
   CognitoUserSession,
 } from 'amazon-cognito-identity-js';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { AuthenticateRequest } from './dto/authenticateRequest.input';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { LoggerService } from '@backend/logger';
 import { Role } from '@backend/infrastructure';
 import { InjectCognitoToken } from './providers/cognito.provider';
 import { userSession } from './interfaces/inrefaces';
+import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import { awsConfig } from '@backend/config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @Inject(awsConfig.KEY)
+    private readonly awsCfg: ConfigType<typeof awsConfig>,
     @InjectCognitoToken()
     private readonly userPool: CognitoUserPool,
     private readonly logger: LoggerService,
@@ -140,29 +146,27 @@ export class AuthService {
     });
   }
 
-  async deleteUser(confirmUserRequest: ConfirmUserRequest): Promise<string> {
-    const userData = {
-      Username: confirmUserRequest.email,
-      Pool: this.userPool,
+  async deleteUser(deleteUserRequest: DeleteUserRequest): Promise<string> {
+
+    const deleteUserData = {
+      Username: deleteUserRequest.username,
+      UserPoolId: this.awsCfg.userPoolId!,
     };
 
-    const cognitoUser = new CognitoUser(userData);
-    return new Promise((resolve, reject) => {
-      return cognitoUser.verifyAttribute('email', confirmUserRequest.code, {
-        onSuccess: () => {
-          cognitoUser.deleteUser((err) => {
-            if (err) {
-              reject(err);
-            } else {
-              this.logger.info(`${confirmUserRequest.email} account deleted.`);
-              resolve('Account deleted');
-            }
-          });
-        },
-        onFailure: (err) => {
-          reject(err);
-        },
-      });
+    const cognito = new CognitoIdentityServiceProvider({
+      region: this.awsCfg.region!,
+      credentials: {
+        secretAccessKey:  this.awsCfg.secretKey!,
+        accessKeyId: this.awsCfg.accessKey!,
+      },
     });
-  }
+
+    return new Promise((resolve, reject) => {
+      return cognito.adminDeleteUser(deleteUserData, (err) => {
+        if (err) reject(err);
+              this.logger.info(`${deleteUserRequest.username} account deleted.`);
+              resolve('User deleted successfully!');
+            })
+        });
+    }
 }

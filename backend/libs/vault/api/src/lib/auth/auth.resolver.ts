@@ -8,6 +8,8 @@ import { RateLimit } from '@backend/infrastructure';
 import { GraphQLString } from 'graphql/type';
 import { AuthUser } from '../authUser/authUser.entity';
 import { AuditService, InjectAuditService } from '@backend/auditService';
+import { DeleteUserRequest } from './dto/deleteUserRequest.input';
+import { randomUUID } from 'node:crypto';
 
 @Resolver(() => AuthUser)
 export class AuthResolver {
@@ -17,7 +19,7 @@ export class AuthResolver {
   ) {}
 
   @Mutation(() => AuthUser)
-  async register(@Args('registerRequest') registerRequest: RegisterRequest) {
+  async register(@Args('registerRequest') registerRequest: RegisterRequest): Promise<AuthUser> {
     const signUpResult = await this.authService.registerUser(registerRequest);
     const user = {
       id: signUpResult.id,
@@ -36,7 +38,7 @@ export class AuthResolver {
   })
   async login(
     @Args('authenticateRequest') authenticateRequest: AuthenticateRequest,
-  ) {
+  ): Promise<AuthUser> {
     try {
       const res = await this.authService.authenticateUser(authenticateRequest);
       return {
@@ -54,12 +56,12 @@ export class AuthResolver {
   @Mutation(() => AuthUser)
   async confirm(
     @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,
-  ) {
+  ): Promise<AuthUser> {
     try {
       const res = await this.authService.confirmUser(confirmUserRequest);
       return {
         id: res.id,
-        email: confirmUserRequest.email,
+        username: confirmUserRequest.email,
         jwt: res.jwt,
         refreshToken: res.refreshToken,
         isValid: res.isValid,
@@ -82,10 +84,12 @@ export class AuthResolver {
 
   @Mutation(() => GraphQLString)
   async delete(
-    @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,
+    @Args('deleteUserRequest') deleteUserRequest: DeleteUserRequest,
   ): Promise<string> {
     try {
-      return await this.authService.deleteUser(confirmUserRequest);
+      const res = await this.authService.deleteUser(deleteUserRequest);
+      await this.sendAuditLog(deleteUserRequest as AuthUser, 'delete');
+      return res;
     } catch (e: any) {
       throw new BadRequestException(e.message);
     }
@@ -102,7 +106,7 @@ export class AuthResolver {
       },
       subject: {
         type: 'auth',
-        id: `${user.id}`,
+        id: `${user.id?? randomUUID()}`,
         event: {
           type: eventType,
           metaData: { user },
