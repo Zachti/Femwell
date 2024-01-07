@@ -19,7 +19,9 @@ export class AuthResolver {
   ) {}
 
   @Mutation(() => AuthUser)
-  async register(@Args('registerRequest') registerRequest: RegisterRequest): Promise<AuthUser> {
+  async register(
+    @Args('registerRequest') registerRequest: RegisterRequest,
+  ): Promise<AuthUser> {
     const signUpResult = await this.authService.registerUser(registerRequest);
     const user = {
       id: signUpResult.id,
@@ -106,7 +108,7 @@ export class AuthResolver {
       },
       subject: {
         type: 'auth',
-        id: `${user.id?? randomUUID()}`,
+        id: `${user.id ?? randomUUID()}`,
         event: {
           type: eventType,
           metaData: { user },

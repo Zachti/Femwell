@@ -147,7 +147,6 @@ export class AuthService {
   }
 
   async deleteUser(deleteUserRequest: DeleteUserRequest): Promise<string> {
-
     const deleteUserData = {
       Username: deleteUserRequest.username,
       UserPoolId: this.awsCfg.userPoolId!,
@@ -156,7 +155,7 @@ export class AuthService {
     const cognito = new CognitoIdentityServiceProvider({
       region: this.awsCfg.region!,
       credentials: {
-        secretAccessKey:  this.awsCfg.secretKey!,
+        secretAccessKey: this.awsCfg.secretKey!,
         accessKeyId: this.awsCfg.accessKey!,
       },
     });
@@ -164,9 +163,9 @@ export class AuthService {
     return new Promise((resolve, reject) => {
       return cognito.adminDeleteUser(deleteUserData, (err) => {
         if (err) reject(err);
-              this.logger.info(`${deleteUserRequest.username} account deleted.`);
-              resolve('User deleted successfully!');
-            })
-        });
-    }
+        this.logger.info(`${deleteUserRequest.username} account deleted.`);
+        resolve('User deleted successfully!');
+      });
+    });
+  }
 }

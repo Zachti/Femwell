@@ -5,7 +5,7 @@ import { awsConfig } from '@backend/config';
 
 export const InjectDynamoDBToken = () => Inject(DynamoDBToken);
 
-export const DynamoDBToken = Symbol('DynamoDB_TOKEN');
+export const DynamoDBToken = Symbol('DYNAMO_DB_TOKEN');
 
 export const DynamoDBProvider: Provider = {
   provide: DynamoDBToken,
@@ -13,7 +13,7 @@ export const DynamoDBProvider: Provider = {
     return new DynamoDBClient({
       region: config.region!,
       credentials: {
-        secretAccessKey:  config.secretKey!,
+        secretAccessKey: config.secretKey!,
         accessKeyId: config.accessKey!,
       },
     });
