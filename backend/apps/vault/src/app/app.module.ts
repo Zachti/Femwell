@@ -4,7 +4,7 @@ import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
-import { awsConfig, awsConfigObject, DynamicConfigModule } from '@backend/config';
+import { awsConfig, awsConfigObject, ConfigCoreModule } from '@backend/config';
 import { vaultConfigObject, AuthModule } from '@backend/vault';
 import { LoggerModule } from '@backend/logger';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -21,7 +21,7 @@ import { ConfigType } from '@nestjs/config';
         federation: 2,
       },
     }),
-    DynamicConfigModule.forRoot({
+    ConfigCoreModule.forRoot({
       isGlobal: true,
       configObjects: [vaultConfigObject, awsConfigObject],
       validationOptions: { presence: 'required' },

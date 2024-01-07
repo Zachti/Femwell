@@ -4,11 +4,11 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { commonConfig, commonConfigValidationSchema } from './common.config';
 
 @Module({})
-export class DynamicConfigModule {
+export class ConfigCoreModule {
   static forRoot(options: ConfigModuleOptions): DynamicModule {
     const { isGlobal, configObjects, validationOptions } = options;
     return {
-      module: DynamicConfigModule,
+      module: ConfigCoreModule,
       imports: [
         ConfigModule.forRoot({
           isGlobal: isGlobal,
@@ -25,8 +25,8 @@ export class DynamicConfigModule {
           validationOptions: validationOptions ?? undefined,
         }),
       ],
-      providers: [DynamicConfigModule],
-      exports: [DynamicConfigModule],
+      providers: [ConfigCoreModule],
+      exports: [ConfigCoreModule],
     };
   }
 }

@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { UploadModule } from '@backend/heimdall';
 import { LoggerModule } from '@backend/logger';
-import { awsConfigObject, DynamicConfigModule } from '@backend/config';
+import { awsConfigObject, ConfigCoreModule } from '@backend/config';
 import { heimdallConfigObject } from '@backend/heimdall';
 import { HealthModule } from '@backend/infrastructure';
 import { HeimdallHealthIndicatorsProvider } from '@backend/heimdall';
@@ -10,7 +10,7 @@ import { HeimdallHealthIndicatorsProvider } from '@backend/heimdall';
   imports: [
     UploadModule,
     LoggerModule.forRoot({ serviceName: 'heimdall' }),
-    DynamicConfigModule.forRoot({
+    ConfigCoreModule.forRoot({
       isGlobal: true,
       configObjects: [heimdallConfigObject, awsConfigObject],
       validationOptions: { presence: 'required' },
