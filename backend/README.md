@@ -27,7 +27,7 @@
 Welcome to the femwell server!
 This repository houses a robust and modularized server architecture built with NestJS and Nx, delivering a comprehensive solution to handle various functionalities via four distinct microservices.
 
-# Microservices:
+### Microservices:
 
 Denden:
 Responsible for streaming video content from S3 buckets to clients.
@@ -41,7 +41,8 @@ Handles user authentication, registration, login, and security-related operation
 Wolverine:
 Serves as the main service for user interactions, managing new user questionnaires, live chat, and the community hub.
 
-Technologies Used
+### Technologies Used:
+
 Nx Monorepo:
 Efficient monorepo tool for streamlined development and maintenance.
 
