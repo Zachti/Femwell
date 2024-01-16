@@ -15,7 +15,7 @@ import { LoggerService } from '@backend/logger';
 import { Role } from '@backend/infrastructure';
 import { InjectCognitoToken } from './providers/cognito.provider';
 import { userSession } from './interfaces/inrefaces';
-import { CognitoIdentityServiceProvider } from 'aws-sdk';
+import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { awsConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
 
@@ -152,7 +152,7 @@ export class AuthService {
       UserPoolId: this.awsCfg.userPoolId!,
     };
 
-    const cognito = new CognitoIdentityServiceProvider({
+    const cognito = new CognitoIdentityProvider({
       region: this.awsCfg.region!,
       credentials: {
         secretAccessKey: this.awsCfg.secretKey!,

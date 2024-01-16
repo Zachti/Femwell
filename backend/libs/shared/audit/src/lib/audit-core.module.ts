@@ -5,9 +5,10 @@ import {
 } from './audit-module.definitions';
 import { AuditService } from './audit.service';
 import { AUDIT_STORE_PROVIDER } from './constants';
-import { Credentials, Kinesis } from 'aws-sdk';
 import { ConfigType } from '@nestjs/config';
 import { awsConfig } from '@backend/config';
+import { Kinesis } from '@aws-sdk/client-kinesis';
+import { fromEnv } from '@aws-sdk/credential-providers';
 
 @Global()
 @Module({
@@ -19,10 +20,7 @@ import { awsConfig } from '@backend/config';
         return new Kinesis({
           region: config.region,
           endpoint: config.kinesisEndpoint,
-          credentials: new Credentials({
-            accessKeyId: config.accessKey!,
-            secretAccessKey: config.secretKey!,
-          }),
+          credentials: fromEnv(),
         });
       },
       inject: [awsConfig.KEY],

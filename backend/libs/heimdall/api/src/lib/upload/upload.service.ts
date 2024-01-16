@@ -5,33 +5,32 @@ import {
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { heimdallConfig } from '../config/heimdall.config';
-import { S3 } from 'aws-sdk';
-import { InjectS3Token } from '../providers/s3.provider';
+import { PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { UploadFile, UploadResult } from '../inetrfaces/interfaces';
 import { LoggerService } from '@backend/logger';
+import { InjectAwsService } from '@backend/awsModule';
 
 @Injectable()
 export class UploadService {
   constructor(
     @Inject(heimdallConfig.KEY)
     private readonly heimdallCfg: ConfigType<typeof heimdallConfig>,
-    @InjectS3Token() private s3: S3,
+    @InjectAwsService(S3) private s3: S3,
     private readonly logger: LoggerService,
   ) {}
 
   async upload(file: UploadFile, username: string): Promise<UploadResult> {
     const keyName = `${this.heimdallCfg.baseFolderLocation}/${username}/${file.key}`;
     this.logger.info('uploading file to s3.');
-    const result = this.s3
-      .upload({
-        Bucket: this.heimdallCfg.awsBucket,
-        Key: keyName,
-        Body: file.data,
-        ContentType: file.mimeType,
-      } as S3.Types.PutObjectRequest)
-      .promise();
     try {
-      await Promise.resolve(result);
+      await this.s3.send(
+        new PutObjectCommand({
+          Bucket: this.heimdallCfg.awsBucket,
+          Key: keyName,
+          Body: file.data,
+          ContentType: file.mimeType,
+        }),
+      );
     } catch (e: any) {
       this.logger.error(`Fail uploading file: ${e.message}`);
       throw new InternalServerErrorException(e, 'Fail uploading file');

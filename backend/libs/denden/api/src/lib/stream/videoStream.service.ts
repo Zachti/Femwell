@@ -4,23 +4,22 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { LoggerService } from '@backend/logger';
-import { CloudFront } from 'aws-sdk';
-import { InjectCloudFrontToken } from '../providers/cloudFront.provider';
+import { InjectAwsService } from '@backend/awsModule';
+import { CloudFront } from '@aws-sdk/client-cloudfront';
 
 @Injectable()
 export class VideoStreamService {
   constructor(
-    @InjectCloudFrontToken() private cloudFront: CloudFront,
+    @InjectAwsService(CloudFront) private cloudFront: CloudFront,
     private readonly logger: LoggerService,
   ) {}
 
   async stream(videoName: string, videoId: string): Promise<URL> {
     this.logger.info('fetching video stream url from cloudfront');
     try {
-      const res = this.cloudFront.getDistribution({
+      const distribution = await this.cloudFront.getDistribution({
         Id: videoId,
       });
-      const distribution = await res.promise();
       const domainName = distribution.Distribution?.DomainName;
       if (!domainName) throw new BadRequestException();
       this.logger.info(`video stream url fetched successfully`);

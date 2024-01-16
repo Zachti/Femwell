@@ -9,7 +9,7 @@ import {
 import { commonConfig } from '@backend/config';
 
 @Injectable()
-export class LoggerService implements OnModuleDestroy{
+export class LoggerService implements OnModuleDestroy {
   private readonly _logger: winston.Logger;
 
   constructor(
@@ -85,10 +85,10 @@ export class LoggerService implements OnModuleDestroy{
   async onModuleDestroy(): Promise<void> {
     await new Promise((resolve) => {
       this.logger.once('finish', () => {
-        this.logger.end()
-        return resolve(null)
-      })
-    })
+        this.logger.end();
+        return resolve(null);
+      });
+    });
   }
 
   private get logger(): winston.Logger {

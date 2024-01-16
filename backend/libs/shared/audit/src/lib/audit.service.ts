@@ -12,11 +12,10 @@ import {
 } from './audit-module.definitions';
 import { LoggerService } from '@backend/logger';
 import { AUDIT_STORE_PROVIDER } from './constants';
-import { Kinesis } from 'aws-sdk';
 import { Buffer } from './buffer';
 import { AuditEvent, AuditEventInput } from './interfaces';
 import { randomUUID } from 'node:crypto';
-import { PutRecordsRequestEntry } from 'aws-sdk/clients/kinesis';
+import { Kinesis, PutRecordsRequestEntry } from '@aws-sdk/client-kinesis';
 
 @Injectable()
 export class AuditService implements OnModuleInit, OnModuleDestroy {
@@ -64,7 +63,7 @@ export class AuditService implements OnModuleInit, OnModuleDestroy {
 
   private eventToStoreEntry(event: AuditEvent): PutRecordsRequestEntry {
     return {
-      Data: JSON.stringify(event),
+      Data: new TextEncoder().encode(JSON.stringify(event)),
       PartitionKey: this?.featureOptions?.namespace ?? 'audit-events',
     };
   }
@@ -78,19 +77,26 @@ export class AuditService implements OnModuleInit, OnModuleDestroy {
       flushReason,
     });
     const putStart = Date.now();
-    const res = await this.store
-      .putRecords({
-        Records: this.eventsBuffer.getAll().map(this.eventToStoreEntry),
-        StreamARN: this.options.streamARN,
-      })
-      .promise();
+    const res = await this.store.putRecords({
+      Records: this.eventsBuffer.getAll().map(this.eventToStoreEntry),
+      StreamARN: this.options.streamARN,
+    });
     const putDurationMS = Date.now() - putStart;
-    const savedEventsCount = res.Records.filter((r) => r.SequenceNumber).length;
+    const savedEventsCount = res.Records?.filter((r) => r.SequenceNumber)
+      .length;
     this.logger.debug(`${savedEventsCount} audit events stored successfully`, {
       flushReason,
       putDurationMS,
     });
     if (res.FailedRecordCount !== 0) {
+      this.logger.error(
+        `${res.FailedRecordCount} audit events failed to be stored in the stream`,
+        {
+          flushReason,
+          putDurationMS,
+        },
+      );
+      // TODO handle errors - insert the fail records back to the buffer
     }
     this.eventsBuffer.reset();
   }

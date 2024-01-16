@@ -1,9 +1,8 @@
-import { InjectDynamoDBToken } from '../../providers/dynamoDB.provider';
 import {
-  DynamoDBClient,
   ScanCommand,
   PutItemCommand,
   GetItemCommand,
+  DynamoDB,
 } from '@aws-sdk/client-dynamodb';
 import { Questionnaire } from '../entities/questionnaire.entity';
 import {
@@ -13,12 +12,13 @@ import {
 } from '@nestjs/common';
 import { CreateQuestionnaireInput } from '../dto/createQuestionnaire.input';
 import { TablesName } from '../enums/tablesName.enum';
+import { InjectAwsService } from '@backend/awsModule';
 
 @Injectable()
 export class QuestionnaireRepository {
-  constructor(@InjectDynamoDBToken() private readonly client: DynamoDBClient) {}
+  constructor(@InjectAwsService(DynamoDB) private readonly dynamo: DynamoDB) {}
   async findAll(): Promise<Questionnaire[]> {
-    const res = await this.client.send(
+    const res = await this.dynamo.send(
       new ScanCommand({
         TableName: TablesName.Questionnaire,
       }),
@@ -31,7 +31,7 @@ export class QuestionnaireRepository {
   }
 
   async findOne(id: string): Promise<Questionnaire> {
-    const res = await this.client.send(
+    const res = await this.dynamo.send(
       new GetItemCommand({
         TableName: TablesName.Questionnaire,
         Key: {
@@ -51,7 +51,7 @@ export class QuestionnaireRepository {
   async create(input: CreateQuestionnaireInput): Promise<Questionnaire> {
     const dynamoDBObject =
       Questionnaire.createDynamoDBObjectFromInstance(input);
-    await this.client.send(
+    await this.dynamo.send(
       new PutItemCommand({
         TableName: TablesName.Questionnaire,
         Item: dynamoDBObject,

@@ -41,6 +41,10 @@
               {
                 "sourceTag": "scope:denden",
                 "onlyDependOnLibsWithTags": ["scope:denden", "scope:shared"]
+              },
+              {
+                "sourceTag": "scope:shared",
+                "onlyDependOnLibsWithTags": ["scope:shared"]
               }
             ]
           }

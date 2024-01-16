@@ -18,6 +18,7 @@
     "paths": {
       "@backend/auditService": ["libs/shared/audit/src/index.ts"],
       "@backend/auth": ["libs/shared/auth/src/index.ts"],
+      "@backend/awsModule": ["libs/shared/aws/src/index.ts"],
       "@backend/config": ["libs/shared/config/src/index.ts"],
       "@backend/configurable-module": ["libs/shared/utils/src/index.ts"],
       "@backend/denden": ["libs/denden/api/src/index.ts"],
