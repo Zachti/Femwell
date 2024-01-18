@@ -20,7 +20,7 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb';
     }),
     HealthModule.forRoot(WolverineHealthIndicatorsProvider),
     AWSSdkModule.forRootWithAsyncOptions({
-      serviceObjects: { client: DynamoDB },
+      serviceObjects: [{ client: DynamoDB }],
       useFactory: (config: ConfigType<typeof awsConfig>) => {
         return {
           region: config.region!,

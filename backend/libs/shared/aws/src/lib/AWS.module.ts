@@ -8,7 +8,7 @@ import { getAwsServiceToken } from './tokens';
 
 @Module({})
 export class AWSSdkModule {
-  static forRoot<C extends AWSServiceCtor>(
+  static forRoot<C extends AWSServiceCtor[]>(
     options: AWSModuleOptions<C>,
   ): DynamicModule {
     const services: Provider[] = options.services.map((s) => {
@@ -26,7 +26,7 @@ export class AWSSdkModule {
     };
   }
 
-  static forRootWithAsyncOptions<C extends AWSServiceCtor>(
+  static forRootWithAsyncOptions<C extends AWSServiceCtor[]>(
     options: AWSModuleAsyncOptions<C>,
   ): DynamicModule {
     const optionsProvider: Provider = {
@@ -35,20 +35,22 @@ export class AWSSdkModule {
       inject: options.inject ?? [],
     };
 
-    const config = options.serviceObjects.options ?? {};
-    const servicesProvider: Provider = {
-      provide: getAwsServiceToken(options.serviceObjects.client),
-      useFactory: (serviceConfig: any) => {
-        const conf = { ...config, serviceConfig };
-        return new options.serviceObjects.client(conf);
-      },
-      inject: ['AWS_SERVICE_CONFIG'],
-    };
+    const servicesProviders: Provider[] = options.serviceObjects.map((s) => {
+      const config = s.options ?? {};
+      return {
+        provide: getAwsServiceToken(s.client),
+        useFactory: (serviceConfig: any) => {
+          const conf = { ...config, serviceConfig };
+          return new s.client(conf);
+        },
+        inject: ['AWS_SERVICE_CONFIG'],
+      };
+    });
     return {
       module: AWSSdkModule,
       global: true,
-      providers: [optionsProvider, servicesProvider],
-      exports: [servicesProvider],
+      providers: [optionsProvider, ...servicesProviders],
+      exports: servicesProviders,
     };
   }
 }

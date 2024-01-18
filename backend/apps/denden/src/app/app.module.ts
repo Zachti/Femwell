@@ -18,7 +18,7 @@ import {CloudFront} from "@aws-sdk/client-cloudfront";
     HealthModule.forRoot(DendenHealthIndicatorsProvider),
     VideoStreamModule,
     AWSSdkModule.forRootWithAsyncOptions({
-      serviceObjects: { client: CloudFront },
+      serviceObjects: [{ client: CloudFront }],
       useFactory: (config: ConfigType<typeof awsConfig>) => {
         return {
           region: config.region!,

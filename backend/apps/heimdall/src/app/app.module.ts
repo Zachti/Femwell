@@ -20,7 +20,7 @@ import { S3 } from '@aws-sdk/client-s3';
     }),
     HealthModule.forRoot(HeimdallHealthIndicatorsProvider),
     AWSSdkModule.forRootWithAsyncOptions({
-      serviceObjects: { client: S3 },
+      serviceObjects: [{ client: S3 }],
       useFactory: (config: ConfigType<typeof awsConfig>) => {
         return {
           region: config.region!,
