@@ -10,6 +10,7 @@ export class CreateLiveChatDto {
   name!: string;
 
   @IsArray()
+  @IsNotEmpty({ message: 'Users Ids required.' })
   @Field(() => [GraphQLString])
   userIds!: string[];
 }
