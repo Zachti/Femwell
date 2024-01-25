@@ -149,11 +149,11 @@ export class AuthService {
   async deleteUser(deleteUserRequest: DeleteUserRequest): Promise<string> {
     const deleteUserData = {
       Username: deleteUserRequest.username,
-      UserPoolId: this.awsCfg.userPoolId!,
+      UserPoolId: this.awsCfg.userPoolId,
     };
 
     const cognito = new CognitoIdentityProvider({
-      region: this.awsCfg.region!,
+      region: this.awsCfg.region,
       credentials: {
         secretAccessKey: this.awsCfg.secretKey!,
         accessKeyId: this.awsCfg.accessKey!,

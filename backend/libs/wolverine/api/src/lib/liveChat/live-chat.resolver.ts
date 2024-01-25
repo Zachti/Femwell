@@ -3,10 +3,10 @@ import { PubSub } from 'graphql-subscriptions';
 import { LiveChatService } from './live-chat.service';
 import { Message } from './entities/message.entity';
 import { LoggerService } from '@backend/logger';
-import { GraphQLString } from 'graphql';
 import { LiveChat } from './entities/liveChat.entity';
 import { Role, Roles } from '@backend/infrastructure';
 import { GraphQLError } from 'graphql/index';
+import { AuthUser } from '@backend/auth';
 
 @Resolver(() => LiveChat)
 export class LiveChatResolver {
@@ -25,7 +25,7 @@ export class LiveChatResolver {
   newMessage(@Args('liveChatId') liveChatId: number) {
     return this.pubSub.asyncIterator(`newMessage.${liveChatId}`);
   }
-  @Subscription(() => GraphQLString, {
+  @Subscription(() => AuthUser, {
     nullable: true,
     resolve: (value) => value.user,
     filter: (payload, variables) => {
@@ -36,7 +36,7 @@ export class LiveChatResolver {
     return this.pubSub.asyncIterator(`userStartedTyping.${liveChatId}`);
   }
 
-  @Subscription(() => GraphQLString, {
+  @Subscription(() => AuthUser, {
     nullable: true,
     resolve: (value) => value.user,
     filter: (payload, variables) => {
@@ -47,7 +47,7 @@ export class LiveChatResolver {
     return this.pubSub.asyncIterator(`userStoppedTyping.${liveChatId}`);
   }
 
-  @Mutation(() => GraphQLString)
+  @Mutation(() => AuthUser)
   async userStartedTypingMutation(
     @Args('liveChatId') liveChatId: number,
     @Args('userId') userId: number,
@@ -58,7 +58,7 @@ export class LiveChatResolver {
     return userId;
   }
 
-  @Mutation(() => GraphQLString, {})
+  @Mutation(() => AuthUser, {})
   async userStoppedTypingMutation(
     @Args('liveChatId') liveChatId: number,
     @Args('userId') userId: number,
