@@ -77,7 +77,7 @@ export class LiveChatService {
         },
       },
       include: {
-        users: true, // Eager loading users
+        users: true, // show all users in the liveChat (padulla and client)
       },
     });
     this.logger.info(`padulla added to liveChat. padulla id: ${padullaId}`);
@@ -98,12 +98,12 @@ export class LiveChatService {
           orderBy: {
             id: 'desc',
           },
-        }, // show all users in the liveChat (padulla and client)
+        }, // show all users in the liveChat (padulla and client) order by id number.
 
         messages: {
           take: 1,
           orderBy: {
-            id: 'desc',
+            createdAt: 'desc',
           },
         }, // display last message in the chat room
       },
@@ -120,10 +120,10 @@ export class LiveChatService {
       include: {
         liveChat: {
           include: {
-            users: true, // Eager loading users
+            users: true, // show all users in the liveChat (padulla and client)
           },
-        }, // Eager loading liveChat
-        user: true, // Eager loading User
+        }, // show liveChat info
+        user: true, // show the user that sent the message
       },
     });
     this.logger.info(`New message sent: ${JSON.stringify(res)}`);
