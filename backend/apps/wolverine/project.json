@@ -12,6 +12,7 @@
         "target": "node",
         "compiler": "tsc",
         "outputPath": "dist/apps/wolverine",
+        "generatePackageJson": true,
         "main": "apps/wolverine/src/main.ts",
         "tsConfig": "apps/wolverine/tsconfig.app.json",
         "assets": ["apps/wolverine/src/assets"],
