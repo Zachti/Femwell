@@ -7,6 +7,9 @@ tmp
 
 # dependencies
 node_modules
+.terraform
+.terraform.lock.hcl
+terraform.tfstate.backup
 
 # IDEs and editors
 .idea
@@ -45,3 +48,7 @@ volume
 # auto schema files
 apps/wv
 apps/vt
+
+#keys
+*.pem
+*.key
