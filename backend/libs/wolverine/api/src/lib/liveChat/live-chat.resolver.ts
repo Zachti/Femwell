@@ -1,4 +1,11 @@
-import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
+import {
+  Args,
+  Context,
+  Mutation,
+  Query,
+  Resolver,
+  Subscription,
+} from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
 import { LiveChatService } from './live-chat.service';
 import { Message } from './entities/message.entity';
@@ -7,6 +14,8 @@ import { LiveChat } from './entities/liveChat.entity';
 import { Role, Roles } from '@backend/infrastructure';
 import { GraphQLError } from 'graphql/index';
 import { AuthUser } from '@backend/auth';
+import { RequestContext } from '../graphQL/interfaces';
+import { GraphQLString } from 'graphql/type';
 
 @Resolver(() => LiveChat)
 export class LiveChatResolver {
@@ -47,23 +56,27 @@ export class LiveChatResolver {
     return this.pubSub.asyncIterator(`userStoppedTyping.${liveChatId}`);
   }
 
-  @Mutation(() => AuthUser)
+  @Mutation(() => GraphQLString)
   async userStartedTypingMutation(
     @Args('liveChatId') liveChatId: number,
     @Args('userId') userId: number,
+    @Context() context: { req: RequestContext },
   ) {
     await this.pubSub.publish(`userStartedTyping.${liveChatId}`, {
+      user: context.req.userPayload,
       typingUserId: userId,
     });
     return userId;
   }
 
-  @Mutation(() => AuthUser, {})
+  @Mutation(() => GraphQLString)
   async userStoppedTypingMutation(
     @Args('liveChatId') liveChatId: number,
     @Args('userId') userId: number,
+    @Context() context: { req: RequestContext },
   ) {
     await this.pubSub.publish(`userStoppedTyping.${liveChatId}`, {
+      user: context.req.userPayload,
       typingUserId: userId,
     });
 
