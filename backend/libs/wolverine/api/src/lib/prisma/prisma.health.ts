@@ -12,7 +12,9 @@ export class PrismaHealthIndicator extends HealthIndicator {
     super();
   }
   async isHealthy(): Promise<HealthIndicatorResult> {
-    const isHealthy = await this.prismaService['$queryRaw']('select 1')
+    const isHealthy = await this.prismaService['$queryRaw']({
+      raw: ['select 1'],
+    } as unknown as TemplateStringsArray)
       .then(() => true)
       .catch(() => false);
 

@@ -19,7 +19,47 @@ model Reponses {
 }
 
 model Questionnaire {
-  id        String     @id @default(uuid())
+  id        String     @id
   username  String
   responses Reponses[]
+}
+
+model User {
+  id            Int             @id
+  fullname      String
+  liveChats     LiveChat[]      @relation("LiveChatUsers")
+  messages      Message[]
+  liveChatUsers LiveChatUsers[]
+}
+
+model LiveChat {
+  id            Int             @id @default(autoincrement())
+  name          String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  users         User[]          @relation("LiveChatUsers")
+  messages      Message[]
+  liveChatUsers LiveChatUsers[]
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  content    String
+  userId     Int
+  liveChatId Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  liveChat   LiveChat @relation(fields: [liveChatId], references: [id], onDelete: Cascade)
+}
+
+model LiveChatUsers {
+  liveChatId Int
+  userId     Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  liveChat   LiveChat @relation(fields: [liveChatId], references: [id], onDelete: Cascade)
+
+  @@id([liveChatId, userId])
 }

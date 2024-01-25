@@ -63,7 +63,7 @@ export class LoggerService implements OnModuleDestroy {
     this.logger.debug(message, metadata);
   }
 
-  info(message: string): void {
+  info(message: string, metadata?: any): void {
     this.logger.info(message);
   }
 

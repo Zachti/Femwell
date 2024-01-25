@@ -3,9 +3,9 @@ import { GraphQLString } from 'graphql/type';
 
 @ObjectType()
 export class Response {
-  @Field(() => [GraphQLString])
-  Questions!: string[];
+  @Field(() => GraphQLString)
+  question!: string;
 
-  @Field(() => [GraphQLString])
-  responses!: string[];
+  @Field(() => GraphQLString)
+  response!: string;
 }

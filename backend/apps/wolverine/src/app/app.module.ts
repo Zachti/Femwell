@@ -1,13 +1,19 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from '@backend/logger';
-import { awsConfig, awsConfigObject, ConfigCoreModule } from '@backend/config';
-import { wolverineConfigObject } from '@backend/wolverine';
+import {
+  /**awsConfig**/ awsConfigObject,
+  ConfigCoreModule,
+} from '@backend/config';
+import {
+  QuestionnaireModule,
+  LiveChatModule,
+  wolverineConfigObject, PrismaModule,
+} from '@backend/wolverine';
 import { HealthModule } from '@backend/infrastructure';
 import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
 import { GraphqlCoreModule } from '@backend/wolverine';
-import { AWSSdkModule } from '@backend/awsModule';
-import { ConfigType } from '@nestjs/config';
-import { DynamoDB } from '@aws-sdk/client-dynamodb';
+// import { AWSSdkModule } from '@backend/awsModule';
+// import { ConfigType } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -19,19 +25,22 @@ import { DynamoDB } from '@aws-sdk/client-dynamodb';
       validationOptions: { presence: 'required' },
     }),
     HealthModule.forRoot(WolverineHealthIndicatorsProvider),
-    AWSSdkModule.forRootWithAsyncOptions({
-      serviceObjects: [{ client: DynamoDB }],
-      useFactory: (config: ConfigType<typeof awsConfig>) => {
-        return {
-          region: config.region!,
-          credentials: {
-            secretAccessKey: config.secretKey!,
-            accessKeyId: config.accessKey!,
-          },
-        };
-      },
-      inject: [awsConfig.KEY],
-    }),
+    // AWSSdkModule.forRootWithAsyncOptions({
+    //   serviceObjects: [{ client: '' }],
+    //   useFactory: (config: ConfigType<typeof awsConfig>) => {
+    //     return {
+    //       region: config.region!,
+    //       credentials: {
+    //         secretAccessKey: config.secretKey!,
+    //         accessKeyId: config.accessKey!,
+    //       },
+    //     };
+    //   },
+    //   inject: [awsConfig.KEY],
+    // }),
+    LiveChatModule,
+    QuestionnaireModule,
+    PrismaModule,
   ],
 })
 export class WolverineMainModule {}

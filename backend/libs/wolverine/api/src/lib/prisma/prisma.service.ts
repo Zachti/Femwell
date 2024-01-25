@@ -37,22 +37,6 @@ export class PrismaService
         timeToConnect: end - start,
       });
     });
-    this['$on']('query' as any, (queryEvent: any) => {
-      const { query, duration, target } = queryEvent;
-      this.loggerService.log('debug', 'query', {
-        query,
-        duration,
-        target,
-      });
-    });
-    this['$on']('error' as any, (queryEvent: any) => {
-      const { message, target, params } = queryEvent;
-      this.loggerService.log('debug', 'query error', {
-        errorMessage: message,
-        target,
-        params,
-      });
-    });
   }
   async onModuleDestroy(): Promise<void> {
     await this['$disconnect']().then(() => {
