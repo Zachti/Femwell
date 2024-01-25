@@ -11,10 +11,10 @@ export class LiveChatService {
     private readonly logger: LoggerService,
   ) {}
 
-  async getLiveChat(id: string) {
+  async getLiveChat(livechatId: number) {
     return this.prisma['liveChat'].findUnique({
       where: {
-        id: parseInt(id),
+        id: livechatId,
       },
     });
   }

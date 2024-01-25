@@ -113,6 +113,11 @@ export class LiveChatResolver {
   }
 
   @Query(() => [LiveChat])
+  async getLiveChat(@Args('liveChatId') liveChatId: number) {
+    return this.liveChatService.getLiveChat(liveChatId);
+  }
+
+  @Query(() => [LiveChat])
   async getPreviousChatsForUser(@Args('userId') userId: number) {
     return this.liveChatService.getPreviousChatsForUser(userId);
   }
