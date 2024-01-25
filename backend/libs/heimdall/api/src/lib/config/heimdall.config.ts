@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import Joi from 'joi';
+import * as Joi from 'joi';
 
 export const heimdallConfig = registerAs('heimdall', () => ({
   awsBucket: process.env['AWS_BUCKET'],

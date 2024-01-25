@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import Joi from 'joi';
+import * as Joi from 'joi';
 
 export const awsConfig = registerAs('aws', () => ({
   region: process.env['AWS_REGION'],
