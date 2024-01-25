@@ -42,7 +42,7 @@ services:
       context: ./
       dockerfile: './apps/wolverine/dockerfile'
       target: 'builder'
-    command: sh -c "npx prisma migrate dev && npm run start:wolverine:dev"
+    command: sh -c "npm run start:wolverine:dev"
     restart: 'unless-stopped'
     volumes:
       - .:/home/node
