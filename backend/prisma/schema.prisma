@@ -1,0 +1,25 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("AWS_AURORA_URL")
+}
+
+model Reponses {
+  id              Int            @id @default(autoincrement())
+  question        String
+  response        String
+  Questionnaire   Questionnaire? @relation(fields: [questionnaireId], references: [id])
+  questionnaireId String
+}
+
+model Questionnaire {
+  id        String     @id @default(uuid())
+  username  String
+  responses Reponses[]
+}

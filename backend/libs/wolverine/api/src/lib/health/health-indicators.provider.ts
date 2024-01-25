@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { HealthIndicatorFunction, HttpHealthIndicator } from '@nestjs/terminus';
+import { HealthIndicatorFunction } from '@nestjs/terminus';
 import { HealthIndicatorsProvider } from '@backend/infrastructure';
+import { PrismaHealthIndicator } from '../prisma/prisma.health';
 
 @Injectable()
 export class WolverineHealthIndicatorsProvider
   implements HealthIndicatorsProvider
 {
-  constructor(private readonly http: HttpHealthIndicator) {}
+  constructor(private readonly prisma: PrismaHealthIndicator) {}
 
   async getIndicators(): Promise<Array<HealthIndicatorFunction>> {
-    return [
-      () =>
-        this.http.pingCheck('dynamoDB', process.env['AWS_DYNAMO_DB_ENDPOINT']!),
-    ];
+    return [() => this.prisma.isHealthy()];
   }
 }
