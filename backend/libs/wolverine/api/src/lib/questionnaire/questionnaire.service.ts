@@ -23,7 +23,7 @@ export class QuestionnaireService {
         response: response.response,
         questionnaireId,
       }));
-      const result = await this.prisma['questionnaire'].create({
+      const result = await this.prisma.questionnaire.create({
         data: {
           id: questionnaireId,
           username: input.username,
@@ -51,7 +51,7 @@ export class QuestionnaireService {
   async findAll(): Promise<Questionnaire[]> {
     try {
       this.logger.info('Finding all questionnaires.');
-      const result = await this.prisma['questionnaire'].findMany();
+      const result = await this.prisma.questionnaire.findMany();
       this.logger.info(
         `Successfully retrieved ${result.length} questionnaires.`,
       );
@@ -69,7 +69,7 @@ export class QuestionnaireService {
   async findOne(id: string): Promise<Questionnaire> {
     try {
       this.logger.info(`Finding questionnaire with id: ${id}.`);
-      const result = await this.prisma['questionnaire'].findUnique({
+      const result = await this.prisma.questionnaire.findUnique({
         where: { id },
       });
       this.logger.info('Questionnaire found successfully.');

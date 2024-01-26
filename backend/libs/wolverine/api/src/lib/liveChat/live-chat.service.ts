@@ -12,7 +12,7 @@ export class LiveChatService {
   ) {}
 
   async getLiveChat(livechatId: number) {
-    return this.prisma['liveChat'].findUnique({
+    return this.prisma.liveChat.findUnique({
       where: {
         id: livechatId,
       },
@@ -20,7 +20,7 @@ export class LiveChatService {
   }
 
   async createLiveChat(name: string, userId: number): Promise<LiveChat> {
-    const existingLiveChat = await this.prisma['liveChat'].findFirst({
+    const existingLiveChat = await this.prisma.liveChat.findFirst({
       where: {
         name,
       },
@@ -33,7 +33,7 @@ export class LiveChatService {
         },
       });
     }
-    const res = this.prisma['liveChat'].create({
+    const res = this.prisma.liveChat.create({
       data: {
         name,
         users: {
@@ -51,7 +51,7 @@ export class LiveChatService {
     liveChatId: number,
     padullaId: number,
   ): Promise<LiveChat> {
-    const existingLiveChat = await this.prisma['liveChat'].findUnique({
+    const existingLiveChat = await this.prisma.liveChat.findUnique({
       where: {
         id: liveChatId,
       },
@@ -65,7 +65,7 @@ export class LiveChatService {
       });
     }
 
-    const res = await this.prisma['liveChat'].update({
+    const res = await this.prisma.liveChat.update({
       where: {
         id: liveChatId,
       },
@@ -85,7 +85,7 @@ export class LiveChatService {
   }
 
   async getPreviousChatsForUser(userId: number): Promise<LiveChat[]> {
-    return this.prisma['liveChat'].findMany({
+    return this.prisma.liveChat.findMany({
       where: {
         users: {
           some: {
@@ -111,7 +111,7 @@ export class LiveChatService {
   }
 
   async sendMessage(liveChatId: number, message: string, userId: number) {
-    const res = await this.prisma['message'].create({
+    const res = await this.prisma.message.create({
       data: {
         content: message,
         liveChatId,
@@ -131,7 +131,7 @@ export class LiveChatService {
   }
 
   async getMessagesForLiveChat(liveChatId: number): Promise<Message[]> {
-    return this.prisma['message'].findMany({
+    return this.prisma.message.findMany({
       where: {
         liveChatId: liveChatId,
       },
@@ -151,7 +151,7 @@ export class LiveChatService {
   }
 
   async deleteLiveChat(liveChatId: number): Promise<LiveChat> {
-    const res = this.prisma['liveChat'].delete({
+    const res = this.prisma.liveChat.delete({
       where: {
         id: liveChatId,
       },
