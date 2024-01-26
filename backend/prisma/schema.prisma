@@ -25,11 +25,10 @@ model Questionnaire {
 }
 
 model User {
-  id            Int             @id
-  fullname      String
-  liveChats     LiveChat[]      @relation("LiveChatUsers")
-  messages      Message[]
-  liveChatUsers LiveChatUsers[]
+  id        Int        @id
+  fullname  String
+  liveChats LiveChat[] @relation("LiveChatUsers")
+  messages  Message[]
 }
 
 model LiveChat {
@@ -58,7 +57,6 @@ model LiveChatUsers {
   userId     Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   liveChat   LiveChat @relation(fields: [liveChatId], references: [id], onDelete: Cascade)
 
   @@id([liveChatId, userId])
