@@ -18,21 +18,19 @@ import { userSession } from './interfaces/inrefaces';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { awsConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
-import { GraphQLClient, gql, Variables } from 'graphql-request';
-import { GraphQLError } from 'graphql';
+import { InjectWolverineSdk, Sdk } from '../wolverine-datasource';
 
 @Injectable()
 export class AuthService {
-  private readonly client: GraphQLClient;
   constructor(
     @Inject(awsConfig.KEY)
     private readonly awsCfg: ConfigType<typeof awsConfig>,
     @InjectCognitoToken()
     private readonly userPool: CognitoUserPool,
+    @InjectWolverineSdk()
+    private readonly wolverineSdk: Sdk,
     private readonly logger: LoggerService,
-  ) {
-    this.client = new GraphQLClient('');
-  }
+  ) {}
 
   registerUser(registerRequest: RegisterRequest): Promise<userSession> {
     const { name, email, password, phoneNumber } = registerRequest;
@@ -66,7 +64,14 @@ export class AuthService {
                 const id = session.getIdToken().decodePayload()[
                   'identities'
                 ].userId;
-                await this.sendWolverineMutation('create', { email, id });
+                await this.wolverineSdk.sendWolverineMutation(
+                  'create',
+                  {
+                    email,
+                    id,
+                  },
+                  this.logger,
+                );
                 resolve({
                   id,
                   isValid: session.isValid(),
@@ -185,42 +190,9 @@ export class AuthService {
         this.logger.info(
           `${deleteUserRequest.username} account deleted from cognito.`,
         );
-        this.sendWolverineMutation('delete', { id });
+        this.wolverineSdk.sendWolverineMutation('delete', { id }, this.logger);
         resolve('User deleted successfully!');
       });
     });
-  }
-
-  private getWolverineMutation(mutation: string) {
-    switch (mutation) {
-      case 'create':
-        return gql`
-  mutation createUser($createUserInput: CreateUserInput!) {
-    createUser(createUserInput: $createUserInput) {}
-  }`;
-      case 'delete':
-        return gql`
-  mutation deleteUser($id: UUID!) {
-    deleteUser(id: $id) {}
-  }`;
-      default:
-        this.logger.error('Not Allowed mutation.');
-        throw new GraphQLError('Not Allowed mutation.', {
-          extensions: {
-            code: 'INTERNAL_SERVER_ERROR',
-          },
-        });
-    }
-  }
-
-  private async sendWolverineMutation(mutation: string, args: Variables) {
-    try {
-      await this.client.request(this.getWolverineMutation(mutation), args);
-      this.logger.info(`user ${mutation} from Wolverine DB.`, args);
-    } catch (e) {
-      this.logger.error(
-        ` Couldn't ${mutation} user at wolverine DB. user args: ${args}`,
-      );
-    }
   }
 }
