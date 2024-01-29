@@ -1,4 +1,4 @@
-import {ServiceCatalogClientConfig } from '@aws-sdk/client-service-catalog';
+import { ServiceCatalogClientConfig } from '@aws-sdk/client-service-catalog';
 
 export type AWSServiceCtor = new (
   config: ServiceCatalogClientConfig | [],

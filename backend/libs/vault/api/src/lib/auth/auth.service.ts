@@ -18,16 +18,21 @@ import { userSession } from './interfaces/inrefaces';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { awsConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
+import { GraphQLClient, gql, Variables } from 'graphql-request';
+import { GraphQLError } from 'graphql';
 
 @Injectable()
 export class AuthService {
+  private readonly client: GraphQLClient;
   constructor(
     @Inject(awsConfig.KEY)
     private readonly awsCfg: ConfigType<typeof awsConfig>,
     @InjectCognitoToken()
     private readonly userPool: CognitoUserPool,
     private readonly logger: LoggerService,
-  ) {}
+  ) {
+    this.client = new GraphQLClient('');
+  }
 
   registerUser(registerRequest: RegisterRequest): Promise<userSession> {
     const { name, email, password, phoneNumber } = registerRequest;
@@ -50,17 +55,26 @@ export class AuthService {
           if (!result) {
             reject(err);
           } else {
-            result.user.getSession((err: null, session: CognitoUserSession) => {
-              if (err) {
-                reject(err);
-              }
-              resolve({
-                id: session.getIdToken().decodePayload()['identities'].userId,
-                isValid: session.isValid(),
-                refreshToken: session.getRefreshToken().getToken(),
-                jwt: session.getAccessToken().getJwtToken(),
-              });
-            });
+            result.user.getSession(
+              async (err: null, session: CognitoUserSession) => {
+                if (err) {
+                  reject(err);
+                }
+                this.logger.info(
+                  `user created in cognito user pool: ${this.userPool.getUserPoolId()}`,
+                );
+                const id = session.getIdToken().decodePayload()[
+                  'identities'
+                ].userId;
+                await this.sendWolverineMutation('create', { email, id });
+                resolve({
+                  id,
+                  isValid: session.isValid(),
+                  refreshToken: session.getRefreshToken().getToken(),
+                  jwt: session.getAccessToken().getJwtToken(),
+                });
+              },
+            );
           }
         },
       );
@@ -160,12 +174,53 @@ export class AuthService {
       },
     });
 
+    const userData = await cognito.adminGetUser(deleteUserData);
+    const id = userData.UserAttributes?.find(
+      (attribute) => attribute.Name === 'sub',
+    );
+
     return new Promise((resolve, reject) => {
       return cognito.adminDeleteUser(deleteUserData, (err) => {
         if (err) reject(err);
-        this.logger.info(`${deleteUserRequest.username} account deleted.`);
+        this.logger.info(
+          `${deleteUserRequest.username} account deleted from cognito.`,
+        );
+        this.sendWolverineMutation('delete', { id });
         resolve('User deleted successfully!');
       });
     });
+  }
+
+  private getWolverineMutation(mutation: string) {
+    switch (mutation) {
+      case 'create':
+        return gql`
+  mutation createUser($createUserInput: CreateUserInput!) {
+    createUser(createUserInput: $createUserInput) {}
+  }`;
+      case 'delete':
+        return gql`
+  mutation deleteUser($id: UUID!) {
+    deleteUser(id: $id) {}
+  }`;
+      default:
+        this.logger.error('Not Allowed mutation.');
+        throw new GraphQLError('Not Allowed mutation.', {
+          extensions: {
+            code: 'INTERNAL_SERVER_ERROR',
+          },
+        });
+    }
+  }
+
+  private async sendWolverineMutation(mutation: string, args: Variables) {
+    try {
+      await this.client.request(this.getWolverineMutation(mutation), args);
+      this.logger.info(`user ${mutation} from Wolverine DB.`, args);
+    } catch (e) {
+      this.logger.error(
+        ` Couldn't ${mutation} user at wolverine DB. user args: ${args}`,
+      );
+    }
   }
 }
