@@ -1,0 +1,21 @@
+.carousel-container {
+  margin: 0 auto;
+}
+
+.carousel-wrapper {
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+.carousel-wrapper h2 {
+  margin: 0;
+  padding-bottom: 15px;
+  text-align: center;
+  color: #5a052e;
+}
+
+@media (max-width: 464px) {
+  .carousel-container {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+}

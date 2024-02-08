@@ -1,0 +1,71 @@
+.product--image {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  width: 100%;
+  height: 10.6em;
+  object-fit: cover;
+  margin-bottom: 0;
+}
+
+.carousel-item {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  max-width: 300px;
+  max-height: 350px;
+  min-width: 210px;
+  margin: auto 0.5rem;
+  background-color: rgb(255, 247, 250);
+  text-align: center;
+  font-family: arial;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-radius: 10px;
+  border: 2px solid #5a052e;
+}
+
+.carousel-content {
+  padding: 0px 5px 0px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content-top {
+  margin-top: 2px;
+  height: 7rem;
+}
+
+.carousel-item h3 {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  color: #5a052e;
+}
+
+.carousel-item p {
+  margin: 0;
+  font-size: 1em;
+  color: #5a052ecc;
+}
+
+.carousel-item button {
+  white-space: nowrap;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  border: 5px solid #5a052e;
+  margin-top: auto;
+  padding: 4px 20px 4px 20px;
+
+  color: rgb(255, 255, 255);
+  background-color: #5a052e;
+  text-align: center;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+@media (max-width: 464px) {
+  .carousel-item {
+    max-width: 80%;
+    margin: auto;
+  }
+}
