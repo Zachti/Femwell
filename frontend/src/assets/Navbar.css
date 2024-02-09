@@ -40,7 +40,7 @@
 
 .nav-menu {
   display: grid;
-  grid-template-columns: repeat(4, auto);
+  grid-template-columns: repeat(5, auto);
   grid-gap: 10px;
   list-style: none;
   width: 60vw;
@@ -73,6 +73,9 @@
 }
 
 .fa-bars {
+  color: #fff;
+}
+.fa-Times {
   color: #fff;
 }
 
@@ -136,14 +139,10 @@
   }
 
   .menu-icon {
+    color: #fff;
     display: block;
     font-size: 1.8rem;
     margin-right: 8px;
     cursor: pointer;
-  }
-
-  .fa-times {
-    color: #fff;
-    font-size: 2rem;
   }
 }

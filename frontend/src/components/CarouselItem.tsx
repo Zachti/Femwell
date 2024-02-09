@@ -1,18 +1,17 @@
 import { FC, useState, useEffect } from "react";
 import "../assets/CarouselItem.css";
-import { Url } from "url";
 
 interface CarouselItemProps {
   label: string;
   image?: string;
-  content?: string;
+  content: string;
 }
 
 const CarouselItem: FC<CarouselItemProps> = ({ label, image, content }) => {
   return (
     <div className="carousel-item">
       <img
-        className="product--image"
+        className="carousel-image"
         src={
           image
             ? image

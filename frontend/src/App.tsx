@@ -1,10 +1,22 @@
 import { useState, FC } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import Navbar from "./components/Navbar";
 import "./index.css";
 import "./assets/App.css";
 import Home from "./components/Home";
 import CommunityHub from "./components/CommunityHub";
+
+const theme = extendTheme({
+  styles: {
+    global: {
+      body: {
+        backgroundColor: "var(--primary-color)",
+        paddingTop: "10vh",
+      },
+    },
+  },
+});
 
 const App: FC<{}> = () => {
   const user = "John Doe";
@@ -27,16 +39,18 @@ const App: FC<{}> = () => {
   ];
 
   return (
-    <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/community"
-          element={<CommunityHub user={user} posts={posts} />}
-        />
-      </Routes>
-    </BrowserRouter>
+    <ChakraProvider theme={theme}>
+      <BrowserRouter>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/community"
+            element={<CommunityHub user={user} posts={posts} />}
+          />
+        </Routes>
+      </BrowserRouter>
+    </ChakraProvider>
   );
 };
 

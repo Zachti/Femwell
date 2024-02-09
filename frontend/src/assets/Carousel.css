@@ -3,14 +3,20 @@
 }
 
 .carousel-wrapper {
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 .carousel-wrapper h2 {
+  font-weight: bold;
+  font-size: 1.2rem;
   margin: 0;
-  padding-bottom: 15px;
+  padding-bottom: 10px;
   text-align: center;
-  color: #5a052e;
+  color: var(--secondary-color);
+}
+
+.react-multi-carousel-item {
+  height: 340px;
 }
 
 @media (max-width: 464px) {

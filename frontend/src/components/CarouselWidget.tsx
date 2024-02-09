@@ -75,10 +75,10 @@ const CarouselComponent: FC<CarouselProps> = ({ label }) => {
     <div className="carousel-wrapper">
       <h2>
         <span>Things to</span>
-        <span style={{ color: "var(--primary-color)" }}> know</span>
+        <span style={{ color: "var(--text-color-a)" }}> know</span>
         <FontAwesomeIcon
           icon={faDna}
-          style={{ marginLeft: "10px", color: "var(--primary-color)" }}
+          style={{ marginLeft: "10px", color: "var(--text-color-a)" }}
         />
       </h2>
       <Carousel

@@ -7,6 +7,7 @@ import {
   faHeartCircleCheck,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
+import InputForm from "./InputForm";
 
 const Navbar: React.FC = () => {
   const [click, setClick] = useState<boolean>(false);
@@ -87,6 +88,9 @@ const Navbar: React.FC = () => {
                 >
                   Premium
                 </Link>
+              </li>
+              <li>
+                <InputForm />
               </li>
             </ul>
           </div>
