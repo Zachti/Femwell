@@ -18,6 +18,35 @@
 .react-multi-carousel-item {
   height: 340px;
 }
+.react-multiple-carousel__arrow {
+  z-index: 3;
+}
+
+.left-arrow,
+.right-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: var(--primary-color);
+  color: var(--secondary-color);
+  border: var(--secondary-color) solid 3px;
+  font-size: 2rem;
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.left-arrow {
+  left: 10px;
+}
+
+.right-arrow {
+  right: 10px;
+}
 
 @media (max-width: 464px) {
   .carousel-container {

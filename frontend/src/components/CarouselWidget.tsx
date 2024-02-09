@@ -4,7 +4,8 @@ import Carousel from "react-multi-carousel";
 import CarouselItem from "./CarouselItem";
 import "react-multi-carousel/lib/styles.css";
 import "../assets/Carousel.css";
-import { faDna } from "@fortawesome/free-solid-svg-icons";
+import { faCircleArrowLeft, faDna } from "@fortawesome/free-solid-svg-icons";
+import { faCircleArrowRight } from "@fortawesome/free-solid-svg-icons/faCircleArrowRight";
 
 interface CarouselProps {
   label?: string;
@@ -71,6 +72,28 @@ const CarouselComponent: FC<CarouselProps> = ({ label }) => {
     },
   ];
 
+  const CustomLeftArrow: React.FC = (props: any) => {
+    const {
+      onClick, // this is the function that Carousel passes
+    } = props;
+    return (
+      <button className="left-arrow" onClick={onClick}>
+        <FontAwesomeIcon icon={faCircleArrowLeft} />
+      </button>
+    );
+  };
+
+  const CustomRightArrow: React.FC = (props: any) => {
+    const {
+      onClick, // this is the function that Carousel passes
+    } = props;
+    return (
+      <button className="right-arrow" onClick={onClick}>
+        <FontAwesomeIcon icon={faCircleArrowRight} />
+      </button>
+    );
+  };
+
   return (
     <div className="carousel-wrapper">
       <h2>
@@ -87,6 +110,9 @@ const CarouselComponent: FC<CarouselProps> = ({ label }) => {
         autoPlay={windowWidth < 500 ? true : false}
         autoPlaySpeed={2500}
         containerClass="carousel-container"
+        customLeftArrow={<CustomLeftArrow />}
+        customRightArrow={<CustomRightArrow />}
+        renderButtonGroupOutside={true}
       >
         {carouselItems.map((item, index) => (
           <CarouselItem key={index} label={item.label} content={item.content} />

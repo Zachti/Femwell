@@ -17,7 +17,7 @@ import {
   InputRightElement,
   FormErrorMessage,
 } from "@chakra-ui/react";
-
+import "../assets/Navbar.css";
 import { Formik, Field } from "formik";
 
 const InputForm: FC<{}> = () => {
@@ -65,13 +65,14 @@ const InputForm: FC<{}> = () => {
 
   return (
     <>
-      <Button
+      <a
+        className="nav-links"
         onClick={() => {
           onOpen();
         }}
       >
         Login
-      </Button>
+      </a>
 
       <Modal preserveScrollBarGap isOpen={isOpen} onClose={onClose}>
         <ModalOverlay
@@ -92,6 +93,7 @@ const InputForm: FC<{}> = () => {
                 login: isLogin,
               }}
               onSubmit={(values) => alert(JSON.stringify(values, null, 2))}
+              enableReinitialize
             >
               {({ handleSubmit, errors, touched }) => (
                 <form onSubmit={handleSubmit} noValidate>
