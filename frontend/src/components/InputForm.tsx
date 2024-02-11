@@ -2,6 +2,10 @@ import { FC, useState } from "react";
 import {
   Button,
   Input,
+  Flex,
+  Text,
+  Box,
+  Image,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -9,7 +13,6 @@ import {
   ModalFooter,
   ModalBody,
   ModalCloseButton,
-  useDisclosure,
   VStack,
   FormControl,
   FormLabel,
@@ -17,11 +20,17 @@ import {
   InputRightElement,
   FormErrorMessage,
 } from "@chakra-ui/react";
+
 import "../assets/Navbar.css";
 import { Formik, Field } from "formik";
 
-const InputForm: FC<{}> = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+interface InputFormProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onOpen: () => void;
+}
+
+const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
   const [passValue, setPassValue] = useState("");
   const [show, setShow] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
@@ -65,15 +74,6 @@ const InputForm: FC<{}> = () => {
 
   return (
     <>
-      <a
-        className="nav-links"
-        onClick={() => {
-          onOpen();
-        }}
-      >
-        Login
-      </a>
-
       <Modal preserveScrollBarGap isOpen={isOpen} onClose={onClose}>
         <ModalOverlay
           bg="blackAlpha.300"
@@ -181,6 +181,31 @@ const InputForm: FC<{}> = () => {
                             ></Field>
                           </InputGroup>
                         </FormControl>
+
+                        <Flex
+                          alignItems="center"
+                          justifyContent="center"
+                          my={1}
+                          w="full"
+                        >
+                          <Box flex={1} h="1px" bg="gray.300" />
+                          <Text mx={1} color="gray.400">
+                            OR
+                          </Text>
+                          <Box flex={1} h="1px" bg="gray.300" />
+                        </Flex>
+
+                        <Flex
+                          alignItems="center"
+                          justifyContent="center"
+                          cursor="pointer"
+                          w="full"
+                        >
+                          <Image src="/google.png" alt="Google logo" w={5} />
+                          <Text mx={2} color="blue.500">
+                            Log in with Google
+                          </Text>
+                        </Flex>
                       </>
                     )}
 

@@ -1,5 +1,4 @@
 import { FC } from "react";
-import { Link } from "react-router-dom";
 import "../assets/Home.css";
 import CarouselComponent from "./CarouselWidget";
 

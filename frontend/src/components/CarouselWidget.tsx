@@ -72,10 +72,8 @@ const CarouselComponent: FC<CarouselProps> = ({ label }) => {
     },
   ];
 
-  const CustomLeftArrow: React.FC = (props: any) => {
-    const {
-      onClick, // this is the function that Carousel passes
-    } = props;
+  const CustomLeftArrow: FC = (props: any) => {
+    const { onClick } = props;
     return (
       <button className="left-arrow" onClick={onClick}>
         <FontAwesomeIcon icon={faCircleArrowLeft} />
@@ -83,10 +81,8 @@ const CarouselComponent: FC<CarouselProps> = ({ label }) => {
     );
   };
 
-  const CustomRightArrow: React.FC = (props: any) => {
-    const {
-      onClick, // this is the function that Carousel passes
-    } = props;
+  const CustomRightArrow: FC = (props: any) => {
+    const { onClick } = props;
     return (
       <button className="right-arrow" onClick={onClick}>
         <FontAwesomeIcon icon={faCircleArrowRight} />

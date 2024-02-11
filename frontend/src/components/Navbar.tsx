@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, FC } from "react";
 import { Link } from "react-router-dom";
+import { useDisclosure } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../assets/Navbar.css";
 import {
@@ -8,22 +9,33 @@ import {
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
 import InputForm from "./InputForm";
+import SideMenu from "./SideMenu";
 
-const Navbar: React.FC = () => {
-  const [click, setClick] = useState<boolean>(false);
+const Navbar: FC<{}> = () => {
+  const {
+    isOpen: isSideMenuOpen,
+    onOpen: onSideMenuOpen,
+    onClose: onSideMenuClose,
+  } = useDisclosure();
+  const {
+    isOpen: isInputFormOpen,
+    onOpen: onInputFormOpen,
+    onClose: onInputFormClose,
+  } = useDisclosure();
   const [logoText, setLogoText] = useState<string>("FemWell");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const handleClick = (): void => setClick(!click);
-  const closeMobileMenu = (): void => setClick(false);
 
-  useEffect(() => {
-    const rootElement = document.querySelector("*") as HTMLElement;
-    if (rootElement) {
-      click
-        ? (rootElement.style.overflow = "hidden")
-        : (rootElement.style.overflow = "");
+  const closeMobileMenu = (): void => {
+    onSideMenuClose();
+  };
+
+  const handleClick = (): void => {
+    if (!isSideMenuOpen) {
+      onSideMenuOpen();
+    } else {
+      onSideMenuClose();
     }
-  }, [click]);
+  };
 
   //on mount
   useEffect(() => {
@@ -54,9 +66,9 @@ const Navbar: React.FC = () => {
           </Link>
           <div className="nav-right-section">
             <div className="menu-icon" onClick={handleClick}>
-              <FontAwesomeIcon icon={click ? faTimes : faBars} />
+              <FontAwesomeIcon icon={isSideMenuOpen ? faTimes : faBars} />
             </div>
-            <ul className={click ? "nav-menu active" : "nav-menu"}>
+            <ul className="nav-menu">
               <li className="nav-item">
                 <Link to="/" className="nav-links" onClick={closeMobileMenu}>
                   Home
@@ -80,7 +92,7 @@ const Navbar: React.FC = () => {
                   Contact
                 </Link>
               </li>
-              <li>
+              <li className="nav-item">
                 <Link
                   to="/premium"
                   className="nav-links"
@@ -89,13 +101,31 @@ const Navbar: React.FC = () => {
                   Premium
                 </Link>
               </li>
-              <li>
-                <InputForm />
+              <li className="nav-item">
+                <a
+                  className="nav-links"
+                  onClick={() => {
+                    onInputFormOpen();
+                  }}
+                >
+                  Login
+                </a>
               </li>
             </ul>
           </div>
         </div>
       </nav>
+      <InputForm
+        isOpen={isInputFormOpen}
+        onClose={onInputFormClose}
+        onOpen={onInputFormOpen}
+      />
+      <SideMenu
+        isOpen={isSideMenuOpen}
+        onClose={onSideMenuClose}
+        onOpen={onSideMenuOpen}
+        onInputFormOpen={onInputFormOpen}
+      />
     </>
   );
 };

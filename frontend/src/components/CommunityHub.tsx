@@ -20,19 +20,21 @@ const onLike = (userId: string, postId: string) => {
 const CommunityHub: FC<CommunityProps> = ({ user, posts }) => {
   return (
     <div className="community-hub">
-      {user ? <h2>Welcome back, {user}!</h2> : null}
-      <div className="feed">
-        {posts.map((post, index) => (
-          <div key={index} className="post">
-            <h3>{post.title}</h3>
-            <p>{post.content}</p>
-            <button>Like</button>
-            <div>
-              <input type="text" placeholder="Add a comment" />
-              <button>Comment</button>
+      <div>
+        {user ? <h2>Welcome back, {user}!</h2> : null}
+        <div className="feed">
+          {posts.map((post, index) => (
+            <div key={index} className="post">
+              <h3>{post.title}</h3>
+              <p>{post.content}</p>
+              <button>Like</button>
+              <div>
+                <input type="text" placeholder="Add a comment" />
+                <button>Comment</button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
