@@ -18,7 +18,6 @@ import {
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
-import { faHouse } from "@fortawesome/free-solid-svg-icons";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -34,7 +33,6 @@ const SideMenu: FC<SideMenuProps> = ({
   onInputFormOpen,
 }) => {
   const navigate = useNavigate();
-  const [isSmallerThan650] = useMediaQuery("(max-width: 650px)");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (

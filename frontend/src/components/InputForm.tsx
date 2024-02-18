@@ -19,6 +19,7 @@ import {
   InputGroup,
   InputRightElement,
   FormErrorMessage,
+  useMediaQuery,
 } from "@chakra-ui/react";
 
 import "../assets/Navbar.css";
@@ -35,6 +36,7 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
   const [show, setShow] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const handleShowClick = () => setShow(!show);
+  const [isLargerThan650] = useMediaQuery("(min-width: 650px)");
 
   const validateEmail = (value: string) => {
     let error = "";
@@ -80,7 +82,7 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
           backdropFilter="blur(3px) hue-rotate(25deg)"
         />
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent width={isLargerThan650 ? "100%" : "85vw"}>
           <ModalHeader>{isLogin ? "Login" : "Create Account"}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>

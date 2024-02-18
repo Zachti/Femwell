@@ -6,6 +6,7 @@ import "./index.css";
 import "./assets/App.css";
 import Home from "./components/Home";
 import CommunityHub from "./components/CommunityHub";
+import Fab from "./components/ActionButton";
 
 const theme = extendTheme({
   styles: {
@@ -41,6 +42,7 @@ const App: FC<{}> = () => {
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
+        <Fab />
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
