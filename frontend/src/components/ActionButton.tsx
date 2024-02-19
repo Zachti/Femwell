@@ -75,7 +75,9 @@ const Fab = () => {
           </Tooltip>
         </ScaleFade>
       )}
-      <LiveChat isOpen={isChatOpen} onClose={onLiveChatClose} />
+      {isChatOpen && (
+        <LiveChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+      )}
     </Box>
   );
 };
