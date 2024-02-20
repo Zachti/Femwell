@@ -99,12 +99,28 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
         position="fixed"
         right={isLargerThan650 ? "1rem" : "0"}
         bottom="1rem"
-        top={isLargerThan650 ? "unset" : "10vh"}
-        width={isExpanded ? "450px" : isLargerThan650 ? "300px" : "100%"}
-        height={isExpanded ? "600px" : isLargerThan650 ? "400px" : "90vh"}
+        top={isLargerThan650 ? "unset" : isExpanded ? "10vh" : "unset"}
+        width={
+          isLargerThan650
+            ? isExpanded
+              ? "450px"
+              : "300px"
+            : isExpanded
+            ? "100%"
+            : "300px"
+        }
+        height={
+          isLargerThan650
+            ? isExpanded
+              ? "600px"
+              : "400px"
+            : isExpanded
+            ? "90vh"
+            : "400px"
+        }
         bg="white"
         boxShadow="0 0 10px rgba(0, 0, 0, 0.35)"
-        borderRadius={isLargerThan650 ? "10px" : "0"}
+        borderRadius={"10px"}
         zIndex="5"
         display="flex"
         flexDirection="column"
@@ -138,20 +154,18 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
           )}
 
           <Flex>
-            {isLargerThan650 && (
-              <IconButton
-                aria-label="Expand"
-                variant="ghost"
-                icon={
-                  isExpanded ? (
-                    <FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} />
-                  ) : (
-                    <FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} />
-                  )
-                }
-                onClick={onExpand}
-              />
-            )}
+            <IconButton
+              aria-label="Expand"
+              variant="ghost"
+              icon={
+                isExpanded ? (
+                  <FontAwesomeIcon icon={faDownLeftAndUpRightToCenter} />
+                ) : (
+                  <FontAwesomeIcon icon={faUpRightAndDownLeftFromCenter} />
+                )
+              }
+              onClick={onExpand}
+            />
 
             <IconButton
               ml="1"
