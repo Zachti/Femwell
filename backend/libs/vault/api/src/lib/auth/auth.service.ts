@@ -18,6 +18,7 @@ import { userSession } from './interfaces/inrefaces';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { awsConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
+import { InjectWolverineSdk, Sdk } from '../wolverine-datasource';
 
 @Injectable()
 export class AuthService {
@@ -26,6 +27,8 @@ export class AuthService {
     private readonly awsCfg: ConfigType<typeof awsConfig>,
     @InjectCognitoToken()
     private readonly userPool: CognitoUserPool,
+    @InjectWolverineSdk()
+    private readonly wolverineSdk: Sdk,
     private readonly logger: LoggerService,
   ) {}
 
@@ -50,17 +53,33 @@ export class AuthService {
           if (!result) {
             reject(err);
           } else {
-            result.user.getSession((err: null, session: CognitoUserSession) => {
-              if (err) {
-                reject(err);
-              }
-              resolve({
-                id: session.getIdToken().decodePayload()['identities'].userId,
-                isValid: session.isValid(),
-                refreshToken: session.getRefreshToken().getToken(),
-                jwt: session.getAccessToken().getJwtToken(),
-              });
-            });
+            result.user.getSession(
+              async (err: null, session: CognitoUserSession) => {
+                if (err) {
+                  reject(err);
+                }
+                this.logger.info(
+                  `user created in cognito user pool: ${this.userPool.getUserPoolId()}`,
+                );
+                const id = session.getIdToken().decodePayload()[
+                  'identities'
+                ].userId;
+                await this.wolverineSdk.sendWolverineMutation(
+                  'create',
+                  {
+                    email,
+                    id,
+                  },
+                  this.logger,
+                );
+                resolve({
+                  id,
+                  isValid: session.isValid(),
+                  refreshToken: session.getRefreshToken().getToken(),
+                  jwt: session.getAccessToken().getJwtToken(),
+                });
+              },
+            );
           }
         },
       );
@@ -160,10 +179,18 @@ export class AuthService {
       },
     });
 
+    const userData = await cognito.adminGetUser(deleteUserData);
+    const id = userData.UserAttributes?.find(
+      (attribute) => attribute.Name === 'sub',
+    );
+
     return new Promise((resolve, reject) => {
       return cognito.adminDeleteUser(deleteUserData, (err) => {
         if (err) reject(err);
-        this.logger.info(`${deleteUserRequest.username} account deleted.`);
+        this.logger.info(
+          `${deleteUserRequest.username} account deleted from cognito.`,
+        );
+        this.wolverineSdk.sendWolverineMutation('delete', { id }, this.logger);
         resolve('User deleted successfully!');
       });
     });
