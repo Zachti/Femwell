@@ -18,6 +18,8 @@ COPY --from=builder /home/node/dist/apps/wolverine/package*.json /home/app/
 
 COPY --from=builder /home/node/dist/ /home/app/dist/
 
+COPY --from=builder /home/node/test.js /home/app/
+
 RUN npm ci --ignore-scripts
 
 RUN apk --no-cache add curl
