@@ -5,15 +5,41 @@ import {
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { GqlConfigService } from './GqlConfigService';
-import { QuestionnaireModule } from '../questionnaire/questionnaire.module';
-import { QuestionnaireService } from '../questionnaire/questionnaire.service';
-import { LiveChatModule } from '../liveChat/live-chat.module';
-import { LiveChatService } from '../liveChat/live-chat.service';
+import {
+  UserModule,
+  PostModule,
+  CommentModule,
+  LikeModule,
+  QuestionnaireModule,
+  LiveChatModule,
+  LiveChatService,
+} from '../index';
+import {
+  UserService,
+  PostService,
+  CommentService,
+  LikeService,
+  QuestionnaireService,
+} from '../index';
 @Module({
   imports: [
     GraphQLModule.forRootAsync<ApolloFederationDriverConfig>({
-      imports: [QuestionnaireModule, LiveChatModule],
-      inject: [QuestionnaireService, LiveChatService],
+      imports: [
+        UserModule,
+        PostModule,
+        CommentModule,
+        LikeModule,
+        QuestionnaireModule,
+        LiveChatModule,
+      ],
+      inject: [
+        UserService,
+        PostService,
+        CommentService,
+        LikeService,
+        QuestionnaireService,
+        LiveChatService,
+      ],
       driver: ApolloFederationDriver,
       useClass: GqlConfigService,
     }),

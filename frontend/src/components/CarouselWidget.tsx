@@ -25,15 +25,19 @@ const CarouselComponent: FC<CarouselProps> = ({ label }) => {
   }, []);
 
   const responsive = {
-    superLargeDesktop: {
-      breakpoint: { max: 4000, min: 1200 },
+    ultraLargeDesktop: {
+      breakpoint: { max: 4000, min: 1625 },
+      items: 6,
+    },
+    largeDesktop: {
+      breakpoint: { max: 1625, min: 1200 },
       items: 5,
     },
-    LargeDesktop: {
+    mediumDesktop: {
       breakpoint: { max: 1200, min: 1024 },
       items: 4,
     },
-    desktop: {
+    smallDesktop: {
       breakpoint: { max: 1000, min: 700 },
       items: 3,
     },
@@ -68,6 +72,10 @@ const CarouselComponent: FC<CarouselProps> = ({ label }) => {
     },
     {
       label: "Here for you 5",
+      content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    },
+    {
+      label: "Here for you 6",
       content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
     },
   ];

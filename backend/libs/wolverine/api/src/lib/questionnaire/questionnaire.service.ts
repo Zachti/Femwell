@@ -1,37 +1,43 @@
 import { Injectable } from '@nestjs/common';
 import { CreateQuestionnaireInput } from './dto/createQuestionnaire.input';
 import { LoggerService } from '@backend/logger';
-import { PrismaService } from '../prisma/prisma.service';
-import { v4 as uuidv4 } from 'uuid';
+import { PrismaService } from '../shared/prisma/prisma.service';
+import { ErrorService } from '../shared/error/error.service';
+import {
+  InternalServerError,
+  NotFoundError,
+} from '../shared/error/customErrors';
 import { Questionnaire } from '@prisma/client';
-import { GraphQLError } from 'graphql';
 
 @Injectable()
 export class QuestionnaireService {
   constructor(
     private readonly logger: LoggerService,
     private readonly prisma: PrismaService,
+    private readonly error: ErrorService,
   ) {}
-  async create(input: CreateQuestionnaireInput): Promise<Questionnaire> {
+  async createQuestionnaire(
+    input: CreateQuestionnaireInput,
+  ): Promise<Questionnaire> {
     try {
       this.logger.info(
         `Creating new questionnaire for user: ${input.username}.`,
       );
-      const questionnaireId = uuidv4();
       const responsesData = input.responses.map((response) => ({
         question: response.question,
-        response: response.response,
-        questionnaireId,
+        answer: response.answer || '',
       }));
       const result = await this.prisma.questionnaire.create({
         data: {
-          id: questionnaireId,
-          username: input.username,
+          userId: input.userId,
           responses: {
             createMany: {
               data: responsesData,
             },
           },
+        },
+        include: {
+          responses: true,
         },
       });
       this.logger.info(
@@ -39,12 +45,7 @@ export class QuestionnaireService {
       );
       return result;
     } catch (e) {
-      this.logger.error('Failed to create questionnaire.');
-      throw new GraphQLError('Failed to create questionnaire.', {
-        extensions: {
-          code: 'INTERNAL_SERVER_ERROR',
-        },
-      });
+      this.error.handleError(new InternalServerError());
     }
   }
 
@@ -57,12 +58,7 @@ export class QuestionnaireService {
       );
       return result;
     } catch (e) {
-      this.logger.error('Failed to find questionnaires.');
-      throw new GraphQLError('Failed to find questionnaires.', {
-        extensions: {
-          code: 'INTERNAL_SERVER_ERROR',
-        },
-      });
+      this.error.handleError(new InternalServerError());
     }
   }
 
@@ -71,16 +67,29 @@ export class QuestionnaireService {
       this.logger.info(`Finding questionnaire with id: ${id}.`);
       const result = await this.prisma.questionnaire.findUnique({
         where: { id },
+        include: { responses: true },
       });
       this.logger.info('Questionnaire found successfully.');
-      return result as Questionnaire;
+      return result;
     } catch (e) {
-      this.logger.error(`Failed to find questionnaire with id: ${id}.`);
-      throw new GraphQLError(`Failed to find questionnaire with id: ${id}.`, {
-        extensions: {
-          code: 'INTERNAL_SERVER_ERROR',
-        },
+      this.error.handleError(new NotFoundError());
+    }
+  }
+
+  async findOneByUser(userId: string): Promise<Questionnaire> {
+    try {
+      this.logger.info(`Finding questionnaire by userId: ${userId}.`);
+      const result = await this.prisma.questionnaire.findUnique({
+        where: { userId },
+        include: { responses: true },
       });
+      this.logger.info('Questionnaire found successfully.');
+      return result;
+    } catch (e) {
+      this.logger.error(
+        `Failed to find questionnaire with for the user: ${userId}, possibly haven't created one.`,
+      );
+      this.error.handleError(new NotFoundError());
     }
   }
 }
