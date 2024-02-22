@@ -13,3 +13,8 @@ export enum MimeTypes {
   JPG = 'image/jpeg',
   PNG = 'image/png',
 }
+
+export interface Email {
+  to: string;
+  buffer: Buffer;
+}

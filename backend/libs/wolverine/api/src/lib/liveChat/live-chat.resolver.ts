@@ -13,7 +13,6 @@ import { LoggerService } from '@backend/logger';
 import { LiveChat } from './entities/liveChat.entity';
 import { Role, Roles } from '@backend/infrastructure';
 import { GraphQLError } from 'graphql/index';
-import { AuthUser } from '@backend/auth';
 import { RequestContext } from '../graphQL/interfaces';
 import { GraphQLString } from 'graphql/type';
 
@@ -34,7 +33,7 @@ export class LiveChatResolver {
   newMessage(@Args('liveChatId') liveChatId: number) {
     return this.pubSub.asyncIterator(`newMessage.${liveChatId}`);
   }
-  @Subscription(() => AuthUser, {
+  @Subscription(() => String, {
     nullable: true,
     resolve: (value) => value.user,
     filter: (payload, variables) => {
@@ -45,7 +44,7 @@ export class LiveChatResolver {
     return this.pubSub.asyncIterator(`userStartedTyping.${liveChatId}`);
   }
 
-  @Subscription(() => AuthUser, {
+  @Subscription(() => String, {
     nullable: true,
     resolve: (value) => value.user,
     filter: (payload, variables) => {
