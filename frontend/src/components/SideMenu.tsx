@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Flex,
-  Text,
-  Input,
   Button,
   Drawer,
   DrawerBody,
@@ -18,6 +16,8 @@ import {
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
+import useAuthStore from "../store/authStore";
+import useLogout from "../hooks/useLogout";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -33,7 +33,8 @@ const SideMenu: FC<SideMenuProps> = ({
   onInputFormOpen,
 }) => {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { logout, isLoggingOut } = useLogout();
+  const authUser = useAuthStore((state) => state.user);
 
   return (
     <Drawer
@@ -50,8 +51,16 @@ const SideMenu: FC<SideMenuProps> = ({
         borderLeft="3px solid var(--secondary-color)"
       >
         <DrawerHeader mb="-4">
-          <Box>Welcome Back!</Box>
-          <Box>XYZ</Box>
+          {authUser ? (
+            <>
+              <Box>Welcome Back!</Box>
+              <Box>{`${authUser.username}`}</Box>
+            </>
+          ) : (
+            <>
+              <Box>Welcome to FemWell!</Box>
+            </>
+          )}
         </DrawerHeader>
         <DrawerBody>
           <VStack justifyContent="center" alignItems="center" spacing={5}>
@@ -105,7 +114,7 @@ const SideMenu: FC<SideMenuProps> = ({
             >
               Premium
             </Button>
-            {!isLoggedIn && (
+            {!authUser && (
               <Button
                 colorScheme="pink"
                 w="full"
@@ -118,13 +127,17 @@ const SideMenu: FC<SideMenuProps> = ({
             )}
           </VStack>
         </DrawerBody>
-        {isLoggedIn && (
+        {authUser && (
           <DrawerFooter>
             <Button
               variant="outline"
               colorScheme="pink"
               w="full"
-              onClick={onClose}
+              onClick={() => {
+                logout();
+                onClose();
+              }}
+              isLoading={isLoggingOut}
             >
               Logout
             </Button>

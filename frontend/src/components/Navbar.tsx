@@ -10,6 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import InputForm from "./InputForm";
 import SideMenu from "./SideMenu";
+import useAuthStore from "../store/authStore";
 
 const Navbar: FC<{}> = () => {
   const {
@@ -22,12 +23,9 @@ const Navbar: FC<{}> = () => {
     onOpen: onInputFormOpen,
     onClose: onInputFormClose,
   } = useDisclosure();
+  const authUser = useAuthStore((state) => state.user);
   const [logoText, setLogoText] = useState<string>("FemWell");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
-  const closeMobileMenu = (): void => {
-    onSideMenuClose();
-  };
 
   const handleClick = (): void => {
     if (!isSideMenuOpen) {
@@ -49,6 +47,9 @@ const Navbar: FC<{}> = () => {
   }, []);
 
   useEffect(() => {
+    if (windowWidth > 930) {
+      onSideMenuClose();
+    }
     if (windowWidth < 500) {
       setLogoText("FW");
     } else {
@@ -60,7 +61,7 @@ const Navbar: FC<{}> = () => {
     <>
       <nav className="navbar">
         <div className="navbar-container">
-          <Link to="/" className="navbar-logo" onClick={closeMobileMenu}>
+          <Link to="/" className="navbar-logo" onClick={onSideMenuClose}>
             {logoText}
             <FontAwesomeIcon icon={faHeartCircleCheck} />
           </Link>
@@ -70,7 +71,7 @@ const Navbar: FC<{}> = () => {
             </div>
             <ul className="nav-menu">
               <li className="nav-item">
-                <Link to="/" className="nav-links" onClick={closeMobileMenu}>
+                <Link to="/" className="nav-links" onClick={onSideMenuClose}>
                   Home
                 </Link>
               </li>
@@ -78,7 +79,7 @@ const Navbar: FC<{}> = () => {
                 <Link
                   to="/community"
                   className="nav-links"
-                  onClick={closeMobileMenu}
+                  onClick={onSideMenuClose}
                 >
                   Community
                 </Link>
@@ -87,7 +88,7 @@ const Navbar: FC<{}> = () => {
                 <Link
                   to="/contact"
                   className="nav-links"
-                  onClick={closeMobileMenu}
+                  onClick={onSideMenuClose}
                 >
                   Contact
                 </Link>
@@ -96,21 +97,23 @@ const Navbar: FC<{}> = () => {
                 <Link
                   to="/premium"
                   className="nav-links"
-                  onClick={closeMobileMenu}
+                  onClick={onSideMenuClose}
                 >
                   Premium
                 </Link>
               </li>
-              <li className="nav-item">
-                <a
-                  className="nav-links"
-                  onClick={() => {
-                    onInputFormOpen();
-                  }}
-                >
-                  Login
-                </a>
-              </li>
+              {!authUser ? (
+                <li className="nav-item">
+                  <a
+                    className="nav-links"
+                    onClick={() => {
+                      onInputFormOpen();
+                    }}
+                  >
+                    Login
+                  </a>
+                </li>
+              ) : null}
             </ul>
           </div>
         </div>

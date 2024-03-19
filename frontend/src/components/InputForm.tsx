@@ -24,6 +24,15 @@ import {
 
 import "../assets/Navbar.css";
 import { Formik, Field } from "formik";
+import {
+  validateEmail,
+  validateUsername,
+  validatePassword,
+  validateConfirmPassword,
+  validatePhone,
+} from "../utils/formValidations";
+import useSignupEmailPassword from "../hooks/useSignupEmailPassword";
+import useLogin from "../hooks/useLogin";
 
 interface InputFormProps {
   isOpen: boolean;
@@ -36,43 +45,9 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
   const [show, setShow] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const handleShowClick = () => setShow(!show);
+  const { signup, isSigningUp, errorSU } = useSignupEmailPassword();
+  const { login, isLoggingIn, errorLI } = useLogin();
   const [isLargerThan650] = useMediaQuery("(min-width: 650px)");
-
-  const validateEmail = (value: string) => {
-    let error = "";
-    const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-    !emailRegex.test(value) ? (error = "Invalid email") : "";
-    if (!value) {
-      error = "*Required";
-    }
-    return error;
-  };
-
-  const validatePassword = (value: string) => {
-    let error = "";
-    const passwordRegex =
-      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9]).*$/;
-
-    value.length < 8 ? (error = "Password must be 8 characters long") : "";
-    !passwordRegex.test(value)
-      ? (error = "Password invalid")
-      : setPassValue(value);
-    if (!value) {
-      error = "*Required";
-    }
-
-    return error;
-  };
-
-  const validateConfirmPassword = (value: string) => {
-    let error = "";
-    if (passValue && value) {
-      if (passValue !== value) {
-        error = "Password not matched";
-      }
-    }
-    return error;
-  };
 
   return (
     <>
@@ -91,10 +66,25 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                 email: "",
                 password: "",
                 confirmPassword: isLogin ? undefined : "",
+                username: isLogin ? undefined : "",
                 phone: isLogin ? undefined : "",
                 login: isLogin,
               }}
-              onSubmit={(values) => alert(JSON.stringify(values, null, 2))}
+              onSubmit={
+                isLogin
+                  ? async (values) => {
+                      const success = await login(values);
+                      if (success) {
+                        onClose();
+                      }
+                    }
+                  : async (values) => {
+                      const success = await signup(values);
+                      if (success) {
+                        onClose();
+                      }
+                    }
+              }
               enableReinitialize
             >
               {({ handleSubmit, errors, touched }) => (
@@ -118,6 +108,27 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                       <FormErrorMessage>{errors.email}</FormErrorMessage>
                     </FormControl>
 
+                    {/* username input */}
+                    {!isLogin && (
+                      <FormControl
+                        isInvalid={!!errors.username && touched.username}
+                      >
+                        <FormLabel htmlFor="username">Username</FormLabel>
+                        <InputGroup>
+                          <Field
+                            as={Input}
+                            placeholder="JohnDoe"
+                            id="username"
+                            name="username"
+                            type="text"
+                            variant="filled"
+                            validate={validateUsername}
+                          />
+                        </InputGroup>
+                        <FormErrorMessage>{errors.username}</FormErrorMessage>
+                      </FormControl>
+                    )}
+
                     {/* password input */}
                     <FormControl
                       isInvalid={!!errors.password && touched.password}
@@ -131,7 +142,12 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                           name="password"
                           type={show ? "text" : "password"}
                           variant="filled"
-                          validate={validatePassword}
+                          validate={
+                            isLogin
+                              ? ""
+                              : (value: string) =>
+                                  validatePassword(value, setPassValue)
+                          }
                         ></Field>
                         <InputRightElement width="4.5rem">
                           <Button size="sm" onClick={handleShowClick}>
@@ -161,7 +177,9 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                               name="confirmPassword"
                               type={show ? "text" : "password"}
                               variant="filled"
-                              validate={validateConfirmPassword}
+                              validate={(value: string) =>
+                                validateConfirmPassword(value, passValue)
+                              }
                             ></Field>
                           </InputGroup>
                           <FormErrorMessage>
@@ -170,7 +188,9 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                         </FormControl>
 
                         {/* phone  input */}
-                        <FormControl isInvalid={!!errors.phone}>
+                        <FormControl
+                          isInvalid={!!errors.phone && touched.phone}
+                        >
                           <FormLabel htmlFor="phone">Phone</FormLabel>
                           <InputGroup>
                             <Field
@@ -180,8 +200,10 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                               name="phone"
                               type="tel"
                               variant="filled"
+                              validate={validatePhone}
                             ></Field>
                           </InputGroup>
+                          <FormErrorMessage>{errors.phone}</FormErrorMessage>
                         </FormControl>
 
                         <Flex
@@ -213,7 +235,12 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
 
                     {/* submit and form change buttons */}
                     <ModalFooter pl={0}>
-                      <Button type="submit" mr={4} colorScheme="pink">
+                      <Button
+                        type="submit"
+                        mr={4}
+                        colorScheme="pink"
+                        isLoading={isSigningUp || isLoggingIn}
+                      >
                         {isLogin ? "Login" : "Submit"}
                       </Button>
                       <Button
