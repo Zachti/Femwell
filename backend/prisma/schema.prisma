@@ -5,30 +5,75 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// datasource db {
+//   provider = "postgres"
+//   url      = env("DATABASE_URL")
+// }
+
 datasource db {
   provider = "mysql"
   url      = env("AWS_AURORA_URL")
 }
 
-model Reponses {
-  id              Int            @id @default(autoincrement())
-  question        String
-  response        String
-  Questionnaire   Questionnaire? @relation(fields: [questionnaireId], references: [id])
-  questionnaireId String
+model User {
+  id            String         @id @default(uuid())
+  username      String
+  posts         Post[]
+  comments      Comment[]      @relation("UserComments")
+  likes         Like[]         @relation("UserLikes")
+  questionnaire Questionnaire?
+  liveChats     LiveChat[]     
+  messages      Message[]      @relation("UserMessages")
+}
+
+model Post {
+  id        String    @id @default(uuid())
+  username  String
+  content   String
+  likes     Like[]
+  comments  Comment[]
+  
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+}
+
+model Like {
+  id        Int       @id @default(autoincrement())
+  username  String
+
+  user      User      @relation("UserLikes", fields: [userId], references: [id])
+  userId    String    
+  post      Post      @relation(fields: [postId], references: [id])
+  postId    String
+
+  @@unique([postId, userId])
+}
+
+model Comment {
+  id        Int       @id @default(autoincrement())
+  content   String
+  
+  user      User      @relation("UserComments", fields: [userId], references: [id])
+  userId    String
+  post      Post      @relation(fields: [postId], references: [id])
+  postId    String
 }
 
 model Questionnaire {
-  id        String     @id
-  username  String
-  responses Reponses[]
+  id        String    @id @default(uuid())
+  responses Response[]
+
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String    @unique
 }
 
-model User {
-  id        Int        @id
-  fullname  String
-  liveChats LiveChat[] @relation("LiveChatUsers")
-  messages  Message[]
+model Response {
+  id        Int       @id @default(autoincrement())
+  question  String
+  answer    String?
+
+  Questionnaire   Questionnaire @relation(fields: [questionnaireId], references: [id])
+  questionnaireId String         
 }
 
 model LiveChat {
@@ -36,28 +81,17 @@ model LiveChat {
   name          String
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  users         User[]          @relation("LiveChatUsers")
+  users         User[]          
   messages      Message[]
-  liveChatUsers LiveChatUsers[]
 }
 
 model Message {
   id         Int      @id @default(autoincrement())
   content    String
-  userId     Int
+  userId     String
   liveChatId Int
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       User     @relation("UserMessages", fields: [userId], references: [id], onDelete: Cascade)
   liveChat   LiveChat @relation(fields: [liveChatId], references: [id], onDelete: Cascade)
-}
-
-model LiveChatUsers {
-  liveChatId Int
-  userId     Int
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  liveChat   LiveChat @relation(fields: [liveChatId], references: [id], onDelete: Cascade)
-
-  @@id([liveChatId, userId])
 }

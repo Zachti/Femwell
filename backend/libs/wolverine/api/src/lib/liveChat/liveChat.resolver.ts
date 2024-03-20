@@ -7,25 +7,25 @@ import {
   Subscription,
 } from '@nestjs/graphql';
 import { PubSub } from 'graphql-subscriptions';
-import { LiveChatService } from './live-chat.service';
+import { LiveChatService } from './liveChat.service';
 import { Message } from './entities/message.entity';
-import { LoggerService } from '@backend/logger';
 import { LiveChat } from './entities/liveChat.entity';
+import { LoggerService } from '@backend/logger';
 import { Role, Roles } from '@backend/infrastructure';
 import { GraphQLError } from 'graphql/index';
 import { RequestContext } from '../graphQL/interfaces';
-import { GraphQLString } from 'graphql/type';
+import { User } from '../shared/user/entities/user.entity';
+import { InjectPubSubToken } from './providers/pubSub.provider';
+import { UserService } from '../shared/user/user.service';
 
 @Resolver(() => LiveChat)
 export class LiveChatResolver {
-  private pubSub: PubSub;
-
   constructor(
+    @InjectPubSubToken() private pubSub: PubSub,
     private readonly liveChatService: LiveChatService,
     private readonly logger: LoggerService,
-  ) {
-    this.pubSub = new PubSub();
-  }
+    private readonly userService: UserService,
+  ) {}
   @Subscription(() => Message, {
     nullable: true,
     resolve: (value) => value.newMessage,
@@ -33,53 +33,65 @@ export class LiveChatResolver {
   newMessage(@Args('liveChatId') liveChatId: number) {
     return this.pubSub.asyncIterator(`newMessage.${liveChatId}`);
   }
-  @Subscription(() => String, {
+  @Subscription(() => User, {
     nullable: true,
     resolve: (value) => value.user,
     filter: (payload, variables) => {
       return variables.userId !== payload.typingUserId;
     },
   })
-  userStartedTyping(@Args('liveChatId') liveChatId: number) {
+  userStartedTyping(
+    @Args('liveChatId') liveChatId: number,
+    @Args('userId') userId: string,
+  ) {
     return this.pubSub.asyncIterator(`userStartedTyping.${liveChatId}`);
   }
 
-  @Subscription(() => String, {
+  @Subscription(() => User, {
     nullable: true,
     resolve: (value) => value.user,
     filter: (payload, variables) => {
       return variables.userId !== payload.typingUserId;
     },
   })
-  userStoppedTyping(@Args('liveChatId') liveChatId: number) {
+  userStoppedTyping(
+    @Args('liveChatId') liveChatId: number,
+    @Args('userId') userId: string,
+  ) {
     return this.pubSub.asyncIterator(`userStoppedTyping.${liveChatId}`);
   }
 
-  @Mutation(() => GraphQLString)
+  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Mutation(() => User)
   async userStartedTypingMutation(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: number,
+    @Args('userId') userId: string,
     @Context() context: { req: RequestContext },
   ) {
+    const user = await this.userService.findOne(userId);
+
     await this.pubSub.publish(`userStartedTyping.${liveChatId}`, {
-      user: context.req.userPayload,
+      user,
       typingUserId: userId,
     });
-    return userId;
+    return user;
   }
 
-  @Mutation(() => GraphQLString)
+  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Mutation(() => User)
   async userStoppedTypingMutation(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: number,
+    @Args('userId') userId: string,
     @Context() context: { req: RequestContext },
   ) {
+    const user = await this.userService.findOne(userId);
+
     await this.pubSub.publish(`userStoppedTyping.${liveChatId}`, {
-      user: context.req.userPayload,
+      user,
       typingUserId: userId,
     });
 
-    return userId;
+    return user;
   }
 
   @Roles([Role.Padulla, Role.Premium, Role.User])
@@ -87,7 +99,7 @@ export class LiveChatResolver {
   async sendMessage(
     @Args('liveChatId') liveChatId: number,
     @Args('content') content: string,
-    @Args('userId') userId: number,
+    @Args('userId') userId: string,
   ) {
     const newMessage = await this.liveChatService.sendMessage(
       liveChatId,
@@ -110,7 +122,7 @@ export class LiveChatResolver {
   @Mutation(() => LiveChat)
   async createLiveChat(
     @Args('name') name: string,
-    @Args('userId') userId: number,
+    @Args('userId') userId: string,
   ) {
     return this.liveChatService.createLiveChat(name, userId);
   }
@@ -119,25 +131,30 @@ export class LiveChatResolver {
   @Mutation(() => LiveChat)
   async addPadullaToLiveChat(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: number,
+    @Args('userId') userId: string,
   ) {
     return this.liveChatService.addPadullaToLiveChat(liveChatId, userId);
   }
 
+  @Roles([Role.Padulla, Role.Premium, Role.User])
   @Query(() => [LiveChat])
   async getLiveChat(@Args('liveChatId') liveChatId: number) {
     return this.liveChatService.getLiveChat(liveChatId);
   }
 
+  @Roles([Role.Padulla, Role.Premium, Role.User])
   @Query(() => [LiveChat])
-  async getPreviousChatsForUser(@Args('userId') userId: number) {
+  async getPreviousChatsForUser(@Args('userId') userId: string) {
     return this.liveChatService.getPreviousChatsForUser(userId);
   }
 
+  @Roles([Role.Padulla, Role.Premium, Role.User])
   @Query(() => [Message])
   async getMessagesForLiveChat(@Args('liveChatId') liveChatId: number) {
     return this.liveChatService.getMessagesForLiveChat(liveChatId);
   }
+
+  @Roles([Role.Padulla, Role.Premium, Role.User])
   @Mutation(() => LiveChat)
   async deleteLiveChat(@Args('liveChatId') liveChatId: number) {
     return await this.liveChatService.deleteLiveChat(liveChatId);
@@ -147,7 +164,7 @@ export class LiveChatResolver {
   @Mutation(() => Boolean)
   async enterLiveChat(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: number,
+    @Args('userId') userId: string,
   ) {
     await this.pubSub
       .publish(`userInLiveCha: ${liveChatId}`, {
@@ -169,7 +186,7 @@ export class LiveChatResolver {
   @Mutation(() => Boolean)
   async leaveChatroom(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: number,
+    @Args('userId') userId: string,
   ) {
     await this.pubSub.publish(`UserLeftLiveChat: ${liveChatId}`, {
       userId,

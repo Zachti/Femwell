@@ -1,6 +1,6 @@
 import { FC } from "react";
 import "../assets/Home.css";
-import CarouselComponent from "./CarouselWidget";
+import CarouselComponent from "../components/CarouselWidget";
 
 const Home: FC<{}> = () => {
   return (

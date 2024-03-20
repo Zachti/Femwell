@@ -10,6 +10,7 @@ node_modules
 .terraform
 .terraform.lock.hcl
 terraform.tfstate.backup
+prisma/migrations
 
 # IDEs and editors
 .idea

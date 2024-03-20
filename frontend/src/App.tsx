@@ -4,9 +4,10 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import Navbar from "./components/Navbar";
 import "./index.css";
 import "./assets/App.css";
-import Home from "./components/Home";
-import CommunityHub from "./components/CommunityHub";
+import Home from "./pages/Home";
+import CommunityHub from "./pages/CommunityHub";
 import Fab from "./components/ActionButton";
+import useAuthStore from "./store/authStore";
 
 const theme = extendTheme({
   styles: {
@@ -20,6 +21,7 @@ const theme = extendTheme({
 });
 
 const App: FC<{}> = () => {
+  const authUser = useAuthStore((state) => state.user);
   const user = "John Doe";
   const posts = [
     {
@@ -42,7 +44,7 @@ const App: FC<{}> = () => {
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
-        <Fab />
+        {authUser ? <Fab /> : null}
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />

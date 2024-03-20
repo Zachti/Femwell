@@ -5,10 +5,10 @@ import { GqlOptionsFactory } from '@nestjs/graphql';
 import { randomUUID } from 'crypto';
 import { join } from 'path';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { LoggerService } from '@backend/logger';
-import { awsConfig, commonConfig } from '@backend/config';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 import { RequestContext, Context } from './interfaces';
+import { LoggerService } from '@backend/logger';
+import { awsConfig, commonConfig } from '@backend/config';
 
 @Injectable()
 export class GqlConfigService
@@ -44,6 +44,7 @@ export class GqlConfigService
     };
   }
 
+  // REMEMBER THIS
   private async getRequestContext(
     expressContext: any,
   ): Promise<RequestContext> {
@@ -62,6 +63,10 @@ export class GqlConfigService
         requestId,
       };
     }
-    throw new UnauthorizedException('Unauthorized: Invalid token');
+    return {
+      userPayload: null,
+      requestId,
+    };
+    //throw new UnauthorizedException('Unauthorized: Invalid token');
   }
 }

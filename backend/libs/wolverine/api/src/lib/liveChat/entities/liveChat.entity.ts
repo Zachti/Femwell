@@ -2,23 +2,24 @@ import { Field, ObjectType, ID } from '@nestjs/graphql';
 import { GraphQLDate } from 'graphql-scalars';
 import { GraphQLString } from 'graphql/type';
 import { Message } from './message.entity';
+import { User } from '../../shared/user/entities/user.entity';
 
 @ObjectType()
 export class LiveChat {
-  @Field(() => ID, { nullable: true })
-  id?: string;
+  @Field(() => ID)
+  id!: string;
 
   @Field(() => GraphQLString, { nullable: true })
-  name?: string;
+  name!: string;
 
-  @Field(() => GraphQLDate, { nullable: true })
-  createdAt?: Date;
+  @Field(() => GraphQLDate)
+  createdAt!: Date;
 
   @Field(() => GraphQLDate, { nullable: true })
   updatedAt?: Date;
 
-  @Field(() => [ID], { nullable: true }) // array of user IDs for padulla id and client id
-  usersIds?: string[];
+  @Field(() => [User]) // array of users that have joined the livechat
+  users: User[];
 
   @Field(() => [Message], { nullable: true }) // array of messages
   messages?: Message[];
