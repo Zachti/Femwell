@@ -13,6 +13,7 @@ import {
   VStack,
   useMediaQuery,
   TagLeftIcon,
+  Avatar,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
@@ -53,8 +54,20 @@ const SideMenu: FC<SideMenuProps> = ({
         <DrawerHeader mb="-4">
           {authUser ? (
             <>
-              <Box>Welcome Back!</Box>
-              <Box>{`${authUser.username}`}</Box>
+              <Flex direction="row" align="center">
+                <VStack align="start">
+                  <Box>Welcome Back!</Box>
+                  <Box>{`${authUser.username}`}</Box>
+                </VStack>
+                <Avatar
+                  bgColor={"pink.500"}
+                  color={"white"}
+                  name={`${authUser.username}`}
+                  size="lg"
+                  src={`${authUser.pfpURL}`}
+                  ml="auto"
+                />
+              </Flex>
             </>
           ) : (
             <>
