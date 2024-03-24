@@ -21,10 +21,10 @@ import {CloudFront} from "@aws-sdk/client-cloudfront";
       serviceObjects: [{ client: CloudFront }],
       useFactory: (config: ConfigType<typeof awsConfig>) => {
         return {
-          region: config.region!,
+          region: config.region,
           credentials: {
-            secretAccessKey: config.secretKey!,
-            accessKeyId: config.accessKey!,
+            secretAccessKey: config.secretKey,
+            accessKeyId: config.accessKey,
           },
         };
       },

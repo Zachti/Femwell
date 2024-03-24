@@ -27,10 +27,10 @@ import { SES } from '@aws-sdk/client-ses';
       serviceObjects: [{ client: S3 }, { client: SES }],
       useFactory: (config: ConfigType<typeof awsConfig>) => {
         return {
-          region: config.region!,
+          region: config.region,
           credentials: {
-            secretAccessKey: config.secretKey!,
-            accessKeyId: config.accessKey!,
+            secretAccessKey: config.secretKey,
+            accessKeyId: config.accessKey,
           },
         };
       },
