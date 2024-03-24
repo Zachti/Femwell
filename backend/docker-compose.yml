@@ -1,6 +1,23 @@
 version: '3'
 
 services:
+  localstack:
+    image: localstack/localstack
+    container_name: localstack
+    restart: unless-stopped
+    ports:
+      - '4566:4566'
+      - '4510-4559:4510-4559'
+    environment:
+      #      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock # required for localstack׳s lambda service
+    networks:
+      - backend_network
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./development/localstack:/var/lib/localstack"
+      - "./development/localstack:/etc/localstack/init/ready.d"
+    hostname: localstack
   vault:
     ports:
       - '3002:3002'
@@ -16,6 +33,8 @@ services:
     env_file:
       - 'apps/vault/development/local.env'
       - 'development/local-base.env'
+    depends_on:
+      - localstack
     networks:
       - backend_network
   heimdall:
@@ -33,6 +52,8 @@ services:
     env_file:
       - 'apps/heimdall/development/local.env'
       - 'development/local-base.env'
+    depends_on:
+      - localstack
     networks:
       - backend_network
   wolverine:
