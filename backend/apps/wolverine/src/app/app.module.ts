@@ -7,7 +7,8 @@ import {
 import {
   QuestionnaireModule,
   LiveChatModule,
-  wolverineConfigObject, PrismaModule,
+  wolverineConfigObject,
+  PrismaModule,
 } from '@backend/wolverine';
 import { HealthModule } from '@backend/infrastructure';
 import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';

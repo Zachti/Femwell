@@ -48,6 +48,15 @@
     ],
     "sharedGlobals": []
   },
-  "nxCloudAccessToken": "MjAxODNmM2QtYjU2NS00NmM2LWFmODAtZjlkYTU0YjIwNTFjfHJlYWQtd3JpdGU=",
-  "parallel": 3
+  "nxCloudAccessToken": "ZjJhZWNlNzItZTU5My00NTljLWI4M2UtYWVlOTk5OGExNjg4fHJlYWQtd3JpdGU=",
+  "parallel": 3,
+  "defaultBase": "main",
+  "plugins": [
+    {
+      "plugin": "@nx/eslint/plugin",
+      "options": {
+        "targetName": "lint"
+      }
+    }
+  ]
 }

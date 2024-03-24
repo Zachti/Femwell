@@ -53,3 +53,5 @@ apps/vt
 #keys
 *.pem
 *.key
+
+.nx/cache
