@@ -10,8 +10,7 @@ import {
   useMediaQuery,
   Spinner,
   VStack,
-  Slide,
-  ScaleFade,
+  AvatarBadge,
   Fade,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -134,13 +133,18 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
           borderBottom="2px solid var(--secondary-color)"
         >
           {isLoading ? (
-            <Spinner
-              thickness="2px"
-              speed="0.65s"
-              emptyColor="gray.200"
-              color="var(--secondary-color)"
-              size="lg"
-            />
+            <Flex align="center">
+              <Spinner
+                thickness="2px"
+                speed="0.65s"
+                emptyColor="gray.200"
+                color="var(--secondary-color)"
+                size="lg"
+              />
+              <Text ml="2" fontStyle={"italic"}>
+                Loading...
+              </Text>
+            </Flex>
           ) : (
             <Flex align="center">
               <Avatar
@@ -148,7 +152,9 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
                 name="John Doe"
                 bgColor="var(--secondary-color)"
                 //   src="link"
-              />
+              >
+                <AvatarBadge boxSize="1.25em" bg="green.500" />
+              </Avatar>
               <Text ml="2">John Doe</Text>
             </Flex>
           )}
@@ -188,7 +194,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
               borderRadius="lg"
               p="2"
               mt="2"
-              maxW="70%"
+              maxW="80%"
             >
               <Text>{msg.message}</Text>
             </Box>

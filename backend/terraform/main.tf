@@ -31,12 +31,16 @@ resource "aws_ecs_cluster" "femwell" {
   name = "femwell"
 }
 
+data "aws_iam_role" "existing" {
+  name = "LabRole"
+}
+
 resource "aws_ecs_task_definition" "femwell_task" {
   family                   = "femwell-task"
   container_definitions    = jsonencode(
   [
     {
-      name: "femwell-task",
+      name: "femwell-task-wolverine",
       image: aws_ecr_repository.wolverine_ecr_repo.repository_url,
       essential: true,
       portMappings: [
@@ -49,7 +53,7 @@ resource "aws_ecs_task_definition" "femwell_task" {
       cpu: 256
     },
     {
-      name: "femwell-task",
+      name: "femwell-task-denden",
       image: aws_ecr_repository.denden_ecr_repo.repository_url,
       essential: true,
       portMappings: [
@@ -62,7 +66,7 @@ resource "aws_ecs_task_definition" "femwell_task" {
       cpu: 256
     },
     {
-      name: "femwell-task",
+      name: "femwell-task-vault",
       image: aws_ecr_repository.vault_ecr_repo.repository_url,
       essential: true,
       portMappings: [
@@ -75,7 +79,7 @@ resource "aws_ecs_task_definition" "femwell_task" {
       cpu: 256
     },
     {
-      name: "femwell-task",
+      name: "femwell-task-heimdall",
       image: aws_ecr_repository.heimdall_ecr_repo.repository_url,
       essential: true,
       portMappings: [
@@ -90,47 +94,19 @@ resource "aws_ecs_task_definition" "femwell_task" {
   ])
   requires_compatibilities = ["FARGATE"] # use Fargate as the launch type
   network_mode             = "awsvpc"    # add the AWS VPN network mode as this is required for Fargate
-  memory                   = 512         # Specify the memory the container requires
-  cpu                      = 256         # Specify the CPU the container requires
-  execution_role_arn       = aws_iam_role.ecsTaskExecutionRole.arn
+  memory                   = 2048         # Specify the memory the container requires
+  cpu                      = 1024         # Specify the CPU the container requires
+  execution_role_arn       = data.aws_iam_role.existing.arn
 }
 
-resource "aws_iam_role" "ecsTaskExecutionRole" {
-  name               = "ecsTaskExecutionRole"
-  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
-}
 
-data "aws_iam_policy_document" "assume_role_policy" {
-  statement {
-    actions = ["sts:AssumeRole"]
 
-    principals {
-      type        = "Service"
-      identifiers = ["ecs-tasks.amazonaws.com"]
-    }
-  }
-}
 
-resource "aws_iam_role_policy_attachment" "ecsTaskExecutionRole_policy" {
-  role       = aws_iam_role.ecsTaskExecutionRole.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-
-resource "aws_default_subnet" "default_subnet_a" {
-  availability_zone = "us-east-1a"
-}
-
-resource "aws_default_subnet" "default_subnet_b" {
-  availability_zone = "us-east-1b"
-}
 
 resource "aws_alb" "femwell_load_balancer" {
   name               = "load-balancer-dev"
   load_balancer_type = "application"
-  subnets = [
-    aws_default_subnet.default_subnet_a.id,
-    aws_default_subnet.default_subnet_b.id
-  ]
+  subnets = module.vpc.public_subnets
   security_groups = [aws_security_group.alb.id]
 }
 
@@ -220,6 +196,9 @@ data "aws_key_pair" "existing_key_pair" {
  }
 
 resource "aws_security_group" "service_security_group" {
+  name = "sg_service"
+  vpc_id = module.vpc.vpc_id
+
   ingress {
     from_port = 0
     to_port   = 0
@@ -234,6 +213,10 @@ resource "aws_security_group" "service_security_group" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+      Name = "sg_service"
+    }
 }
 
 resource "aws_ecs_service" "femwell_service" {
@@ -241,16 +224,16 @@ resource "aws_ecs_service" "femwell_service" {
   cluster         = aws_ecs_cluster.femwell.id   # Reference the created Cluster
   task_definition = aws_ecs_task_definition.femwell_task.arn # Reference the task that the service will spin up
   launch_type     = "FARGATE"
-  desired_count   = 5 # Set up the number of containers to 5
+  desired_count   = 1
 
   load_balancer {
     target_group_arn = aws_lb_target_group.target_group.arn # Reference the target group
-    container_name   = aws_ecs_task_definition.femwell_task.family
-    container_port   = 5000 # Specify the container port
+    container_name   = "femwell-task-wolverine" 
+    container_port   = 3001 # Specify the container port
   }
 
   network_configuration {
-    subnets          = [aws_default_subnet.default_subnet_a.id, aws_default_subnet.default_subnet_b.id]
+    subnets          = module.vpc.public_subnets 
     assign_public_ip = true     # Provide the containers with public IPs
     security_groups  = [aws_security_group.alb.id] # Set up the security group
   }

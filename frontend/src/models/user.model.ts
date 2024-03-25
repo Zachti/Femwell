@@ -6,4 +6,5 @@ export interface User {
   username: string;
   phone?: string;
   posts?: Post[];
+  pfpURL?: string;
 }

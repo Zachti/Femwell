@@ -8,12 +8,14 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon, SettingsIcon, EditIcon, ChatIcon } from "@chakra-ui/icons";
 import LiveChat from "./LiveChat";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Fab = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const toggleIsOpen = () => setIsOpen(!isOpen);
 
+  const navigate = useNavigate();
   const ref = useRef(null);
 
   useOutsideClick({
@@ -71,6 +73,7 @@ const Fab = () => {
               isRound
               aria-label="Settings"
               style={{ position: "absolute", bottom: "60px", right: "0px" }}
+              onClick={() => navigate("/account")}
             />
           </Tooltip>
         </ScaleFade>

@@ -1,6 +1,6 @@
 import { useState, useEffect, FC } from "react";
 import { Link } from "react-router-dom";
-import { useDisclosure } from "@chakra-ui/react";
+import { useDisclosure, useMultiStyleConfig } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../assets/Navbar.css";
 import {
@@ -11,6 +11,7 @@ import {
 import InputForm from "./InputForm";
 import SideMenu from "./SideMenu";
 import useAuthStore from "../store/authStore";
+import useLogout from "../hooks/useLogout";
 
 const Navbar: FC<{}> = () => {
   const {
@@ -26,6 +27,7 @@ const Navbar: FC<{}> = () => {
   const authUser = useAuthStore((state) => state.user);
   const [logoText, setLogoText] = useState<string>("FemWell");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const { logout, isLoggingOut } = useLogout();
 
   const handleClick = (): void => {
     if (!isSideMenuOpen) {
@@ -113,7 +115,13 @@ const Navbar: FC<{}> = () => {
                     Login
                   </a>
                 </li>
-              ) : null}
+              ) : (
+                <li className="nav-item">
+                  <a className="nav-links" onClick={logout}>
+                    Logout
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
         </div>
