@@ -1,5 +1,11 @@
 import { useState, FC } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation,
+  Navigate,
+} from "react-router-dom";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import Navbar from "./components/Navbar";
 import "./index.css";
@@ -8,6 +14,7 @@ import Home from "./pages/Home";
 import CommunityHub from "./pages/CommunityHub";
 import Fab from "./components/ActionButton";
 import useAuthStore from "./store/authStore";
+import AccountSettings from "./pages/AccountSettings";
 
 const theme = extendTheme({
   styles: {
@@ -41,16 +48,26 @@ const App: FC<{}> = () => {
     },
   ];
 
+  const FabWithLocation = () => {
+    const location = useLocation();
+
+    return authUser && location.pathname !== "/account" ? <Fab /> : null;
+  };
+
   return (
     <ChakraProvider theme={theme}>
       <BrowserRouter>
-        {authUser ? <Fab /> : null}
         <Navbar />
+        <FabWithLocation />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route
             path="/community"
             element={<CommunityHub user={user} posts={posts} />}
+          />
+          <Route
+            path="/account"
+            element={authUser ? <AccountSettings /> : <Navigate to="/" />}
           />
         </Routes>
       </BrowserRouter>

@@ -138,6 +138,18 @@ const SideMenu: FC<SideMenuProps> = ({
                 Login
               </Button>
             )}
+            {authUser && (
+              <Button
+                colorScheme="pink"
+                w="full"
+                onClick={() => {
+                  onClose();
+                  navigate("/account");
+                }}
+              >
+                Account
+              </Button>
+            )}
           </VStack>
         </DrawerBody>
         {authUser && (
