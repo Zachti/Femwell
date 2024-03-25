@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { RateLimit } from '@backend/infrastructure';
 import { GraphQLString } from 'graphql/type';
-import { AuthUser } from '@backend/auth';
+import { AuthUser } from '../authUser/authUser.entity';
 import { AuditService, InjectAuditService } from '@backend/auditService';
 import { DeleteUserRequest } from './dto/deleteUserRequest.input';
 import { randomUUID } from 'node:crypto';

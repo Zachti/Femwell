@@ -6,7 +6,7 @@ import {
 import { AuditService } from './audit.service';
 import { AUDIT_STORE_PROVIDER } from './constants';
 import { ConfigType } from '@nestjs/config';
-import { awsConfig } from '@backend/config';
+import { awsConfig, commonConfig } from '@backend/config';
 import { Kinesis } from '@aws-sdk/client-kinesis';
 import { fromEnv } from '@aws-sdk/credential-providers';
 
@@ -16,14 +16,19 @@ import { fromEnv } from '@aws-sdk/credential-providers';
     AuditService,
     {
       provide: 'AUDIT_STORE_PROVIDER',
-      useFactory: (config: ConfigType<typeof awsConfig>) => {
-        return new Kinesis({
-          region: config.region,
-          endpoint: config.kinesisEndpoint,
-          credentials: fromEnv(),
-        });
+      useFactory: (
+        awsCfg: ConfigType<typeof awsConfig>,
+        config: ConfigType<typeof commonConfig>,
+      ) => {
+        return config.isLiveEnv
+          ? {}
+          : new Kinesis({
+              region: awsCfg.region,
+              endpoint: awsCfg.kinesisEndpoint,
+              credentials: fromEnv(),
+            });
       },
-      inject: [awsConfig.KEY],
+      inject: [awsConfig.KEY, commonConfig.KEY],
     },
   ],
   exports: [AuditService, MODULE_OPTIONS_TOKEN, AUDIT_STORE_PROVIDER],

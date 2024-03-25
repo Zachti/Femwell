@@ -7,7 +7,8 @@ import {
 import {
   QuestionnaireModule,
   LiveChatModule,
-  wolverineConfigObject, PrismaModule,
+  wolverineConfigObject,
+  PrismaModule,
 } from '@backend/wolverine';
 import { HealthModule } from '@backend/infrastructure';
 import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
@@ -29,10 +30,10 @@ import { GraphqlCoreModule } from '@backend/wolverine';
     //   serviceObjects: [{ client: '' }],
     //   useFactory: (config: ConfigType<typeof awsConfig>) => {
     //     return {
-    //       region: config.region!,
+    //       region: config.region,
     //       credentials: {
-    //         secretAccessKey: config.secretKey!,
-    //         accessKeyId: config.accessKey!,
+    //         secretAccessKey: config.secretKey,
+    //         accessKeyId: config.accessKey,
     //       },
     //     };
     //   },

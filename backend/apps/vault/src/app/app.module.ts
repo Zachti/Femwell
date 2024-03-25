@@ -52,7 +52,7 @@ import { ConfigType } from '@nestjs/config';
       injectionKey: 'WOLVERINE_GQL_DS',
       useFactory: (config: ConfigType<typeof vaultConfig>) => {
         return {
-          endpoint: config.wolverineGraphqlEndpoint as string,
+          endpoint: config.wolverineGraphqlEndpoint,
         };
       },
       inject: [vaultConfig.KEY],
