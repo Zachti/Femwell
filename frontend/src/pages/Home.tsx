@@ -1,10 +1,10 @@
 import { FC } from "react";
-import "../assets/Home.css";
+import "../assets/App.css";
 import CarouselComponent from "../components/CarouselWidget";
 
 const Home: FC<{}> = () => {
   return (
-    <div className="home">
+    <div className="page">
       <CarouselComponent />
     </div>
   );
