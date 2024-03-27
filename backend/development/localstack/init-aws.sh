@@ -1,6 +1,4 @@
-#_________________________________________________________________
-# This script called automatically after localstack initialization
-#_________________________________________________________________
+#!/bin/bash
 
 # verify the email address so ses will send mails
 awslocal ses verify-email-identity --email-address no-reply-dev@femwell.com
@@ -22,5 +20,12 @@ echo '******************************'
 echo '    buckets created    '
 echo '******************************'
 
-aws --endpoint-url=http://localhost:4566 s3 cp /var/lib/localstack/local-dev/ s3://demo-data/ --recursive
+#create Cognito user pool
+#export COGNITO_USER_POOL_ID=$(awslocal cognito-idp create-user-pool --pool-name myUserPool | jq -rc ".UserPool.Id")
+#create Cognito client id
+#export COGNITO_CLIENT_ID=$(awslocal cognito-idp create-user-pool-client --user-pool-id COGNITO_USER_POOL_ID --client-name myClient | jq -rc ".UserPoolClient.ClientId")
 
+#echo "COGNITO_CLIENT_ID: $COGNITO_CLIENT_ID"
+#echo "COGNITO_USER_POOL_ID: $COGNITO_USER_POOL_ID"
+
+aws --endpoint-url=http://localhost:4566 s3 cp /var/lib/localstack/local-dev/ s3://demo-data/ --recursive

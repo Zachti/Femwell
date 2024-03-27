@@ -5,12 +5,7 @@ import {
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
 import { awsConfig, awsConfigObject, ConfigCoreModule } from '@backend/config';
-import {
-  vaultConfigObject,
-  AuthModule,
-  vaultConfig,
-  GraphqlDatasourceModule,
-} from '@backend/vault';
+import { vaultConfigObject, AuthModule } from '@backend/vault';
 import { LoggerModule } from '@backend/logger';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { join } from 'path';
@@ -47,15 +42,6 @@ import { ConfigType } from '@nestjs/config';
         return { streamARN: config.streamARN };
       },
       inject: [awsConfig.KEY],
-    }),
-    GraphqlDatasourceModule.registerAsync({
-      injectionKey: 'WOLVERINE_GQL_DS',
-      useFactory: (config: ConfigType<typeof vaultConfig>) => {
-        return {
-          endpoint: config.wolverineGraphqlEndpoint,
-        };
-      },
-      inject: [vaultConfig.KEY],
     }),
   ],
 })
