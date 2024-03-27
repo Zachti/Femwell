@@ -21,10 +21,10 @@ echo '    buckets created    '
 echo '******************************'
 
 #create Cognito user pool
-#export COGNITO_USER_POOL_ID=$(awslocal cognito-idp create-user-pool --pool-name myUserPool | jq -rc ".UserPool.Id")
+#export COGNITO_USER_POOL_ID=$(awslocal cognito-idp create-user-pool --pool-name myUserPool | awk -F'"' '/UserPool/{getline; print $4}')
 #create Cognito client id
-#export COGNITO_CLIENT_ID=$(awslocal cognito-idp create-user-pool-client --user-pool-id COGNITO_USER_POOL_ID --client-name myClient | jq -rc ".UserPoolClient.ClientId")
-
+#export COGNITO_CLIENT_ID=$(awslocal cognito-idp create-user-pool-client --user-pool-id $COGNITO_USER_POOL_ID --client-name myClient | awk -F'"' '/ClientId/{print $4}')
+#
 #echo "COGNITO_CLIENT_ID: $COGNITO_CLIENT_ID"
 #echo "COGNITO_USER_POOL_ID: $COGNITO_USER_POOL_ID"
 
