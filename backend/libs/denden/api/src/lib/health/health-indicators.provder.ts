@@ -17,7 +17,10 @@ export class DendenHealthIndicatorsProvider
   async getIndicators(): Promise<Array<HealthIndicatorFunction>> {
     return [
       () =>
-        this.http.pingCheck('cloudFront', this.dendenCfg.cloudFrontEndpoint!),
+        this.http.pingCheck(
+          'cloudFront',
+          this.dendenCfg.cloudFrontEndpoint ?? '',
+        ),
     ];
   }
 }
