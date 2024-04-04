@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #ebd9ef;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -13,14 +13,15 @@
   -moz-osx-font-smoothing: grayscale;
 
   --primary-color: #ebd9ef;
-  --secondary-color: #5a052e;
+  --secondary-color: #6e0839;
   --tertiary-color: #ffead7;
+  --tertiary-color-dim: #ffead7aa;
   --divider-color: #c9c9c9;
   --text-color-a: #ff86e7;
+  --recommended-color: #d6fdae;
 }
 
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
 }

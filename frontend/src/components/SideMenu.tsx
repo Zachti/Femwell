@@ -112,10 +112,10 @@ const SideMenu: FC<SideMenuProps> = ({
               w="full"
               onClick={() => {
                 onClose();
-                navigate("/contact");
+                navigate("/ION");
               }}
             >
-              Contact
+              Information
             </Button>
             <Button
               colorScheme="pink"

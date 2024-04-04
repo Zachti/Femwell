@@ -53,19 +53,6 @@ resource "aws_ecs_task_definition" "femwell_task" {
       cpu: 256
     },
     {
-      name: "femwell-task-denden",
-      image: aws_ecr_repository.denden_ecr_repo.repository_url,
-      essential: true,
-      portMappings: [
-        {
-          "containerPort": 3004,
-          "hostPort": 3004
-        }
-      ],
-      memory: 512,
-      cpu: 256
-    },
-    {
       name: "femwell-task-vault",
       image: aws_ecr_repository.vault_ecr_repo.repository_url,
       essential: true,
@@ -90,6 +77,19 @@ resource "aws_ecs_task_definition" "femwell_task" {
       ],
       memory: 512,
       cpu: 256
+    },
+    {
+      name: "femwell-task-denden",
+      image: aws_ecr_repository.denden_ecr_repo.repository_url,
+      essential: true,
+      portMappings: [
+        {
+          "containerPort": 3004,
+          "hostPort": 3004
+        }
+      ],
+      memory: 512,
+      cpu: 256
     }
   ])
   requires_compatibilities = ["FARGATE"] # use Fargate as the launch type
@@ -99,10 +99,6 @@ resource "aws_ecs_task_definition" "femwell_task" {
   execution_role_arn       = data.aws_iam_role.existing.arn
 }
 
-
-
-
-
 resource "aws_alb" "femwell_load_balancer" {
   name               = "load-balancer-dev"
   load_balancer_type = "application"
@@ -110,12 +106,32 @@ resource "aws_alb" "femwell_load_balancer" {
   security_groups = [aws_security_group.alb.id]
 }
 
-resource "aws_lb_target_group" "target_group" {
-  name        = "target-group"
-  port        = 80
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = module.vpc.vpc_id
+resource "aws_lb_target_group" "wolverine_target_group" {
+  name     = "wolverine-target-group"
+  port     = 3001
+  protocol = "HTTP"
+  vpc_id   = module.vpc.vpc_id
+}
+
+resource "aws_lb_target_group" "vault_target_group" {
+  name     = "vault-target-group"
+  port     = 3002
+  protocol = "HTTP"
+  vpc_id   = module.vpc.vpc_id
+}
+
+resource "aws_lb_target_group" "heimdall_target_group" {
+  name     = "heimdall-target-group"
+  port     = 3003
+  protocol = "HTTP"
+  vpc_id   = module.vpc.vpc_id
+}
+
+resource "aws_lb_target_group" "denden_target_group" {
+  name     = "denden-target-group"
+  port     = 3004
+  protocol = "HTTP"
+  vpc_id   = module.vpc.vpc_id
 }
 
 resource "aws_lb_listener" "listener" {
@@ -123,10 +139,79 @@ resource "aws_lb_listener" "listener" {
   port              = "80"
   protocol          = "HTTP"
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.target_group.arn # target group
+    type             = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "404: Not Found"
+      status_code  = "404"
+    }
   }
 }
+
+resource "aws_lb_listener_rule" "wolverine_listener_rule" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.wolverine_target_group.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/wolverine/*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "vault_listener_rule" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 200
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.vault_target_group.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/vault/*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "heimdall_listener_rule" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 300
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.heimdall_target_group.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/heimdall/*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "denden_listener_rule" {
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 400
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.denden_target_group.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/denden/*"]
+    }
+  }
+}
+
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
@@ -169,13 +254,6 @@ resource "aws_security_group" "alb" {
    protocol         = "tcp"
    from_port        = 22
    to_port          = 22
-   cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  ingress {
-   protocol         = "tcp"
-   from_port        = 3001
-   to_port          = 3001
    cidr_blocks      = ["0.0.0.0/0"]
   }
 
@@ -226,12 +304,6 @@ resource "aws_ecs_service" "femwell_service" {
   launch_type     = "FARGATE"
   desired_count   = 1
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.target_group.arn # Reference the target group
-    container_name   = "femwell-task-wolverine" 
-    container_port   = 3001 # Specify the container port
-  }
-
   network_configuration {
     subnets          = module.vpc.public_subnets 
     assign_public_ip = true     # Provide the containers with public IPs
@@ -242,33 +314,3 @@ resource "aws_ecs_service" "femwell_service" {
 output "femwell_url" {
   value = aws_alb.femwell_load_balancer.dns_name
 }
-
-#resource "aws_instance" "my_ec2_instance" {
-#  ami           = "ami-0a3c3a20c09d6f377" #AZN LINUX
-#  instance_type = "t2.micro"
-#  key_name      = data.aws_key_pair.existing_key_pair.key_name
-#  associate_public_ip_address = true
-#  subnet_id = module.vpc.public_subnets[0]
-#  security_groups = [aws_security_group.alb.id]
-#
-#  user_data = <<-EOF
-#              #!/bin/bash
-#              sudo yum update -y
-#              sudo yum install -y git
-#              sudo mkdir /home/ec2-user/Femwell
-#              sudo git clone https://github.com/BeBo1337/Femwell.git /home/ec2-user/Femwell
-#              sudo yum install -y docker
-#              sudo service docker start
-#              sudo usermod -a -G docker ec2-user
-#              sudo yum install curl -y
-#              sudo dnf install libxcrypt-compat -y
-#              sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-#              sudo chmod +x /usr/local/bin/docker-compose
-#              sudo cd /home/ec2-user/Femwell/backend
-#              sudo docker-compose up wolverine
-#              EOF
-#
-#  tags = {
-#    Name = "Imagine?"
-#  }
-#}

@@ -100,14 +100,6 @@ const CarouselComponent: FC<CarouselProps> = ({ label }) => {
 
   return (
     <div className="carousel-wrapper">
-      <h2>
-        <span>Things to</span>
-        <span style={{ color: "var(--text-color-a)" }}> know</span>
-        <FontAwesomeIcon
-          icon={faDna}
-          style={{ marginLeft: "10px", color: "var(--text-color-a)" }}
-        />
-      </h2>
       <Carousel
         responsive={responsive}
         infinite={true}

@@ -15,15 +15,27 @@ import CommunityHub from "./pages/CommunityHub";
 import Fab from "./components/ActionButton";
 import useAuthStore from "./store/authStore";
 import AccountSettings from "./pages/AccountSettings";
+import ION from "./pages/ION";
 
 const theme = extendTheme({
   styles: {
     global: {
       body: {
-        backgroundColor: "var(--primary-color)",
+        backgroundColor: "primaryColor",
         paddingTop: "10vh",
       },
     },
+  },
+  colors: {
+    fabColor: {
+      500: "#6e0839 ",
+      600: "#5a052e",
+      700: "#3f0421",
+    },
+    primaryColor: "#ebd9ef",
+    secondaryColor: "#5a052e",
+    tertiaryColor: "#ffead7",
+    dividerColor: "#c9c9c9",
   },
 });
 
@@ -69,6 +81,7 @@ const App: FC<{}> = () => {
             path="/account"
             element={authUser ? <AccountSettings /> : <Navigate to="/" />}
           />
+          <Route path="/ION" element={<ION />} />
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

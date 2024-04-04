@@ -31,7 +31,7 @@ const Fab = () => {
   return (
     <Box position="fixed" right="1rem" bottom="1rem" ref={ref}>
       <IconButton
-        colorScheme="pink"
+        colorScheme="fabColor"
         size="lg"
         fontSize="lg"
         boxShadow="0 0 10px rgba(0, 0, 0, 0.15)"
@@ -45,7 +45,7 @@ const Fab = () => {
         <ScaleFade initialScale={0.9} in={isOpen}>
           <Tooltip label="LiveChat" placement="left">
             <IconButton
-              colorScheme="pink"
+              colorScheme="fabColor"
               size="md"
               icon={<ChatIcon />}
               isRound
@@ -57,7 +57,7 @@ const Fab = () => {
 
           <Tooltip label="New Post" placement="left">
             <IconButton
-              colorScheme="pink"
+              colorScheme="fabColor"
               size="md"
               icon={<EditIcon />}
               isRound
@@ -67,7 +67,7 @@ const Fab = () => {
           </Tooltip>
           <Tooltip label="Settings" placement="left">
             <IconButton
-              colorScheme="pink"
+              colorScheme="fabColor"
               size="md"
               icon={<SettingsIcon />}
               isRound
