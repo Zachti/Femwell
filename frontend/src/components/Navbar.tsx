@@ -87,12 +87,8 @@ const Navbar: FC<{}> = () => {
                 </Link>
               </li>
               <li className="nav-item">
-                <Link
-                  to="/contact"
-                  className="nav-links"
-                  onClick={onSideMenuClose}
-                >
-                  Contact
+                <Link to="/ION" className="nav-links" onClick={onSideMenuClose}>
+                  Information
                 </Link>
               </li>
               <li className="nav-item">
