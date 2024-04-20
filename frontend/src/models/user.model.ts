@@ -1,4 +1,4 @@
-import { Post } from "./";
+import { Post } from "./post.model";
 
 export interface User {
   id: string;
@@ -7,4 +7,5 @@ export interface User {
   phone?: string;
   posts?: Post[];
   pfpURL?: string;
+  laterArticles?: string[];
 }

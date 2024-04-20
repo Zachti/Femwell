@@ -12,6 +12,7 @@ import {
   VStack,
   AvatarBadge,
   Fade,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -29,6 +30,8 @@ import { ChatMsg } from "../models/chatMsg.model";
 import { SmallCloseIcon } from "@chakra-ui/icons";
 import { emojis } from "../utils/emojis";
 import { MimeType } from "../utils/mimeTypes";
+import { Colors } from "../utils/colorsConstants";
+import "../assets/LiveChat.css";
 
 interface LiveChatProps {
   isOpen: boolean;
@@ -43,6 +46,9 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const bgColor = useColorModeValue("white", Colors.color5);
+  const msgBgColor1 = useColorModeValue("pink.200", "pink.700");
+  const msgBgColor2 = useColorModeValue("gray.200", "gray.500");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -117,9 +123,9 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
             ? "90vh"
             : "400px"
         }
-        bg="white"
+        bg={`${bgColor}`}
         boxShadow="0 0 10px rgba(0, 0, 0, 0.35)"
-        borderRadius={"10px"}
+        borderRadius={isLargerThan650 ? "10px" : isExpanded ? "0" : "10px"}
         zIndex="5"
         display="flex"
         flexDirection="column"
@@ -150,7 +156,6 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
               <Avatar
                 size="sm"
                 name="John Doe"
-                bgColor="var(--secondary-color)"
                 //   src="link"
               >
                 <AvatarBadge boxSize="1.25em" bg="green.500" />
@@ -185,11 +190,18 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
             />
           </Flex>
         </Flex>
-        <Flex direction="column" overflowY="auto" px="3" py="2" flex="1">
+        <Flex
+          className="msg-box"
+          direction="column"
+          overflowY="auto"
+          px="3"
+          py="2"
+          flex="1"
+        >
           {messages.map((msg, index) => (
             <Box
               key={index}
-              bg={msg.sender === "You" ? "pink.200" : "gray.200"}
+              bg={msg.sender === "You" ? `${msgBgColor1}` : `${msgBgColor2}`}
               alignSelf={msg.sender === "You" ? "flex-start" : "flex-end"}
               borderRadius="lg"
               p="2"
@@ -268,7 +280,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
                     right="0"
                     zIndex="10"
                     p={2}
-                    bg="white"
+                    bg={`${bgColor}`}
                     boxShadow="lg"
                     borderRadius="md"
                   >
@@ -292,7 +304,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
                 <Text
                   mt={2}
                   mr={0}
-                  color={inputValue.length > 200 ? "red" : "black"}
+                  color={inputValue.length > 200 ? "red" : ""}
                 >{`${inputValue.length}/200`}</Text>
                 <Button
                   aria-label="Send"

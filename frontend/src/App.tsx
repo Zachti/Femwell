@@ -1,4 +1,4 @@
-import { useState, FC } from "react";
+import { useState, FC, useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -17,27 +17,10 @@ import useAuthStore from "./store/authStore";
 import AccountSettings from "./pages/AccountSettings";
 import ION from "./pages/ION";
 
-const theme = extendTheme({
-  styles: {
-    global: {
-      body: {
-        backgroundColor: "primaryColor",
-        paddingTop: "10vh",
-      },
-    },
-  },
-  colors: {
-    fabColor: {
-      500: "#6e0839 ",
-      600: "#5a052e",
-      700: "#3f0421",
-    },
-    primaryColor: "#ebd9ef",
-    secondaryColor: "#5a052e",
-    tertiaryColor: "#ffead7",
-    dividerColor: "#c9c9c9",
-  },
-});
+const config = {
+  initialColorMode: "light",
+  useSystemColorMode: false,
+};
 
 const App: FC<{}> = () => {
   const authUser = useAuthStore((state) => state.user);
@@ -59,6 +42,38 @@ const App: FC<{}> = () => {
       content: "This is the third post.",
     },
   ];
+
+  const theme = extendTheme({
+    config,
+    styles: {
+      global: (props: any) => ({
+        body: {
+          backgroundColor: props.colorMode === "dark" ? "#250515" : "#fbf2f7",
+          color: props.colorMode === "dark" ? "#fbf2f7" : "#250515",
+          paddingTop: "10vh",
+        },
+      }),
+    },
+    components: {
+      Button: {
+        baseStyle: {
+          _focus: {
+            boxShadow: "none",
+          },
+        },
+      },
+    },
+    colors: {
+      fabColor: {
+        200: "#EC407A",
+        300: "#B8325F",
+        400: "#7B223F",
+        500: "#86003C",
+        600: "#5A052E",
+        700: "#3F0421",
+      },
+    },
+  });
 
   const FabWithLocation = () => {
     const location = useLocation();

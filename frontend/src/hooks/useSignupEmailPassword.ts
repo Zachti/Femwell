@@ -36,6 +36,7 @@ const useSignupEmailPassword = () => {
           phone: data.phone,
           posts: [],
           pfpURL: "",
+          laterArticles: [],
         };
         await setDoc(doc(firestore, "users", newUser.user.uid), userDoc);
         localStorage.setItem("user", JSON.stringify(userDoc));

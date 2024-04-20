@@ -35,10 +35,13 @@ const useGoogleAuth = () => {
           phone: "",
           posts: [],
           pfpURL: newUser.user.photoURL || "",
+          laterArticles: [],
         };
         await setDoc(doc(firestore, "users", newUser.user.uid), userDoc);
         localStorage.setItem("user", JSON.stringify(userDoc));
         loginUser(userDoc);
+        showToast("Success", "Account created successfully", "success");
+        return true;
       }
     } catch (error: any) {
       showToast("Error", error.message, "error");

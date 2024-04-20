@@ -34,6 +34,7 @@ import {
 import useSignupEmailPassword from "../hooks/useSignupEmailPassword";
 import useLogin from "../hooks/useLogin";
 import useGoogleAuth from "../hooks/useGoogleAuth";
+import { reloadPage } from "../utils/genericFunctions";
 
 interface InputFormProps {
   isOpen: boolean;
@@ -78,12 +79,14 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                       const success = await login(values);
                       if (success) {
                         onClose();
+                        reloadPage();
                       }
                     }
                   : async (values) => {
                       const success = await signup(values);
                       if (success) {
                         onClose();
+                        reloadPage();
                       }
                     }
               }
@@ -230,6 +233,7 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                             const success = await handleGoogleAuth();
                             if (success) {
                               onClose();
+                              reloadPage();
                             }
                           }}
                         >

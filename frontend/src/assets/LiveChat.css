@@ -1,0 +1,9 @@
+.msg-box::-webkit-scrollbar {
+  width: 8px;
+  background-color: var(--primary-color);
+}
+
+.msg-box::-webkit-scrollbar-thumb {
+  background-color: var(--secondary-color);
+  border-radius: 5px;
+}
