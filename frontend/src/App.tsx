@@ -6,8 +6,8 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import Navbar from "./components/Navbar";
+import { ChakraProvider, extendTheme, list } from "@chakra-ui/react";
+import Navbar from "./components/Menus/Navbar";
 import "./index.css";
 import "./assets/App.css";
 import Home from "./pages/Home";
@@ -24,24 +24,6 @@ const config = {
 
 const App: FC<{}> = () => {
   const authUser = useAuthStore((state) => state.user);
-  const user = "John Doe";
-  const posts = [
-    {
-      username: "Sophie Barnet",
-      title: "First post",
-      content: "This is the first post.",
-    },
-    {
-      username: "Shiri Cohen",
-      title: "Second post",
-      content: "This is the second post.",
-    },
-    {
-      username: "Sara Netanyahu",
-      title: "Third post",
-      content: "This is the third post.",
-    },
-  ];
 
   const theme = extendTheme({
     config,
@@ -62,12 +44,25 @@ const App: FC<{}> = () => {
           },
         },
       },
+      Menu: {
+        baseStyle: {
+          list: {
+            bg: "var(--quaternary-color)",
+            fontSize: "16px",
+          },
+          item: {
+            bg: "var(--quaternary-color)",
+            fontWeight: "600",
+            _focus: { bg: "var(--hover-menu-color)" },
+          },
+        },
+      },
     },
     colors: {
       fabColor: {
-        200: "#EC407A",
-        300: "#B8325F",
-        400: "#7B223F",
+        200: "#86003C",
+        300: "#5A052E",
+        400: "#3F0421",
         500: "#86003C",
         600: "#5A052E",
         700: "#3F0421",
@@ -88,10 +83,7 @@ const App: FC<{}> = () => {
         <FabWithLocation />
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route
-            path="/community"
-            element={<CommunityHub user={user} posts={posts} />}
-          />
+          <Route path="/community" element={<CommunityHub />} />
           <Route
             path="/account"
             element={authUser ? <AccountSettings /> : <Navigate to="/" />}

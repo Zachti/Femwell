@@ -16,26 +16,30 @@
   --divider-color: #c9c9c9;
   --text-color-a: #ff86e7;
   --recommended-color: #d6fdae;
+  --light-color: #fbf2f7;
+  --dim-color: #ffffff30;
 }
 
 :root.light {
   --primary-color: #fbf2f7;
   --secondary-color: #5a052e;
   --tertiary-color: #fefff8;
-  --quaternary-color: #5b163b;
+  --quaternary-color: #d8bfa8;
   --hover-color: #250515;
   --hover-color-dim: #25051536;
   --navbar-color: #ffb0de;
+  --hover-menu-color: #430423;
 }
 
 :root.dark {
   --primary-color: #250515;
   --secondary-color: #5a052e;
   --tertiary-color: #d8bfa8;
-  --quaternary-color: #72465c;
+  --quaternary-color: #5b163b;
   --hover-color: #efe5f1;
   --hover-color-dim: #efe5f144;
   --navbar-color: #5a052e;
+  --hover-menu-color: #430423;
 }
 
 :root.light::-webkit-scrollbar {

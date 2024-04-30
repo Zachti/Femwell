@@ -1,12 +1,9 @@
 import { Post } from "./post.model";
 
-export interface User {
+export interface Profile {
   id: string;
-  email: string;
   username: string;
-  phone?: string;
   posts?: Post[];
   likedPosts?: Post[];
   pfpURL?: string;
-  laterArticles?: string[];
 }

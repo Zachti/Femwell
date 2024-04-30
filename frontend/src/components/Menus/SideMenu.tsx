@@ -15,9 +15,9 @@ import {
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
-import useAuthStore from "../store/authStore";
-import useLogout from "../hooks/useLogout";
-import { reloadPage } from "../utils/genericFunctions";
+import useAuthStore from "../../store/authStore";
+import useLogout from "../../hooks/useLogout";
+import { reloadPage } from "../../utils/genericFunctions";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -162,7 +162,7 @@ const SideMenu: FC<SideMenuProps> = ({
               onClick={() => {
                 logout();
                 onClose();
-                reloadPage();
+                //reloadPage();
               }}
               isLoading={isLoggingOut}
             >

@@ -1,24 +1,16 @@
 import {
   Box,
   Flex,
-  Link,
-  Tooltip,
   Text,
   VStack,
   useMediaQuery,
   Avatar,
 } from "@chakra-ui/react";
-import { faHeart, faPenToSquare } from "@fortawesome/free-regular-svg-icons";
-import {
-  faBookmark,
-  faSearch,
-  faThumbsUp,
-  faUserPen,
-} from "@fortawesome/free-solid-svg-icons";
+import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FC } from "react";
-import useAuthStore from "../store/authStore";
-import SideBarItem from "./SideBarItem";
+import useAuthStore from "../../store/authStore";
+import SideBarItems from "./SideBar/SideBarItems";
 
 interface SideBarProps {
   searchFunc?: () => void;
@@ -27,13 +19,15 @@ interface SideBarProps {
   newPostFunc?: () => void;
 }
 
-const Sidebar: FC<{}> = ({}) => {
+const Sidebar: FC<SideBarProps> = ({}) => {
   const authUser = useAuthStore((state) => state.user);
   const [isLargerThan760] = useMediaQuery("(min-width: 760px)");
+  const [isLargerThan400] = useMediaQuery("(min-width: 400px)");
+
   return (
     <Box
-      height={"90vh"}
-      w={isLargerThan760 ? "180px" : "65px"}
+      height={"auto"}
+      w={isLargerThan760 ? "180px" : isLargerThan400 ? "65px" : "45px"}
       borderRight={"3px solid"}
       borderColor={"var(--secondary-color)"}
       py={6}
@@ -44,13 +38,17 @@ const Sidebar: FC<{}> = ({}) => {
     >
       {authUser ? (
         <>
-          <Flex direction="column" align="center" pb={isLargerThan760 ? 2 : 4}>
+          <Flex
+            direction="column"
+            align="center"
+            pb={isLargerThan760 ? 2 : isLargerThan400 ? 4 : 2}
+          >
             <Avatar
               border="2px solid var(--secondary-color)"
               bgColor={"pink.500"}
               color={"white"}
               name={`${authUser.username}`}
-              size={isLargerThan760 ? "lg" : "md"}
+              size={isLargerThan760 ? "lg" : isLargerThan400 ? "md" : "sm"}
               src={`${authUser.pfpURL}`}
               mb={1}
             />
@@ -73,17 +71,23 @@ const Sidebar: FC<{}> = ({}) => {
         w="full"
         pb={isLargerThan760 ? 2 : 4}
       >
-        <Box flex={1} h="1px" bg="var(--divider-color)" mx={1} />
+        <Box
+          flex={1}
+          h="1px"
+          bg="var(--divider-color)"
+          mx={isLargerThan400 ? 1 : 0.25}
+        />
         <FontAwesomeIcon icon={faHeart} color="var(--divider-color)" />
-        <Box flex={1} h="1px" bg="var(--divider-color)" mx={1} />
+        <Box
+          flex={1}
+          h="1px"
+          bg="var(--divider-color)"
+          mx={isLargerThan400 ? 1 : 0.25}
+        />
       </Flex>
 
       <VStack gap={4} w="full">
-        <SideBarItem btnText="Search" Icon={faSearch} />
-        <SideBarItem btnText="My Posts" Icon={faBookmark} />
-        <SideBarItem btnText="Liked Posts" Icon={faThumbsUp} />
-        <SideBarItem btnText="New Post" Icon={faPenToSquare} />
-        <SideBarItem btnText="Edit Profile" Icon={faUserPen} />
+        <SideBarItems />
       </VStack>
     </Box>
   );

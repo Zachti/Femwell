@@ -52,7 +52,7 @@ const ION = () => {
       setAllArticles(articles);
     }
     setTimeout(() => setLoading(false), 30);
-  }, []);
+  }, [authUser]);
 
   const openArticle = (article: any) => {
     setSelectedArticle(article);

@@ -2,18 +2,18 @@ import { useState, useEffect, FC } from "react";
 import { Link } from "react-router-dom";
 import { useColorModeValue, useDisclosure } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "../assets/Navbar.css";
+import "../../assets/Navbar.css";
 import {
   faBars,
   faHeartCircleCheck,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
-import InputForm from "./InputForm";
+import InputForm from "../InputForm";
 import SideMenu from "./SideMenu";
-import useAuthStore from "../store/authStore";
-import useLogout from "../hooks/useLogout";
-import ColorModeSwitch from "./ColorModeSwitch";
-import { Colors } from "../utils/colorsConstants";
+import useAuthStore from "../../store/authStore";
+import useLogout from "../../hooks/useLogout";
+import ColorModeSwitch from "../ColorModeSwitch";
+import { Colors } from "../../utils/colorsConstants";
 
 const Navbar: FC<{}> = () => {
   const {

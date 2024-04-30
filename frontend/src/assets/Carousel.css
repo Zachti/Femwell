@@ -27,7 +27,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: var(--primary-color);
+  background-color: var(--light-color);
   color: var(--secondary-color);
   border: var(--secondary-color) solid 3px;
   font-size: 2rem;

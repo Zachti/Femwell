@@ -60,7 +60,10 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
           backdropFilter="blur(3px) hue-rotate(25deg)"
         />
         <ModalOverlay />
-        <ModalContent width={isLargerThan650 ? "100%" : "85vw"}>
+        <ModalContent
+          width={isLargerThan650 ? "100%" : "85vw"}
+          bgColor={"var(--primary-color)"}
+        >
           <ModalHeader>{isLogin ? "Login" : "Create Account"}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -79,14 +82,14 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                       const success = await login(values);
                       if (success) {
                         onClose();
-                        reloadPage();
+                        //reloadPage();
                       }
                     }
                   : async (values) => {
                       const success = await signup(values);
                       if (success) {
                         onClose();
-                        reloadPage();
+                        //reloadPage();
                       }
                     }
               }
@@ -233,7 +236,7 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                             const success = await handleGoogleAuth();
                             if (success) {
                               onClose();
-                              reloadPage();
+                              //reloadPage();
                             }
                           }}
                         >

@@ -4,6 +4,7 @@
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
+  z-index: -100;
 }
 
 .header {
@@ -21,6 +22,16 @@
   font-size: 3em;
   text-shadow: 4px 10px 10px rgba(0, 0, 0, 0.7);
   text-align: center;
+}
+
+.msg-box::-webkit-scrollbar {
+  width: 8px;
+  background-color: var(--primary-color);
+}
+
+.msg-box::-webkit-scrollbar-thumb {
+  background-color: var(--secondary-color);
+  border-radius: 5px;
 }
 
 @media (max-width: 929px) {

@@ -29,7 +29,13 @@ const Fab = () => {
   };
 
   return (
-    <Box position="fixed" right="1rem" bottom="1rem" ref={ref}>
+    <Box
+      position="fixed"
+      right="1rem"
+      bottom="1rem"
+      ref={ref}
+      zIndex={isChatOpen ? 0 : 1}
+    >
       <IconButton
         color="white"
         colorScheme="fabColor"

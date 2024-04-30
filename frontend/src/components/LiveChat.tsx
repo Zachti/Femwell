@@ -25,13 +25,12 @@ import {
   faFileImage,
 } from "@fortawesome/free-solid-svg-icons";
 import { createPortal } from "react-dom";
-import "../index.css";
 import { ChatMsg } from "../models/chatMsg.model";
 import { SmallCloseIcon } from "@chakra-ui/icons";
 import { emojis } from "../utils/emojis";
 import { MimeType } from "../utils/mimeTypes";
 import { Colors } from "../utils/colorsConstants";
-import "../assets/LiveChat.css";
+import "../assets/App.css";
 
 interface LiveChatProps {
   isOpen: boolean;
@@ -51,6 +50,22 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
   const msgBgColor2 = useColorModeValue("gray.200", "gray.500");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [cursorPosition, setCursorPosition] = useState(0);
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(e.currentTarget.value);
+    setCursorPosition(e.target.selectionStart);
+  };
+  const handleCursorClick = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    setCursorPosition(e.currentTarget.selectionStart);
+  };
+  const addEmoji = (emoji: string) => {
+    const textBeforeCursor = inputValue.substring(0, cursorPosition);
+    const textAfterCursor = inputValue.substring(cursorPosition);
+    setInputValue(textBeforeCursor + emoji + textAfterCursor);
+    setCursorPosition(cursorPosition + emoji.length);
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -72,10 +87,6 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
 
   const handleSndRcvMessage = (msg: ChatMsg) => {
     setMessages([...messages, msg]);
-  };
-
-  const addEmoji = (emoji: string) => {
-    setInputValue(inputValue + emoji);
   };
 
   const onSendMessage = (msg: ChatMsg) => {
@@ -126,7 +137,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
         bg={`${bgColor}`}
         boxShadow="0 0 10px rgba(0, 0, 0, 0.35)"
         borderRadius={isLargerThan650 ? "10px" : isExpanded ? "0" : "10px"}
-        zIndex="5"
+        zIndex={4}
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
@@ -222,6 +233,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
         >
           <VStack w="100%">
             <Textarea
+              ref={textAreaRef}
               isDisabled={isLoading}
               placeholder="Type a message"
               variant="filled"
@@ -234,7 +246,8 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
                 borderColor: "var(--secondary-color)",
               }}
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={handleTextChange}
+              onClick={handleCursorClick}
             />
             <Flex justify="space-between" width="100%">
               <Flex>
