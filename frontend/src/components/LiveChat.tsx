@@ -12,6 +12,7 @@ import {
   VStack,
   AvatarBadge,
   Fade,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -24,11 +25,12 @@ import {
   faFileImage,
 } from "@fortawesome/free-solid-svg-icons";
 import { createPortal } from "react-dom";
-import "../index.css";
 import { ChatMsg } from "../models/chatMsg.model";
 import { SmallCloseIcon } from "@chakra-ui/icons";
 import { emojis } from "../utils/emojis";
 import { MimeType } from "../utils/mimeTypes";
+import { Colors } from "../utils/colorsConstants";
+import "../assets/App.css";
 
 interface LiveChatProps {
   isOpen: boolean;
@@ -43,8 +45,27 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const bgColor = useColorModeValue("white", Colors.color5);
+  const msgBgColor1 = useColorModeValue("pink.200", "pink.700");
+  const msgBgColor2 = useColorModeValue("gray.200", "gray.500");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [cursorPosition, setCursorPosition] = useState(0);
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(e.currentTarget.value);
+    setCursorPosition(e.target.selectionStart);
+  };
+  const handleCursorClick = (e: React.MouseEvent<HTMLTextAreaElement>) => {
+    setCursorPosition(e.currentTarget.selectionStart);
+  };
+  const addEmoji = (emoji: string) => {
+    const textBeforeCursor = inputValue.substring(0, cursorPosition);
+    const textAfterCursor = inputValue.substring(cursorPosition);
+    setInputValue(textBeforeCursor + emoji + textAfterCursor);
+    setCursorPosition(cursorPosition + emoji.length);
+  };
 
   useEffect(() => {
     if (isOpen) {
@@ -68,10 +89,6 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
     setMessages([...messages, msg]);
   };
 
-  const addEmoji = (emoji: string) => {
-    setInputValue(inputValue + emoji);
-  };
-
   const onSendMessage = (msg: ChatMsg) => {
     if (!(inputValue.trim() === "" || inputValue.length > 200)) {
       handleSndRcvMessage(msg);
@@ -93,7 +110,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
   };
 
   const chat = (
-    <Fade in={isOpen}>
+    <Fade in={isOpen} className="live-chat">
       <Box
         position="fixed"
         right={isLargerThan650 ? "1rem" : "0"}
@@ -117,10 +134,10 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
             ? "90vh"
             : "400px"
         }
-        bg="white"
+        bg={`${bgColor}`}
         boxShadow="0 0 10px rgba(0, 0, 0, 0.35)"
-        borderRadius={"10px"}
-        zIndex="5"
+        borderRadius={isLargerThan650 ? "10px" : isExpanded ? "0" : "10px"}
+        zIndex={4}
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
@@ -150,7 +167,6 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
               <Avatar
                 size="sm"
                 name="John Doe"
-                bgColor="var(--secondary-color)"
                 //   src="link"
               >
                 <AvatarBadge boxSize="1.25em" bg="green.500" />
@@ -185,11 +201,18 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
             />
           </Flex>
         </Flex>
-        <Flex direction="column" overflowY="auto" px="3" py="2" flex="1">
+        <Flex
+          className="msg-box"
+          direction="column"
+          overflowY="auto"
+          px="3"
+          py="2"
+          flex="1"
+        >
           {messages.map((msg, index) => (
             <Box
               key={index}
-              bg={msg.sender === "You" ? "pink.200" : "gray.200"}
+              bg={msg.sender === "You" ? `${msgBgColor1}` : `${msgBgColor2}`}
               alignSelf={msg.sender === "You" ? "flex-start" : "flex-end"}
               borderRadius="lg"
               p="2"
@@ -210,6 +233,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
         >
           <VStack w="100%">
             <Textarea
+              ref={textAreaRef}
               isDisabled={isLoading}
               placeholder="Type a message"
               variant="filled"
@@ -222,7 +246,9 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
                 borderColor: "var(--secondary-color)",
               }}
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              className="msg-box"
+              onChange={handleTextChange}
+              onClick={handleCursorClick}
             />
             <Flex justify="space-between" width="100%">
               <Flex>
@@ -268,7 +294,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
                     right="0"
                     zIndex="10"
                     p={2}
-                    bg="white"
+                    bg={`${bgColor}`}
                     boxShadow="lg"
                     borderRadius="md"
                   >
@@ -292,7 +318,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
                 <Text
                   mt={2}
                   mr={0}
-                  color={inputValue.length > 200 ? "red" : "black"}
+                  color={inputValue.length > 200 ? "red" : ""}
                 >{`${inputValue.length}/200`}</Text>
                 <Button
                   aria-label="Send"

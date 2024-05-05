@@ -26,7 +26,7 @@ const Article: FC<ArticleProps> = ({
   onClick,
 }) => {
   const [isLargerThan1400] = useMediaQuery("(min-width: 1400px)");
-  const [isLargerThan900] = useMediaQuery("(min-width: 900px)");
+  const [isLargerThan1000] = useMediaQuery("(min-width: 1000px)");
 
   return (
     <Flex
@@ -39,8 +39,8 @@ const Article: FC<ArticleProps> = ({
       bgPosition="center"
       bgRepeat="no-repeat"
       borderRadius="10px"
-      minH={isLargerThan1400 ? "350px" : isLargerThan900 ? "300px" : "300px"}
-      maxW={isLargerThan1400 ? "350px" : isLargerThan900 ? "300px" : "400px"}
+      minH={isLargerThan1400 ? "350px" : isLargerThan1000 ? "300px" : "300px"}
+      maxW={isLargerThan1400 ? "350px" : isLargerThan1000 ? "300px" : "400px"}
       alignItems={"center"}
     >
       <Flex alignItems={"center"} justifyContent={"space-between"} w={"100%"}>
@@ -93,6 +93,7 @@ const Article: FC<ArticleProps> = ({
               size={"lg"}
               icon={faQuoteLeft}
               style={{
+                color: "black",
                 paddingTop: "4px",
                 marginRight: isRecommended ? "23px" : "",
               }}
@@ -100,7 +101,12 @@ const Article: FC<ArticleProps> = ({
           </Flex>
         </Flex>
         <blockquote
-          style={{ fontFamily: "monospace", fontSize: "1rem", padding: "4px" }}
+          style={{
+            color: "black",
+            fontFamily: "monospace",
+            fontSize: "1rem",
+            padding: "4px",
+          }}
         >
           {summary}
         </blockquote>

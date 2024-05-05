@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -11,14 +11,13 @@ import {
   DrawerOverlay,
   DrawerContent,
   VStack,
-  useMediaQuery,
-  TagLeftIcon,
   Avatar,
 } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
-import useAuthStore from "../store/authStore";
-import useLogout from "../hooks/useLogout";
+import useAuthStore from "../../store/authStore";
+import useLogout from "../../hooks/useLogout";
+import { reloadPage } from "../../utils/genericFunctions";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -46,6 +45,7 @@ const SideMenu: FC<SideMenuProps> = ({
     >
       <DrawerOverlay bg="transparent" />
       <DrawerContent
+        bg="var(--primary-color)"
         maxWidth="300px"
         height="90vh"
         marginTop="10vh"
@@ -60,6 +60,7 @@ const SideMenu: FC<SideMenuProps> = ({
                   <Box>{`${authUser.username}`}</Box>
                 </VStack>
                 <Avatar
+                  border="2px solid var(--secondary-color)"
                   bgColor={"pink.500"}
                   color={"white"}
                   name={`${authUser.username}`}
@@ -161,6 +162,7 @@ const SideMenu: FC<SideMenuProps> = ({
               onClick={() => {
                 logout();
                 onClose();
+                //reloadPage();
               }}
               isLoading={isLoggingOut}
             >

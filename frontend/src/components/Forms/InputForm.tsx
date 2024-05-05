@@ -22,7 +22,7 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 
-import "../assets/Navbar.css";
+import "../../assets/Navbar.css";
 import { Formik, Field } from "formik";
 import {
   validateEmail,
@@ -30,10 +30,10 @@ import {
   validatePassword,
   validateConfirmPassword,
   validatePhone,
-} from "../utils/formValidations";
-import useSignupEmailPassword from "../hooks/useSignupEmailPassword";
-import useLogin from "../hooks/useLogin";
-import useGoogleAuth from "../hooks/useGoogleAuth";
+} from "../../utils/formValidations";
+import useSignupEmailPassword from "../../hooks/useSignupEmailPassword";
+import useLogin from "../../hooks/useLogin";
+import useGoogleAuth from "../../hooks/useGoogleAuth";
 
 interface InputFormProps {
   isOpen: boolean;
@@ -59,7 +59,10 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
           backdropFilter="blur(3px) hue-rotate(25deg)"
         />
         <ModalOverlay />
-        <ModalContent width={isLargerThan650 ? "100%" : "85vw"}>
+        <ModalContent
+          width={isLargerThan650 ? "100%" : "85vw"}
+          bgColor={"var(--primary-color)"}
+        >
           <ModalHeader>{isLogin ? "Login" : "Create Account"}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
@@ -78,12 +81,14 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                       const success = await login(values);
                       if (success) {
                         onClose();
+                        //reloadPage();
                       }
                     }
                   : async (values) => {
                       const success = await signup(values);
                       if (success) {
                         onClose();
+                        //reloadPage();
                       }
                     }
               }
@@ -230,6 +235,7 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                             const success = await handleGoogleAuth();
                             if (success) {
                               onClose();
+                              //reloadPage();
                             }
                           }}
                         >

@@ -1,17 +1,19 @@
 import { useState, useEffect, FC } from "react";
 import { Link } from "react-router-dom";
-import { useDisclosure, useMultiStyleConfig } from "@chakra-ui/react";
+import { useColorModeValue, useDisclosure } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "../assets/Navbar.css";
+import "../../assets/Navbar.css";
 import {
   faBars,
   faHeartCircleCheck,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
-import InputForm from "./InputForm";
+import InputForm from "../Forms/InputForm";
 import SideMenu from "./SideMenu";
-import useAuthStore from "../store/authStore";
-import useLogout from "../hooks/useLogout";
+import useAuthStore from "../../store/authStore";
+import useLogout from "../../hooks/useLogout";
+import ColorModeSwitch from "../ColorModeSwitch";
+import { Colors } from "../../utils/colorsConstants";
 
 const Navbar: FC<{}> = () => {
   const {
@@ -28,6 +30,10 @@ const Navbar: FC<{}> = () => {
   const [logoText, setLogoText] = useState<string>("FemWell");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const { logout, isLoggingOut } = useLogout();
+  const navFadeColor = useColorModeValue(
+    Colors.primaryColor,
+    Colors.secondaryColor,
+  );
 
   const handleClick = (): void => {
     if (!isSideMenuOpen) {
@@ -61,19 +67,29 @@ const Navbar: FC<{}> = () => {
 
   return (
     <>
-      <nav className="navbar">
+      <nav
+        className="navbar"
+        // style={{
+        //   background: `${navFadeColor}`,
+        // }}
+      >
         <div className="navbar-container">
           <Link to="/" className="navbar-logo" onClick={onSideMenuClose}>
             {logoText}
             <FontAwesomeIcon icon={faHeartCircleCheck} />
           </Link>
+          <ColorModeSwitch />
           <div className="nav-right-section">
             <div className="menu-icon" onClick={handleClick}>
               <FontAwesomeIcon icon={isSideMenuOpen ? faTimes : faBars} />
             </div>
             <ul className="nav-menu">
               <li className="nav-item">
-                <Link to="/" className="nav-links" onClick={onSideMenuClose}>
+                <Link
+                  to="/home"
+                  className="nav-links"
+                  onClick={onSideMenuClose}
+                >
                   Home
                 </Link>
               </li>
@@ -113,7 +129,12 @@ const Navbar: FC<{}> = () => {
                 </li>
               ) : (
                 <li className="nav-item">
-                  <a className="nav-links" onClick={logout}>
+                  <a
+                    className="nav-links"
+                    onClick={() => {
+                      logout();
+                    }}
+                  >
                     Logout
                   </a>
                 </li>

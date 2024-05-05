@@ -29,8 +29,15 @@ const Fab = () => {
   };
 
   return (
-    <Box position="fixed" right="1rem" bottom="1rem" ref={ref}>
+    <Box
+      position="fixed"
+      right="1rem"
+      bottom="1rem"
+      ref={ref}
+      className="fab-element"
+    >
       <IconButton
+        color="white"
         colorScheme="fabColor"
         size="lg"
         fontSize="lg"
@@ -45,6 +52,7 @@ const Fab = () => {
         <ScaleFade initialScale={0.9} in={isOpen}>
           <Tooltip label="LiveChat" placement="left">
             <IconButton
+              color="white"
               colorScheme="fabColor"
               size="md"
               icon={<ChatIcon />}
@@ -57,6 +65,7 @@ const Fab = () => {
 
           <Tooltip label="New Post" placement="left">
             <IconButton
+              color="white"
               colorScheme="fabColor"
               size="md"
               icon={<EditIcon />}
@@ -67,6 +76,7 @@ const Fab = () => {
           </Tooltip>
           <Tooltip label="Settings" placement="left">
             <IconButton
+              color="white"
               colorScheme="fabColor"
               size="md"
               icon={<SettingsIcon />}

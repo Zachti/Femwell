@@ -1,4 +1,4 @@
-import { useState, FC } from "react";
+import { useState, FC, useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -6,8 +6,8 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import Navbar from "./components/Navbar";
+import { ChakraProvider, extendTheme, list } from "@chakra-ui/react";
+import Navbar from "./components/Menus/Navbar";
 import "./index.css";
 import "./assets/App.css";
 import Home from "./pages/Home";
@@ -16,49 +16,60 @@ import Fab from "./components/ActionButton";
 import useAuthStore from "./store/authStore";
 import AccountSettings from "./pages/AccountSettings";
 import ION from "./pages/ION";
+import Welcome from "./pages/Welcome";
 
-const theme = extendTheme({
-  styles: {
-    global: {
-      body: {
-        backgroundColor: "primaryColor",
-        paddingTop: "10vh",
-      },
-    },
-  },
-  colors: {
-    fabColor: {
-      500: "#6e0839 ",
-      600: "#5a052e",
-      700: "#3f0421",
-    },
-    primaryColor: "#ebd9ef",
-    secondaryColor: "#5a052e",
-    tertiaryColor: "#ffead7",
-    dividerColor: "#c9c9c9",
-  },
-});
+const config = {
+  initialColorMode: "light",
+  useSystemColorMode: false,
+};
 
 const App: FC<{}> = () => {
   const authUser = useAuthStore((state) => state.user);
-  const user = "John Doe";
-  const posts = [
-    {
-      username: "Sophie Barnet",
-      title: "First post",
-      content: "This is the first post.",
+
+  const theme = extendTheme({
+    config,
+    styles: {
+      global: (props: any) => ({
+        body: {
+          backgroundColor: props.colorMode === "dark" ? "#250515" : "#fbf2f7",
+          color: props.colorMode === "dark" ? "#fbf2f7" : "#250515",
+          paddingTop: "10vh",
+        },
+      }),
     },
-    {
-      username: "Shiri Cohen",
-      title: "Second post",
-      content: "This is the second post.",
+    components: {
+      Button: {
+        baseStyle: {
+          _focus: {
+            boxShadow: "none",
+          },
+        },
+      },
+      Menu: {
+        baseStyle: {
+          list: {
+            bg: "var(--quaternary-color)",
+            fontSize: "16px",
+          },
+          item: {
+            bg: "var(--quaternary-color)",
+            fontWeight: "600",
+            _focus: { bg: "var(--hover-menu-color)" },
+          },
+        },
+      },
     },
-    {
-      username: "Sara Netanyahu",
-      title: "Third post",
-      content: "This is the third post.",
+    colors: {
+      fabColor: {
+        200: "#86003C",
+        300: "#5A052E",
+        400: "#3F0421",
+        500: "#86003C",
+        600: "#5A052E",
+        700: "#3F0421",
+      },
     },
-  ];
+  });
 
   const FabWithLocation = () => {
     const location = useLocation();
@@ -72,11 +83,12 @@ const App: FC<{}> = () => {
         <Navbar />
         <FabWithLocation />
         <Routes>
-          <Route path="/" element={<Home />} />
           <Route
-            path="/community"
-            element={<CommunityHub user={user} posts={posts} />}
+            path="/"
+            element={!authUser ? <Welcome /> : <Navigate to="/home" />}
           />
+          <Route path="/home" element={<Home />} />
+          <Route path="/community" element={<CommunityHub />} />
           <Route
             path="/account"
             element={authUser ? <AccountSettings /> : <Navigate to="/" />}

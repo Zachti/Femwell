@@ -13,7 +13,6 @@
   margin: 0;
   padding-bottom: 10px;
   text-align: center;
-  color: var(--secondary-color);
 }
 
 .react-multi-carousel-item {
@@ -28,7 +27,7 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: var(--primary-color);
+  background-color: var(--light-color);
   color: var(--secondary-color);
   border: var(--secondary-color) solid 3px;
   font-size: 2rem;
