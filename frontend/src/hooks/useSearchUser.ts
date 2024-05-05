@@ -9,7 +9,6 @@ import {
 } from "firebase/firestore";
 import { firestore } from "../firebase/firebase";
 import useProfileStore from "../store/profileStore";
-import { queryTypes } from "../utils/userPostQueries";
 import usePostStore from "../store/postStore";
 
 const useSearchUser = () => {

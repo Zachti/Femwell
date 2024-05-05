@@ -18,9 +18,6 @@ const useEditPost = () => {
   const editPost = usePostStore((state) => state.editPost);
   const showToast = useShowToast();
 
-  useEffect(() => {
-    console.log(isLoadingEdit);
-  }, [isLoadingEdit]);
   const handleEditPost = async (updatedPost: any, originalPost: any) => {
     if (isLoadingEdit || !authUser || !originalPost.postId) return;
 
@@ -29,7 +26,7 @@ const useEditPost = () => {
       updatedPost.imgURL === originalPost.imgURL
     )
       return;
-    console.log("Editing Post...");
+
     setIsLoadingEdit(true);
 
     try {

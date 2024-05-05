@@ -110,7 +110,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
   };
 
   const chat = (
-    <Fade in={isOpen}>
+    <Fade in={isOpen} className="live-chat">
       <Box
         position="fixed"
         right={isLargerThan650 ? "1rem" : "0"}
@@ -246,6 +246,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
                 borderColor: "var(--secondary-color)",
               }}
               value={inputValue}
+              className="msg-box"
               onChange={handleTextChange}
               onClick={handleCursorClick}
             />

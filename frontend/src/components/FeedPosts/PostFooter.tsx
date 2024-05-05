@@ -3,8 +3,6 @@ import {
   Flex,
   InputGroup,
   Text,
-  Input,
-  InputRightElement,
   Button,
   IconButton,
   Textarea,
@@ -21,14 +19,19 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { FC, useState } from "react";
 import EmojiPicker from "../EmojiPicker";
+import { Comment } from "../../models/comment.model";
+import PostComment from "./PostComment";
 
 interface PostFooterProps {
-  likes: number;
+  likes: number; //will be array of userIDs who liked the post
+  comments?: Comment[]; //will be array of comments
 }
 
-const PostFooter: FC<PostFooterProps> = ({ likes }) => {
+const PostFooter: FC<PostFooterProps> = ({ likes, comments }) => {
   const [liked, setLiked] = useState(false);
   const [likeCount, setLikes] = useState(likes);
+  const [showComments, setShowComments] = useState(false);
+  const [visibleCommentsCount, setVisibleCommentsCount] = useState(10);
   const [commentActive, setCommentActive] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
@@ -43,6 +46,10 @@ const PostFooter: FC<PostFooterProps> = ({ likes }) => {
   };
   const addEmoji = (emoji: string) => {
     setInputValue(inputValue + emoji);
+  };
+
+  const handleShowMoreComments = () => {
+    setVisibleCommentsCount(visibleCommentsCount + 10);
   };
 
   return (
@@ -79,8 +86,12 @@ const PostFooter: FC<PostFooterProps> = ({ likes }) => {
         justifyContent={"space-between"}
         w="full"
       >
-        <Text _hover={{ color: "pink.200" }} cursor={"pointer"}>
-          View all xxx comments
+        <Text
+          _hover={{ color: "pink.200" }}
+          cursor={"pointer"}
+          onClick={() => setShowComments(!showComments)}
+        >
+          {`View all comments (${comments?.length})`}
         </Text>
 
         {commentActive && (
@@ -116,6 +127,7 @@ const PostFooter: FC<PostFooterProps> = ({ likes }) => {
               placeholder={"Write a comment..."}
               fontSize={16}
               value={inputValue}
+              className="msg-box"
               onChange={(e) => setInputValue(e.target.value)}
             />
           </InputGroup>
@@ -123,6 +135,27 @@ const PostFooter: FC<PostFooterProps> = ({ likes }) => {
       )}
 
       {showEmojiPicker ? <EmojiPicker Func={addEmoji} /> : null}
+
+      <Flex w={"full"} direction={"column"} gap={3} pt={showComments ? 3 : 0}>
+        {showComments &&
+          comments
+            ?.slice(0, visibleCommentsCount)
+            .map((comment) => (
+              <PostComment key={comment.id} comment={comment} />
+            ))}
+
+        {showComments &&
+          comments &&
+          comments?.length > visibleCommentsCount && (
+            <Text
+              _hover={{ color: "pink.200" }}
+              cursor={"pointer"}
+              onClick={handleShowMoreComments}
+            >
+              Show more comments...
+            </Text>
+          )}
+      </Flex>
     </>
   );
 };

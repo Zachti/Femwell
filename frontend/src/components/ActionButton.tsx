@@ -34,7 +34,7 @@ const Fab = () => {
       right="1rem"
       bottom="1rem"
       ref={ref}
-      zIndex={isChatOpen ? 0 : 1}
+      className="fab-element"
     >
       <IconButton
         color="white"

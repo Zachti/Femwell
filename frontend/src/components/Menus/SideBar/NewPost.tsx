@@ -18,7 +18,6 @@ interface SideBarProps {
 const NewPost: FC<SideBarProps> = ({}) => {
   const [isLargerThan400] = useMediaQuery("(min-width: 400px)");
   const [isLargerThan760] = useMediaQuery("(min-width: 760px)");
-  const { isLoading } = useCreatePost();
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -47,7 +46,6 @@ const NewPost: FC<SideBarProps> = ({}) => {
         isWinOpen={isOpen}
         onWinOpen={onOpen}
         onWinClose={onClose}
-        isLoading={isLoading}
         mode="create"
       />
     </>

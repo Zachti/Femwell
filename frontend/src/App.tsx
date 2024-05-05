@@ -16,6 +16,7 @@ import Fab from "./components/ActionButton";
 import useAuthStore from "./store/authStore";
 import AccountSettings from "./pages/AccountSettings";
 import ION from "./pages/ION";
+import Welcome from "./pages/Welcome";
 
 const config = {
   initialColorMode: "light",
@@ -82,7 +83,11 @@ const App: FC<{}> = () => {
         <Navbar />
         <FabWithLocation />
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={!authUser ? <Welcome /> : <Navigate to="/home" />}
+          />
+          <Route path="/home" element={<Home />} />
           <Route path="/community" element={<CommunityHub />} />
           <Route
             path="/account"

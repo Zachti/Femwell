@@ -107,7 +107,7 @@ const ION = () => {
 
   return (
     <div className="page">
-      <Fade in={!loading}>
+      <Fade in={!loading} className="main-element">
         <Header image="/sunset.jpg">
           <h1>Informational Online Notebook</h1>
         </Header>
@@ -252,6 +252,15 @@ const ION = () => {
           </ModalContent>
         </Modal>
       </Fade>
+
+      <svg
+        preserveAspectRatio="none"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1440 320"
+        className="svg"
+      >
+        <path d="M0,160L34.3,186.7C68.6,213,137,267,206,288C274.3,309,343,299,411,266.7C480,235,549,181,617,133.3C685.7,85,754,43,823,58.7C891.4,75,960,149,1029,176C1097.1,203,1166,181,1234,160C1302.9,139,1371,117,1406,106.7L1440,96L1440,320L1405.7,320C1371.4,320,1303,320,1234,320C1165.7,320,1097,320,1029,320C960,320,891,320,823,320C754.3,320,686,320,617,320C548.6,320,480,320,411,320C342.9,320,274,320,206,320C137.1,320,69,320,34,320L0,320Z"></path>
+      </svg>
     </div>
   );
 };

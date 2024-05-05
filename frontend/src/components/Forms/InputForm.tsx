@@ -22,7 +22,7 @@ import {
   useMediaQuery,
 } from "@chakra-ui/react";
 
-import "../assets/Navbar.css";
+import "../../assets/Navbar.css";
 import { Formik, Field } from "formik";
 import {
   validateEmail,
@@ -30,11 +30,10 @@ import {
   validatePassword,
   validateConfirmPassword,
   validatePhone,
-} from "../utils/formValidations";
-import useSignupEmailPassword from "../hooks/useSignupEmailPassword";
-import useLogin from "../hooks/useLogin";
-import useGoogleAuth from "../hooks/useGoogleAuth";
-import { reloadPage } from "../utils/genericFunctions";
+} from "../../utils/formValidations";
+import useSignupEmailPassword from "../../hooks/useSignupEmailPassword";
+import useLogin from "../../hooks/useLogin";
+import useGoogleAuth from "../../hooks/useGoogleAuth";
 
 interface InputFormProps {
   isOpen: boolean;

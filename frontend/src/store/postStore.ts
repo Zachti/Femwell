@@ -4,16 +4,19 @@ import { Post } from "../models";
 type State = {
   posts: Post[];
   queryType: string;
+  prevQueryType: string;
   createPost: (post: Post) => void;
   editPost: (postId: string, content: string, imgURL: string) => void;
   deletePost: (postId: string) => void;
   setPosts: (posts: Post[]) => void;
   setPostsQuery: (queryType: string) => void;
+  setPrevPostsQuery: (queryType: string) => void;
 };
 
 const usePostStore = create<State>((set) => ({
   posts: [],
   queryType: "",
+  prevQueryType: "",
   createPost: (post) =>
     set((state) => ({ ...state, posts: [post, ...state.posts] })),
   editPost: (postId, content, imgURL) =>
@@ -30,6 +33,8 @@ const usePostStore = create<State>((set) => ({
     })),
   setPosts: (posts) => set((state) => ({ ...state, posts })),
   setPostsQuery: (queryType) => set((state) => ({ ...state, queryType })),
+  setPrevPostsQuery: (prevQueryType) =>
+    set((state) => ({ ...state, prevQueryType })),
 }));
 
 export default usePostStore;

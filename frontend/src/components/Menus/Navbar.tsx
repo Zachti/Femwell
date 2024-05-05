@@ -8,7 +8,7 @@ import {
   faHeartCircleCheck,
   faTimes,
 } from "@fortawesome/free-solid-svg-icons";
-import InputForm from "../InputForm";
+import InputForm from "../Forms/InputForm";
 import SideMenu from "./SideMenu";
 import useAuthStore from "../../store/authStore";
 import useLogout from "../../hooks/useLogout";
@@ -85,7 +85,11 @@ const Navbar: FC<{}> = () => {
             </div>
             <ul className="nav-menu">
               <li className="nav-item">
-                <Link to="/" className="nav-links" onClick={onSideMenuClose}>
+                <Link
+                  to="/home"
+                  className="nav-links"
+                  onClick={onSideMenuClose}
+                >
                   Home
                 </Link>
               </li>
@@ -129,9 +133,6 @@ const Navbar: FC<{}> = () => {
                     className="nav-links"
                     onClick={() => {
                       logout();
-                      setTimeout(() => {
-                        window.location.reload();
-                      }, 300);
                     }}
                   >
                     Logout

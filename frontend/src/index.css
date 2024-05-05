@@ -14,7 +14,7 @@
   --strong-pink-color: #b32c6b;
   --tertiary-color-dim: #ffead7aa;
   --divider-color: #c9c9c9;
-  --text-color-a: #ff86e7;
+  --text-color-a: #ffc4e5;
   --recommended-color: #d6fdae;
   --light-color: #fbf2f7;
   --dim-color: #ffffff30;
@@ -25,9 +25,11 @@
   --secondary-color: #5a052e;
   --tertiary-color: #fefff8;
   --quaternary-color: #d8bfa8;
+  --quaternary-color-dim: #5b163b80;
   --hover-color: #250515;
   --hover-color-dim: #25051536;
   --navbar-color: #ffb0de;
+  --waves-bg-color: #ffdff160;
   --hover-menu-color: #430423;
 }
 
@@ -36,9 +38,11 @@
   --secondary-color: #5a052e;
   --tertiary-color: #d8bfa8;
   --quaternary-color: #5b163b;
+  --quaternary-color-dim: #5b163b80;
   --hover-color: #efe5f1;
   --hover-color-dim: #efe5f144;
   --navbar-color: #5a052e;
+  --waves-bg-color: #5a052e4f;
   --hover-menu-color: #430423;
 }
 

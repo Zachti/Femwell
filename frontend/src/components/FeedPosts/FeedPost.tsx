@@ -3,6 +3,7 @@ import PostHeader from "./PostHeader";
 import { Box, Image, Text, Flex, useMediaQuery } from "@chakra-ui/react";
 import PostFooter from "./PostFooter";
 import { Timestamp } from "firebase/firestore";
+import { Comment } from "../../models/comment.model";
 
 interface PostProps {
   id: string;
@@ -13,6 +14,7 @@ interface PostProps {
   createdAt: Timestamp;
   createdBy: string;
   likes: number;
+  comments?: Comment[];
 }
 
 const FeedPost: FC<PostProps> = ({
@@ -24,6 +26,7 @@ const FeedPost: FC<PostProps> = ({
   createdAt,
   createdBy,
   likes,
+  comments,
 }) => {
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
@@ -99,7 +102,7 @@ const FeedPost: FC<PostProps> = ({
           )}
         </Flex>
       </Box>
-      <PostFooter likes={likes} />
+      <PostFooter likes={likes} comments={comments} />
     </Box>
   );
 };

@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import usePostStore from "../store/postStore";
 import useShowToast from "./useShowToast";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { firestore } from "../firebase/firebase";
+import { getDocs } from "firebase/firestore";
 import { Post } from "../models";
 import useProfileStore from "../store/profileStore";
 import { queryTypes, userPostQueries } from "../utils/userPostQueries";
 
 const useGetUserPost = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { posts, setPosts, queryType } = usePostStore();
+  const { setPosts, queryType } = usePostStore();
   const userProfile = useProfileStore((state) => state.userProfile);
+  const prevQueryType = usePostStore((state) => state.prevQueryType);
+  const setPrevPostsQuery = usePostStore((state) => state.setPrevPostsQuery);
   const showToast = useShowToast();
 
   useEffect(() => {
@@ -47,6 +48,7 @@ const useGetUserPost = () => {
 
         posts.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
         setPosts(posts);
+        setPrevPostsQuery(queryType);
       } catch (error: any) {
         showToast("Error", error.message, "error");
         setPosts([]);
@@ -54,64 +56,10 @@ const useGetUserPost = () => {
         setIsLoading(false);
       }
     };
-
-    getPosts();
+    if (queryType !== prevQueryType) getPosts();
   }, [setPosts, userProfile, queryType]);
 
-  return { isLoading, posts };
+  return { isLoading };
 };
 
 export default useGetUserPost;
-
-// import { useEffect, useState } from "react";
-// import usePostStore from "../store/postStore";
-// import useShowToast from "./useShowToast";
-// import { collection, getDocs, query, where } from "firebase/firestore";
-// import { firestore } from "../firebase/firebase";
-// import { Post } from "../models";
-// import useProfileStore from "../store/profileStore";
-
-// const useGetUserPost = () => {
-//   const [isLoading, setIsLoading] = useState(false);
-//   const { posts, setPosts } = usePostStore();
-//   const userProfile = useProfileStore((state) => state.userProfile);
-//   const showToast = useShowToast();
-
-//   useEffect(() => {
-//     const getPosts = async () => {
-//       if (!userProfile) return;
-//       setIsLoading(true);
-//       setPosts([]);
-//       try {
-//         const q = query(
-//           collection(firestore, "posts"),
-//           where("createdBy", "==", userProfile.id),
-//           where("username", "==", userProfile.username),
-//         );
-//         const qSnapshot = await getDocs(q);
-//         const posts: Post[] = [];
-
-//         qSnapshot.forEach((doc) => {
-//           posts.push({
-//             ...(doc.data() as Post),
-//             id: doc.id,
-//             pfpURL: userProfile.pfpURL,
-//           });
-//         });
-//         posts.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
-//         setPosts(posts);
-//       } catch (error: any) {
-//         showToast("Error", error.message, "error");
-//         setPosts([]);
-//       } finally {
-//         setIsLoading(false);
-//       }
-//     };
-
-//     getPosts();
-//   }, [setPosts, userProfile]);
-
-//   return { isLoading, posts };
-// };
-
-// export default useGetUserPost;
