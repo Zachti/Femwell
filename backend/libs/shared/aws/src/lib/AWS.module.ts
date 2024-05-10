@@ -40,7 +40,7 @@ export class AWSSdkModule {
       return {
         provide: getAwsServiceToken(s.client),
         useFactory: (serviceConfig: any) => {
-          const conf = { ...config, serviceConfig };
+          const conf = { ...config, ...serviceConfig };
           return new s.client(conf);
         },
         inject: ['AWS_SERVICE_CONFIG'],
