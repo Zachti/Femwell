@@ -152,15 +152,16 @@ export class AuthService {
     const cognito = new CognitoIdentityProvider({
       region: this.awsCfg.region,
       credentials: {
-        secretAccessKey: this.awsCfg.secretKey!,
-        accessKeyId: this.awsCfg.accessKey!,
+        secretAccessKey: this.awsCfg.secretKey,
+        accessKeyId: this.awsCfg.accessKey,
+        sessionToken: this.awsCfg.sessionToken,
       },
     });
 
     const userData = await cognito.adminGetUser(deleteUserData);
     const id = userData.UserAttributes?.find(
       (attribute) => attribute.Name === 'sub',
-    );
+    )?.Value;
 
     return new Promise((resolve, reject) => {
       return cognito.adminDeleteUser(deleteUserData, (err) => {
