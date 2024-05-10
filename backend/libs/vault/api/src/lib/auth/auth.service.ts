@@ -132,13 +132,9 @@ export class AuthService {
 
     const cognitoUser = new CognitoUser(userData);
     return new Promise((resolve, reject) => {
-      return cognitoUser.getAttributeVerificationCode('email', {
-        onSuccess: () => {
-          resolve('Verification code sent');
-        },
-        onFailure: (err) => {
-          reject(err);
-        },
+      return cognitoUser.resendConfirmationCode((err) => {
+        if (err) reject(err);
+        resolve('Verification code sent!');
       });
     });
   }
