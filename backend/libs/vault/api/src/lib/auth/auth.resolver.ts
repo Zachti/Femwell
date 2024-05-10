@@ -10,6 +10,8 @@ import { AuthUser } from '../authUser/authUser.entity';
 import { AuditService, InjectAuditService } from '@backend/auditService';
 import { DeleteUserRequest } from './dto/deleteUserRequest.input';
 import { randomUUID } from 'node:crypto';
+import { GraphQLVoid } from 'graphql-scalars';
+import { SignedUpUser } from '../authUser/signedUpUser.entity';
 
 @Resolver(() => AuthUser)
 export class AuthResolver {
@@ -18,17 +20,14 @@ export class AuthResolver {
     @InjectAuditService('auth') private readonly auditService: AuditService,
   ) {}
 
-  @Mutation(() => AuthUser)
+  @Mutation(() => SignedUpUser)
   async register(
     @Args('registerRequest') registerRequest: RegisterRequest,
-  ): Promise<AuthUser> {
+  ): Promise<SignedUpUser> {
     const signUpResult = await this.authService.registerUser(registerRequest);
     const user = {
       id: signUpResult.id,
       username: registerRequest.email,
-      jwt: signUpResult.jwt,
-      refreshToken: signUpResult.refreshToken,
-      isValid: signUpResult.isValid,
     };
     await this.sendAuditLog(user, 'registration');
     return user;
@@ -55,19 +54,12 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(() => AuthUser)
+  @Mutation(() => GraphQLVoid)
   async confirm(
     @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,
-  ): Promise<AuthUser> {
+  ) {
     try {
-      const res = await this.authService.confirmUser(confirmUserRequest);
-      return {
-        id: res.id,
-        username: confirmUserRequest.email,
-        jwt: res.jwt,
-        refreshToken: res.refreshToken,
-        isValid: res.isValid,
-      };
+      return await this.authService.confirmUser(confirmUserRequest);
     } catch (e: any) {
       throw new BadRequestException(e.message);
     }
@@ -97,10 +89,7 @@ export class AuthResolver {
     }
   }
 
-  private async sendAuditLog(
-    user: AuthUser,
-    eventType: string,
-  ): Promise<string> {
+  private async sendAuditLog(user: any, eventType: string): Promise<string> {
     return this.auditService.auditEvent({
       trigger: {
         id: { type: 'email', value: user.username },
