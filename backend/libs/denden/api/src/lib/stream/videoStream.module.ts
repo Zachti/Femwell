@@ -5,6 +5,5 @@ import { VideoStreamController } from './videoStream.controller';
 @Module({
   controllers: [VideoStreamController],
   providers: [VideoStreamService],
-  exports: [],
 })
 export class VideoStreamModule {}

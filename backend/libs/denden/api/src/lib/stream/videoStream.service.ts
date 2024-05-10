@@ -1,24 +1,29 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { LoggerService } from '@backend/logger';
 import { InjectAwsService } from '@backend/awsModule';
 import { CloudFront } from '@aws-sdk/client-cloudfront';
+import { dendenConfig } from '@backend/denden';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class VideoStreamService {
   constructor(
     @InjectAwsService(CloudFront) private cloudFront: CloudFront,
+    @Inject(dendenConfig.KEY)
+    private readonly Cfg: ConfigType<typeof dendenConfig>,
     private readonly logger: LoggerService,
   ) {}
 
-  async stream(videoName: string, videoId: string): Promise<URL> {
+  async stream(videoName: string): Promise<URL> {
     this.logger.info('fetching video stream url from cloudfront');
     try {
       const distribution = await this.cloudFront.getDistribution({
-        Id: videoId,
+        Id: this.Cfg.cloudFrontDistributionId,
       });
       const domainName = distribution.Distribution?.DomainName;
       if (!domainName) throw new BadRequestException();
@@ -28,7 +33,7 @@ export class VideoStreamService {
       this.logger.error(`video stream url not found: ${e.message}`);
       if (e instanceof BadRequestException) {
         throw new BadRequestException(
-          `there is not distribution with this id - ${videoId}`,
+          `there is not distribution with this id: ${this.Cfg.cloudFrontDistributionId}`,
         );
       }
       throw new InternalServerErrorException(

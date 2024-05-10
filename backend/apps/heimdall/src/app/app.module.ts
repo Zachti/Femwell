@@ -31,6 +31,7 @@ import { SES } from '@aws-sdk/client-ses';
           credentials: {
             secretAccessKey: config.secretKey,
             accessKeyId: config.accessKey,
+            sessionToken: config.sessionToken,
           },
         };
       },
