@@ -24,8 +24,11 @@ export class EventResolver {
   }
 
   @Mutation(() => Event)
-  updateEvent(@Args('updateEventInput') updateEventInput: UpdateEventInput) {
-    return this.eventService.update(updateEventInput.id, updateEventInput);
+  updateEvent(
+    @Args('eventId', { type: () => Int }) eventId: number,
+    @Args('updateEventInput') updateEventInput: UpdateEventInput,
+  ) {
+    return this.eventService.update(eventId, updateEventInput);
   }
 
   @Mutation(() => Event)

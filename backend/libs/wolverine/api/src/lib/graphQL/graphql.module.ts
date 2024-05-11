@@ -13,14 +13,15 @@ import {
   QuestionnaireModule,
   LiveChatModule,
   LiveChatService,
-} from '../index';
-import {
+  EventModule,
+  EventService,
   UserService,
   PostService,
   CommentService,
   LikeService,
   QuestionnaireService,
 } from '../index';
+
 @Module({
   imports: [
     GraphQLModule.forRootAsync<ApolloFederationDriverConfig>({
@@ -31,6 +32,7 @@ import {
         LikeModule,
         QuestionnaireModule,
         LiveChatModule,
+        EventModule,
       ],
       inject: [
         UserService,
@@ -39,6 +41,7 @@ import {
         LikeService,
         QuestionnaireService,
         LiveChatService,
+        EventService,
       ],
       driver: ApolloFederationDriver,
       useClass: GqlConfigService,

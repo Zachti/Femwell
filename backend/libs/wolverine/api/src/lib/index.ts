@@ -32,3 +32,5 @@ export * from './liveChat/liveChat.module';
 export * from './liveChat/liveChat.service';
 
 export * from './event/entities/event.entity';
+export * from './event/event.module';
+export * from './event/event.service';
