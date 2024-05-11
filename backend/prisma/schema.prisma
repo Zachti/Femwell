@@ -102,12 +102,14 @@ model Message {
 }
 
 model Event {
-  id       Int      @id @default(autoincrement())
-  title    String
-  date     DateTime @map("date")
-  duration String
-  userId   String
-  info     String?  @default("")
+  id                       Int      @id @default(autoincrement())
+  title                    String
+  date                     DateTime @map("date")
+  duration                 String
+  userId                   String
+  info                     String?  @default("")
+  is24HourNotificationSent Boolean  @default(false)
+  is1HourNotificationSent  Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

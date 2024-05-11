@@ -21,4 +21,10 @@ export class Event {
 
   @Field(() => GraphQLString)
   info?: string;
+
+  @Field(() => Boolean)
+  is24HourNotificationSent!: boolean;
+
+  @Field(() => Boolean)
+  is1HourNotificationSent!: boolean;
 }
