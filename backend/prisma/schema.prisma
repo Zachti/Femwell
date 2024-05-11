@@ -27,6 +27,7 @@ model User {
   liveChats     LiveChat[]
   messages      Message[]      @relation("UserMessages")
   readLater     String[]       @default([])
+  events        Event[]
 }
 
 model Post {
@@ -98,4 +99,15 @@ model Message {
   user       User     @relation("UserMessages", fields: [userId], references: [id], onDelete: Cascade)
   liveChat   LiveChat @relation(fields: [liveChatId], references: [id], onDelete: Cascade)
   seen       Boolean  @default(false)
+}
+
+model Event {
+  id       Int      @id @default(autoincrement())
+  title    String
+  date     DateTime @map("date")
+  duration String
+  userId   String
+  info     String?  @default("")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

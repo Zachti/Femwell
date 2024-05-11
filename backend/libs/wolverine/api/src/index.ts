@@ -4,3 +4,4 @@ export * from './lib/graphQL/graphql.module';
 export * from './lib/questionnaire/questionnaire.module';
 export * from './lib/liveChat/liveChat.module';
 export * from './lib/shared/prisma/prisma.module';
+export * from './lib/event/event.module';

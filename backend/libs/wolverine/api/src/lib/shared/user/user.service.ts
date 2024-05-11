@@ -98,6 +98,7 @@ export class UserService {
           posts: true,
           comments: true,
           likes: true,
+          events: true,
           questionnaire: {
             include: {
               responses: true,

@@ -12,6 +12,7 @@ import {
   Questionnaire,
   LiveChat,
   Message,
+  Event,
 } from '../../../index';
 
 @ObjectType()
@@ -48,4 +49,7 @@ export class User {
 
   @Field(() => [GraphQLString])
   readLater!: string[];
+
+  @Field(() => [Event])
+  events!: Event[];
 }
