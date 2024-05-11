@@ -165,7 +165,7 @@ export class LiveChatResolver {
   async enterLiveChat(
     @Args('liveChatId') liveChatId: number,
     @Args('userId') userId: string,
-  ) {
+  ): Promise<boolean> {
     await this.pubSub
       .publish(`userInLiveCha: ${liveChatId}`, {
         userId,
@@ -187,11 +187,23 @@ export class LiveChatResolver {
   async leaveChatroom(
     @Args('liveChatId') liveChatId: number,
     @Args('userId') userId: string,
-  ) {
+  ): Promise<boolean> {
     await this.pubSub.publish(`UserLeftLiveChat: ${liveChatId}`, {
       userId,
       liveChatId,
     });
     return true;
+  }
+
+  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Mutation(() => [Message])
+  async setMessagesAsRead(@Args('liveChatId') liveChatId: number) {
+    return await this.liveChatService.setMessagesAsRead(liveChatId);
+  }
+
+  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Mutation(() => Message)
+  async setMessageAsUnread(@Args('liveChatId') liveChatId: number) {
+    return await this.liveChatService.setMessageAsUnread(liveChatId);
   }
 }
