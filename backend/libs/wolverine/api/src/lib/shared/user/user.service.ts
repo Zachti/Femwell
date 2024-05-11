@@ -17,12 +17,14 @@ export class UserService {
   async createUser(input: CreateUserInput): Promise<User> {
     try {
       this.logger.info(
-        `Creating a new user in db for cognito user: ${input.username}.`,
+        `Creating a new user in db for cognito user: ${input.email}.`,
       );
       const result = await this.prisma.user.create({
         data: {
-          id: input.cognitoUserId || uuidv4(), // the || is for dev phase
-          username: input.username,
+          id: input.cognitoUserId || uuidv4(), // the || is for dev phase todo remove this shit leibo
+          username: input.profileUsername,
+          email: input.email,
+          phoneNumber: input.phoneNumber || undefined,
         },
       });
       this.logger.info(`User created successfully with id: ${result.id}.`);
@@ -35,11 +37,15 @@ export class UserService {
   async updateUser(input: UpdateUserInput): Promise<User> {
     try {
       this.logger.info(
-        `Updating a user in db with old username: ${input.prevUsername}.`,
+        `Updating a user in db with old username: ${input.username}.`,
       );
       const result = await this.prisma.user.update({
-        where: { id: input.userId },
-        data: { username: input.newUsername ?? input.prevUsername },
+        where: { id: input.id },
+        data: {
+          username: input.newUsername || undefined,
+          readLater: input.readLater || undefined,
+          phoneNumber: input.phoneNumber || undefined,
+        },
       });
       this.logger.info(
         `User updated successfully, new username is: ${result.username}.`,

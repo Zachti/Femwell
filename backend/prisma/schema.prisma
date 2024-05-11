@@ -11,19 +11,22 @@ generator client {
 // }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("AWS_AURORA_URL")
 }
 
 model User {
   id            String         @id @default(uuid())
   username      String
+  email         String
+  phoneNumber   String?
   posts         Post[]
   comments      Comment[]      @relation("UserComments")
   likes         Like[]         @relation("UserLikes")
   questionnaire Questionnaire?
   liveChats     LiveChat[]
   messages      Message[]      @relation("UserMessages")
+  readLater     String[]       @default([])
 }
 
 model Post {

@@ -32,19 +32,19 @@ export class AuthService {
   ) {}
 
   registerUser(registerRequest: RegisterRequest): Promise<signUpUser> {
-    const { name, email, password, phoneNumber } = registerRequest;
-    this.logger.info(`${name} trying to sign up.`);
+    const { profileUsername, email, password, phoneNumber } = registerRequest;
+    this.logger.info(`${profileUsername} trying to sign up.`);
     return new Promise((resolve, reject) => {
       return this.userPool.signUp(
         email,
         password,
         [
-          new CognitoUserAttribute({ Name: 'name', Value: name }),
+          new CognitoUserAttribute({ Name: 'name', Value: profileUsername }),
           new CognitoUserAttribute({ Name: 'email', Value: email }),
           //new CognitoUserAttribute({ Name: 'role', Value: Role.User }),
           new CognitoUserAttribute({
             Name: 'phone_number',
-            Value: phoneNumber || '+972535554444',
+            Value: phoneNumber || '+972535554444', // todo remove !
           }),
         ],
         [],
@@ -60,7 +60,9 @@ export class AuthService {
               'create',
               {
                 email,
-                id,
+                cognitoUserId: id,
+                profileUsername,
+                phoneNumber,
               },
               this.logger,
             );

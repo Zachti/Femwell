@@ -5,10 +5,10 @@ import { GraphQLEmailAddress } from 'graphql-scalars';
 @InputType()
 export class RegisterRequest {
   @Field(() => GraphQLString)
-  name!: string; // Pay attention please this field is not the username!
+  profileUsername!: string;
 
   @Field(() => GraphQLEmailAddress)
-  email!: string; // this field will be the username!
+  email!: string;
 
   @Field(() => GraphQLString)
   password!: string;
