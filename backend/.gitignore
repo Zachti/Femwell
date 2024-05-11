@@ -55,3 +55,6 @@ apps/vt
 *.key
 
 .nx/cache
+
+#terraform
+terraform/terraform.tfstate
