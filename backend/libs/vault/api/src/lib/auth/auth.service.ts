@@ -34,19 +34,20 @@ export class AuthService {
   registerUser(registerRequest: RegisterRequest): Promise<signUpUser> {
     const { profileUsername, email, password, phoneNumber } = registerRequest;
     this.logger.info(`${profileUsername} trying to sign up.`);
+    const userAttributes = [
+      new CognitoUserAttribute({ Name: 'name', Value: profileUsername }),
+      new CognitoUserAttribute({ Name: 'email', Value: email }),
+      //new CognitoUserAttribute({ Name: 'role', Value: Role.User }), // todo try to solve the role issue
+    ];
+    phoneNumber &&
+      userAttributes.push(
+        new CognitoUserAttribute({ Name: 'phone_number', Value: phoneNumber }),
+      );
     return new Promise((resolve, reject) => {
       return this.userPool.signUp(
         email,
         password,
-        [
-          new CognitoUserAttribute({ Name: 'name', Value: profileUsername }),
-          new CognitoUserAttribute({ Name: 'email', Value: email }),
-          //new CognitoUserAttribute({ Name: 'role', Value: Role.User }),
-          new CognitoUserAttribute({
-            Name: 'phone_number',
-            Value: phoneNumber || '+972535554444', // todo remove !
-          }),
-        ],
+        userAttributes,
         [],
         async (err, result) => {
           if (!result) {
