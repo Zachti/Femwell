@@ -22,13 +22,13 @@ import { InjectWolverineSdk, Sdk } from '../wolverine-datasource';
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(awsConfig.KEY)
-    private readonly awsCfg: ConfigType<typeof awsConfig>,
     @InjectCognitoToken()
     private readonly userPool: CognitoUserPool,
     @InjectWolverineSdk()
     private readonly wolverineSdk: Sdk,
     private readonly logger: LoggerService,
+    @Inject(awsConfig.KEY)
+    private readonly awsCfg: ConfigType<typeof awsConfig>,
   ) {}
 
   registerUser(registerRequest: RegisterRequest): Promise<signUpUser> {
@@ -148,14 +148,9 @@ export class AuthService {
       UserPoolId: this.awsCfg.userPoolId,
     };
 
-    const cognito = new CognitoIdentityProvider({
-      region: this.awsCfg.region,
-      credentials: {
-        secretAccessKey: this.awsCfg.secretKey,
-        accessKeyId: this.awsCfg.accessKey,
-        sessionToken: this.awsCfg.sessionToken,
-      },
-    });
+    const cognito = new CognitoIdentityProvider(
+      this.awsCfg.localDevConfigOverride,
+    );
 
     const userData = await cognito.adminGetUser(deleteUserData);
     const id = userData.UserAttributes?.find(
@@ -163,7 +158,7 @@ export class AuthService {
     )?.Value;
 
     return new Promise((resolve, reject) => {
-      return cognito.adminDeleteUser(deleteUserData, (err) => {
+      return cognito.adminDeleteUser(deleteUserData, (err: any) => {
         if (err) reject(err);
         this.logger.info(
           `${deleteUserRequest.username} account deleted from cognito.`,

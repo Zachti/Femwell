@@ -11,8 +11,8 @@ export const CognitoProvider: Provider = {
   provide: CognitoToken,
   useFactory: (config: ConfigType<typeof awsConfig>) => {
     return new CognitoUserPool({
-      UserPoolId: config.userPoolId!,
-      ClientId: config.clientId!,
+      UserPoolId: config.userPoolId,
+      ClientId: config.clientId,
     });
   },
   inject: [awsConfig.KEY],
