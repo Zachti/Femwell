@@ -4,12 +4,18 @@ import { LoggerService } from '@backend/logger';
 
 const createUserMutation = gql`
   mutation createUser($createUserInput: CreateUserInput!) {
-    createUser(createUserInput: $createUserInput) {}
-  }`;
+    createUser(createUserInput: $createUserInput) {
+      id
+    }
+  }
+`;
 const deleteUserMutation = gql`
   mutation deleteUser($id: UUID!) {
-    deleteUser(id: $id) {}
-  }`;
+    deleteUser(id: $id) {
+      id
+    }
+  }
+`;
 
 export function getSdk(client: GraphQLClient) {
   const getWolverineMutation = (mutation: string, logger: LoggerService) => {

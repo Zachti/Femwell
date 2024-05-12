@@ -6,7 +6,6 @@ import {
   CognitoUser,
   AuthenticationDetails,
   ICognitoUserData,
-  CognitoUserSession,
 } from 'amazon-cognito-identity-js';
 import { Inject, Injectable } from '@nestjs/common';
 import { AuthenticateRequest } from './dto/authenticateRequest.input';
@@ -14,7 +13,7 @@ import { ConfirmUserRequest } from './dto/confirmUserRequest.input';
 import { LoggerService } from '@backend/logger';
 import { Role } from '@backend/infrastructure';
 import { InjectCognitoToken } from './providers/cognito.provider';
-import { userSession } from './interfaces/inrefaces';
+import { signUpUser, userSession } from './interfaces/inrefaces';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { awsConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
@@ -23,63 +22,55 @@ import { InjectWolverineSdk, Sdk } from '../wolverine-datasource';
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject(awsConfig.KEY)
-    private readonly awsCfg: ConfigType<typeof awsConfig>,
     @InjectCognitoToken()
     private readonly userPool: CognitoUserPool,
     @InjectWolverineSdk()
     private readonly wolverineSdk: Sdk,
     private readonly logger: LoggerService,
+    @Inject(awsConfig.KEY)
+    private readonly awsCfg: ConfigType<typeof awsConfig>,
   ) {}
 
-  registerUser(registerRequest: RegisterRequest): Promise<userSession> {
-    const { name, email, password, phoneNumber } = registerRequest;
-    this.logger.info(`${name} signed up.`);
+  registerUser(registerRequest: RegisterRequest): Promise<signUpUser> {
+    const { profileUsername, email, password, phoneNumber } = registerRequest;
+    this.logger.info(`${profileUsername} trying to sign up.`);
+    const userAttributes = [
+      new CognitoUserAttribute({ Name: 'name', Value: profileUsername }),
+      new CognitoUserAttribute({ Name: 'email', Value: email }),
+      //new CognitoUserAttribute({ Name: 'role', Value: Role.User }), // todo try to solve the role issue
+    ];
+    phoneNumber &&
+      userAttributes.push(
+        new CognitoUserAttribute({ Name: 'phone_number', Value: phoneNumber }),
+      );
     return new Promise((resolve, reject) => {
       return this.userPool.signUp(
         email,
         password,
-        [
-          new CognitoUserAttribute({ Name: 'name', Value: name }),
-          new CognitoUserAttribute({ Name: 'email', Value: email }),
-          new CognitoUserAttribute({ Name: 'role', Value: Role.User }),
-          new CognitoUserAttribute({
-            Name: 'phone_number',
-            Value: phoneNumber || '',
-          }),
-        ],
+        userAttributes,
         [],
-        (err, result) => {
+        async (err, result) => {
           if (!result) {
             reject(err);
           } else {
-            result.user.getSession(
-              async (err: null, session: CognitoUserSession) => {
-                if (err) {
-                  reject(err);
-                }
-                this.logger.info(
-                  `user created in cognito user pool: ${this.userPool.getUserPoolId()}`,
-                );
-                const id = session.getIdToken().decodePayload()[
-                  'identities'
-                ].userId;
-                await this.wolverineSdk.sendWolverineMutation(
-                  'create',
-                  {
-                    email,
-                    id,
-                  },
-                  this.logger,
-                );
-                resolve({
-                  id,
-                  isValid: session.isValid(),
-                  refreshToken: session.getRefreshToken().getToken(),
-                  jwt: session.getAccessToken().getJwtToken(),
-                });
-              },
+            this.logger.info(
+              `user created in cognito user pool: ${this.userPool.getUserPoolId()}`,
             );
+            const id = result.userSub;
+            await this.wolverineSdk.sendWolverineMutation(
+              'create',
+              {
+                email,
+                cognitoUserId: id,
+                profileUsername,
+                phoneNumber,
+              },
+              this.logger,
+            );
+            resolve({
+              email,
+              id,
+            });
           }
         },
       );
@@ -103,7 +94,7 @@ export class AuthService {
       return cognitoUser.authenticateUser(authDetails, {
         onSuccess: (result) =>
           resolve({
-            id: result.getIdToken().decodePayload()['identities'].userId,
+            id: result.getIdToken().decodePayload()['sub'],
             isValid: result.isValid(),
             refreshToken: result.getRefreshToken().getToken(),
             jwt: result.getAccessToken().getJwtToken(),
@@ -113,7 +104,7 @@ export class AuthService {
     });
   }
 
-  confirmUser(confirmUserRequest: ConfirmUserRequest): Promise<userSession> {
+  confirmUser(confirmUserRequest: ConfirmUserRequest) {
     const userData: ICognitoUserData = {
       Username: confirmUserRequest.email,
       Pool: this.userPool,
@@ -130,17 +121,7 @@ export class AuthService {
         true,
         (err, result) => {
           if (err) reject(err);
-          result.user.getSession((err: null, session: CognitoUserSession) => {
-            if (err) {
-              reject(err);
-            }
-            resolve({
-              id: session.getIdToken().decodePayload()['identities'].userId,
-              isValid: session.isValid(),
-              refreshToken: session.getRefreshToken().getToken(),
-              jwt: session.getAccessToken().getJwtToken(),
-            });
-          });
+          resolve(result);
         },
       );
     });
@@ -154,13 +135,9 @@ export class AuthService {
 
     const cognitoUser = new CognitoUser(userData);
     return new Promise((resolve, reject) => {
-      return cognitoUser.getAttributeVerificationCode('email', {
-        onSuccess: () => {
-          resolve('Verification code sent');
-        },
-        onFailure: (err) => {
-          reject(err);
-        },
+      return cognitoUser.resendConfirmationCode((err) => {
+        if (err) reject(err);
+        resolve('Verification code sent!');
       });
     });
   }
@@ -171,21 +148,17 @@ export class AuthService {
       UserPoolId: this.awsCfg.userPoolId,
     };
 
-    const cognito = new CognitoIdentityProvider({
-      region: this.awsCfg.region,
-      credentials: {
-        secretAccessKey: this.awsCfg.secretKey!,
-        accessKeyId: this.awsCfg.accessKey!,
-      },
-    });
+    const cognito = new CognitoIdentityProvider(
+      this.awsCfg.localDevConfigOverride,
+    );
 
     const userData = await cognito.adminGetUser(deleteUserData);
     const id = userData.UserAttributes?.find(
       (attribute) => attribute.Name === 'sub',
-    );
+    )?.Value;
 
     return new Promise((resolve, reject) => {
-      return cognito.adminDeleteUser(deleteUserData, (err) => {
+      return cognito.adminDeleteUser(deleteUserData, (err: any) => {
         if (err) reject(err);
         this.logger.info(
           `${deleteUserRequest.username} account deleted from cognito.`,

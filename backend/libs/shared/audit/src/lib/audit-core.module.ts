@@ -22,11 +22,7 @@ import { fromEnv } from '@aws-sdk/credential-providers';
       ) => {
         return config.isLiveEnv
           ? {}
-          : new Kinesis({
-              region: awsCfg.region,
-              endpoint: awsCfg.kinesisEndpoint,
-              credentials: fromEnv(),
-            });
+          : new Kinesis(awsCfg.localDevConfigOverride);
       },
       inject: [awsConfig.KEY, commonConfig.KEY],
     },

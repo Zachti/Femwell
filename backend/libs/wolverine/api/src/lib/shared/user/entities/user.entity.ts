@@ -1,6 +1,10 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
-import { GraphQLUUID } from 'graphql-scalars';
+import {
+  GraphQLEmailAddress,
+  GraphQLPhoneNumber,
+  GraphQLUUID,
+} from 'graphql-scalars';
 import {
   Post,
   Comment,
@@ -17,6 +21,12 @@ export class User {
 
   @Field(() => GraphQLString)
   username!: string;
+
+  @Field(() => GraphQLEmailAddress, { nullable: true })
+  email!: string;
+
+  @Field(() => GraphQLPhoneNumber, { nullable: true })
+  phoneNumber?: string;
 
   @Field(() => [Post], { nullable: true })
   posts?: Post[];
@@ -35,4 +45,7 @@ export class User {
 
   @Field(() => [Message], { nullable: true })
   messages?: Message[];
+
+  @Field(() => [GraphQLString])
+  readLater!: string[];
 }

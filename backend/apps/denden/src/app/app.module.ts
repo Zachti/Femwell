@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { LoggerModule } from '@backend/logger';
-import {awsConfig, awsConfigObject, ConfigCoreModule} from '@backend/config';
+import {awsConfig, awsConfigObject, commonConfig, ConfigCoreModule} from '@backend/config';
 import { HealthModule } from '@backend/infrastructure';
 import { dendenConfigObject, DendenHealthIndicatorsProvider, VideoStreamModule } from '@backend/denden';
 import {AWSSdkModule} from "@backend/awsModule";
@@ -19,16 +19,13 @@ import {CloudFront} from "@aws-sdk/client-cloudfront";
     VideoStreamModule,
     AWSSdkModule.forRootWithAsyncOptions({
       serviceObjects: [{ client: CloudFront }],
-      useFactory: (config: ConfigType<typeof awsConfig>) => {
-        return {
-          region: config.region,
-          credentials: {
-            secretAccessKey: config.secretKey,
-            accessKeyId: config.accessKey,
-          },
-        };
+      useFactory: (
+        awsCfg: ConfigType<typeof awsConfig>,
+        config: ConfigType<typeof commonConfig>,
+      ) => {
+        return config.isLiveEnv ? {} : awsCfg.localDevConfigOverride;
       },
-      inject: [awsConfig.KEY],
+      inject: [awsConfig.KEY, commonConfig.KEY],
     }),
     ],
 })

@@ -37,10 +37,11 @@ export class ExporterService {
   async export(userEmail: string) {
     const buffer = await this.getFileFromS3();
     this.logger.info('sending email.');
-    await this.emailService.sendEmail({
+    const res = await this.emailService.sendEmail({
       to: userEmail,
       buffer,
     });
     this.logger.info('email sent successfully.');
+    return res;
   }
 }

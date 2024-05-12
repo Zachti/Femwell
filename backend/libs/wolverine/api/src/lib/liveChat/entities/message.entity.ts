@@ -25,4 +25,7 @@ export class Message {
 
   @Field(() => User)
   user!: User;
+
+  @Field(() => Boolean, { defaultValue: false })
+  seen!: boolean;
 }

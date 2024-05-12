@@ -4,3 +4,8 @@ export interface userSession {
   refreshToken: string;
   jwt: string;
 }
+
+export interface signUpUser {
+  email: string;
+  id: string;
+}

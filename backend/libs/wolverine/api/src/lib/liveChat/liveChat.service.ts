@@ -163,4 +163,62 @@ export class LiveChatService {
       this.error.handleError(new NotFoundError());
     }
   }
+
+  async setMessagesAsRead(liveChatId: number): Promise<Message[]> {
+    const oldestUnseenMessage = await this.prisma.message.findFirst({
+      where: {
+        liveChatId: liveChatId,
+        seen: false,
+      },
+      orderBy: {
+        createdAt: 'asc', // Order by creation date to get the oldest message
+      },
+    });
+
+    if (!oldestUnseenMessage) {
+      return [];
+    }
+
+    const messagesToUpdate = await this.prisma.message.findMany({
+      where: {
+        liveChatId: liveChatId,
+        createdAt: {
+          gte: oldestUnseenMessage.createdAt, // Filter messages from oldest to newest
+        },
+      },
+    });
+
+    messagesToUpdate.map(async (message) => {
+      await this.prisma.message.update({
+        where: {
+          id: message.id,
+        },
+        data: {
+          seen: true,
+        },
+      });
+    });
+
+    return messagesToUpdate;
+  }
+
+  async setMessageAsUnread(liveChatId: number): Promise<Message> {
+    const lastMessage = await this.prisma.message.findFirst({
+      where: {
+        liveChatId: liveChatId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+    await this.prisma.message.update({
+      where: {
+        id: lastMessage.id,
+      },
+      data: {
+        seen: false,
+      },
+    });
+    return lastMessage;
+  }
 }

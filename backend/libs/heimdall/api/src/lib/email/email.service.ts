@@ -18,10 +18,18 @@ export class EmailService {
   async sendEmail(email: Email): Promise<SendRawEmailCommandOutput> {
     this.logger.info('sending email.');
     try {
+      const headers =
+        `Content-Type: application/pdf\r\n` +
+        `From: Admin <${this.heimdallCfg.supportEmail}>\r\n` +
+        `To: ${email.to}\r\n` +
+        `Subject: check list\r\n\r\n`;
+
+      const emailContent = headers + email.buffer.toString();
+
       const res = await this.ses.sendRawEmail({
         Source: this.heimdallCfg.supportEmail,
         Destinations: [email.to],
-        RawMessage: { Data: new Uint8Array(email.buffer) },
+        RawMessage: { Data: new Uint8Array(Buffer.from(emailContent)) },
       });
       this.logger.debug('email sent.', { res });
       return res;

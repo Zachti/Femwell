@@ -7,10 +7,7 @@ export class VideoStreamController {
   constructor(private readonly videoStreamService: VideoStreamService) {}
   @Get()
   @Auth()
-  async stream(
-    @Query('videoId') videoId: string,
-    @Query('videoName') videoName: string,
-  ): Promise<URL> {
-    return await this.videoStreamService.stream(videoName, videoId);
+  async stream(@Query('videoName') videoName: string): Promise<URL> {
+    return await this.videoStreamService.stream(videoName);
   }
 }

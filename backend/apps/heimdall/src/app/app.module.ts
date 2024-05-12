@@ -6,7 +6,12 @@ import {
   heimdallConfigObject,
 } from '@backend/heimdall';
 import { LoggerModule } from '@backend/logger';
-import { awsConfig, awsConfigObject, ConfigCoreModule } from '@backend/config';
+import {
+  awsConfig,
+  awsConfigObject,
+  commonConfig,
+  ConfigCoreModule,
+} from '@backend/config';
 import { HealthModule } from '@backend/infrastructure';
 import { AWSSdkModule } from '@backend/awsModule';
 import { ConfigType } from '@nestjs/config';
@@ -25,16 +30,13 @@ import { SES } from '@aws-sdk/client-ses';
     HealthModule.forRoot(HeimdallHealthIndicatorsProvider),
     AWSSdkModule.forRootWithAsyncOptions({
       serviceObjects: [{ client: S3 }, { client: SES }],
-      useFactory: (config: ConfigType<typeof awsConfig>) => {
-        return {
-          region: config.region,
-          credentials: {
-            secretAccessKey: config.secretKey,
-            accessKeyId: config.accessKey,
-          },
-        };
+      useFactory: (
+        awsCfg: ConfigType<typeof awsConfig>,
+        config: ConfigType<typeof commonConfig>,
+      ) => {
+        return config.isLiveEnv ? {} : awsCfg.localDevConfigOverride;
       },
-      inject: [awsConfig.KEY],
+      inject: [awsConfig.KEY, commonConfig.KEY],
     }),
     ExporterModule,
   ],

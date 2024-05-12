@@ -28,9 +28,9 @@ export class AuthGuard implements CanActivate {
   private async validateJwt(jwt: string): Promise<CognitoAccessTokenPayload> {
     try {
       const verifier = CognitoJwtVerifier.create({
-        userPoolId: this.awsCfg.userPoolId!,
+        userPoolId: this.awsCfg.userPoolId,
         tokenUse: 'access',
-        clientId: this.awsCfg.clientId ?? null,
+        clientId: this.awsCfg.clientId,
       });
       return await verifier.verify(jwt);
     } catch (e) {
