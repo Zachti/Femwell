@@ -7,8 +7,8 @@ import {
   useOutsideClick,
 } from "@chakra-ui/react";
 import { AddIcon, SettingsIcon, EditIcon, ChatIcon } from "@chakra-ui/icons";
-import LiveChat from "./LiveChat";
-import { Navigate, useNavigate } from "react-router-dom";
+import LiveChat from "../LiveChat";
+import { useNavigate } from "react-router-dom";
 
 const Fab = () => {
   const [isOpen, setIsOpen] = useState(false);

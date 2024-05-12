@@ -12,7 +12,7 @@ import "./index.css";
 import "./assets/App.css";
 import Home from "./pages/Home";
 import CommunityHub from "./pages/CommunityHub";
-import Fab from "./components/ActionButton";
+import Fab from "./components/Menus/ActionButton";
 import useAuthStore from "./store/authStore";
 import AccountSettings from "./pages/AccountSettings";
 import ION from "./pages/ION";
