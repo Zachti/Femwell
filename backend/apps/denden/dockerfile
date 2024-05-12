@@ -1,4 +1,4 @@
-FROM node:18.16.1-alpine as builder
+FROM --platform=linux/amd64 node:18.16.1-alpine as builder
 
 WORKDIR /home/node
 
@@ -22,6 +22,6 @@ RUN npm ci --ignore-scripts
 
 RUN apk --no-cache add curl
 
-RUN npm install @nx/nx-linux-x64-gnu
+RUN npm install @nx/nx-linux-amd64-gnu
 
 CMD ["sh", "-c", "node dist/apps/denden/main.js"]
