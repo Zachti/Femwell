@@ -3,14 +3,15 @@ import { auth, firestore } from "../firebase/firebase";
 import useShowToast from "./useShowToast";
 import useAuthStore from "../store/authStore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { User } from "../models";
+import { User, Response } from "../models";
 
 const useGoogleAuth = () => {
   const [signInWithGoogle, , , errorG] = useSignInWithGoogle(auth);
   const showToast = useShowToast();
   const loginUser = useAuthStore((state) => state.login);
 
-  const handleGoogleAuth = async () => {
+  const handleGoogleAuth = async (data?: any) => {
+    console.log(data);
     try {
       const newUser = await signInWithGoogle();
       if (!newUser) {
@@ -28,15 +29,24 @@ const useGoogleAuth = () => {
         showToast("Success", "Logged in successfully", "success");
         return true;
       } else {
-        const userDoc = {
+        let dtoQuestionnaire = undefined;
+        if (data.responses.some((response: Response) => response.answer)) {
+          dtoQuestionnaire = {
+            responses: data.responses,
+            username: newUser.user.email?.split("@")[0],
+            userId: newUser.user.uid,
+          };
+        }
+        const userDoc: any = {
           id: newUser.user.uid,
           email: newUser.user.email || "",
-          username: newUser.user.email?.split("@")[0] || "",
+          username: newUser.user.email?.split("@")[0],
           phone: "",
           posts: [],
           pfpURL: newUser.user.photoURL || "",
           laterArticles: [],
         };
+        if (dtoQuestionnaire) userDoc.questionnaire = dtoQuestionnaire;
         await setDoc(doc(firestore, "users", newUser.user.uid), userDoc);
         localStorage.setItem("user", JSON.stringify(userDoc));
         loginUser(userDoc);

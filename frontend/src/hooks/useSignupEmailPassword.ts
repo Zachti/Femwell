@@ -3,6 +3,7 @@ import { auth, firestore } from "../firebase/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import userAuthStore from "../store/authStore";
 import useShowToast from "./useShowToast";
+import { Response } from "../models/reponse.model";
 
 const useSignupEmailPassword = () => {
   const [createUserWithEmailAndPassword, , isSigningUp, errorSU] =
@@ -10,6 +11,7 @@ const useSignupEmailPassword = () => {
   const showToast = useShowToast();
   const loginUser = userAuthStore((state) => state.login);
   const signup = async (data: any) => {
+    console.log(data);
     if (
       !data.email ||
       !data.username ||
@@ -29,7 +31,15 @@ const useSignupEmailPassword = () => {
         return false;
       }
       if (newUser) {
-        const userDoc = {
+        let dtoQuestionnaire = undefined;
+        if (data.responses.some((response: Response) => response.answer)) {
+          dtoQuestionnaire = {
+            responses: data.responses,
+            username: data.username,
+            userId: newUser.user.uid,
+          };
+        }
+        let userDoc: any = {
           id: newUser.user.uid,
           email: data.email,
           username: data.username,
@@ -38,6 +48,7 @@ const useSignupEmailPassword = () => {
           pfpURL: "",
           laterArticles: [],
         };
+        if (dtoQuestionnaire) userDoc.questionnaire = dtoQuestionnaire;
         await setDoc(doc(firestore, "users", newUser.user.uid), userDoc);
         localStorage.setItem("user", JSON.stringify(userDoc));
         loginUser(userDoc);
