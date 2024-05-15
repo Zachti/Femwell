@@ -13,6 +13,7 @@ import {
 import { HealthModule } from '@backend/infrastructure';
 import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
 import { GraphqlCoreModule } from '@backend/wolverine';
+import { ErrorModule } from '../../../../libs/wolverine/api/src/lib/shared/error/error.module';
 // import { AWSSdkModule } from '@backend/awsModule';
 // import { ConfigType } from '@nestjs/config';
 
@@ -42,6 +43,7 @@ import { GraphqlCoreModule } from '@backend/wolverine';
     LiveChatModule,
     QuestionnaireModule,
     PrismaModule,
+    ErrorModule,
   ],
 })
 export class WolverineMainModule {}
