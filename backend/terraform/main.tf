@@ -35,69 +35,142 @@ data "aws_iam_role" "existing" {
   name = "LabRole"
 }
 
-resource "aws_ecs_task_definition" "femwell_task" {
-  family                   = "femwell-task"
-  container_definitions    = jsonencode(
-  [
-    {
-      name: "femwell-task-wolverine",
-      image: aws_ecr_repository.wolverine_ecr_repo.repository_url,
-      essential: true,
-      portMappings: [
-        {
-          "containerPort": 3001,
-          "hostPort": 3001
-        }
-      ],
-      memory: 512,
-      cpu: 256
-    },
-    {
-      name: "femwell-task-vault",
-      image: aws_ecr_repository.vault_ecr_repo.repository_url,
-      essential: true,
-      portMappings: [
-        {
-          "containerPort": 3002,
-          "hostPort": 3002
-        }
-      ],
-      memory: 512,
-      cpu: 256
-    },
-    {
-      name: "femwell-task-heimdall",
-      image: aws_ecr_repository.heimdall_ecr_repo.repository_url,
-      essential: true,
-      portMappings: [
-        {
-          "containerPort": 3003,
-          "hostPort": 3003
-        }
-      ],
-      memory: 512,
-      cpu: 256
-    },
-    {
-      name: "femwell-task-denden",
-      image: aws_ecr_repository.denden_ecr_repo.repository_url,
-      essential: true,
-      portMappings: [
-        {
-          "containerPort": 3004,
-          "hostPort": 3004
-        }
-      ],
-      memory: 512,
-      cpu: 256
+resource "aws_cognito_user_pool" "femwell_user_pool" {
+  name = "femwell-user-pool"
+
+  password_policy {
+    minimum_length    = 7
+    require_lowercase = false
+    require_numbers   = true
+    require_symbols   = true
+    require_uppercase = true
+  }
+
+  username_attributes = ["email"]
+
+  schema {
+    attribute_data_type      = "String"
+    developer_only_attribute = false
+    mutable                  = true
+    name                     = "email"
+    required                 = true
+
+    string_attribute_constraints {
+      min_length = 5
+      max_length = 254
     }
-  ])
-  requires_compatibilities = ["FARGATE"] # use Fargate as the launch type
-  network_mode             = "awsvpc"    # add the AWS VPN network mode as this is required for Fargate
-  memory                   = 2048         # Specify the memory the container requires
-  cpu                      = 1024         # Specify the CPU the container requires
-  execution_role_arn       = data.aws_iam_role.existing.arn
+  }
+
+  auto_verified_attributes = ["email"]
+   mfa_configuration = "OFF"
 }
+
+resource "aws_cognito_user_pool_client" "femwell_client_pool" {
+  name = "femwell-client-pool"
+
+  user_pool_id = aws_cognito_user_pool.femwell_user_pool.id
+
+  allowed_oauth_flows = ["code", "implicit"]
+  allowed_oauth_scopes = ["phone", "email", "openid", "profile", "aws.cognito.signin.user.admin"]
+
+  callback_urls = ["https://google.com"]
+
+  allowed_oauth_flows_user_pool_client = true
+  generate_secret                      = false
+}
+
+
+# resource "aws_ecs_task_definition" "femwell_task" {
+#   family                   = "femwell-task"
+#   container_definitions    = jsonencode(
+#   [
+#     {
+#       name: "femwell-task-wolverine",
+#       image: aws_ecr_repository.wolverine_ecr_repo.repository_url,
+#       essential: false,
+#       portMappings: [
+#         {
+#           "containerPort": 3001,
+#           "hostPort": 3001
+#         }
+#       ],
+#       memory: 512,
+#       cpu: 256
+#     },
+#     {
+#       name: "femwell-task-vault",
+#       image: aws_ecr_repository.vault_ecr_repo.repository_url,
+#       essential: true,
+#       portMappings: [
+#         {
+#           "containerPort": 3002,
+#           "hostPort": 3002
+#         }
+#       ],
+#       environment = [
+#         {
+#           name  = "COGNITO_USER_POOL_ID",
+#           value = aws_cognito_user_pool.femwell_user_pool.id
+#         },
+#         {
+#           name  = "COGNITO_CLIENT_ID",
+#           value = aws_cognito_user_pool_client.femwell_client_pool.id
+#         }
+#       ],
+#       memory: 512,
+#       cpu: 256
+#     },
+#     {
+#       name: "femwell-task-heimdall",
+#       image: aws_ecr_repository.heimdall_ecr_repo.repository_url,
+#       essential: false,
+#       portMappings: [
+#         {
+#           "containerPort": 3003,
+#           "hostPort": 3003
+#         }
+#       ],
+#       memory: 512,
+#       cpu: 256
+#     },
+#     {
+#       name: "femwell-task-denden",
+#       image: aws_ecr_repository.denden_ecr_repo.repository_url,
+#       essential: false,
+#       portMappings: [
+#         {
+#           "containerPort": 3004,
+#           "hostPort": 3004
+#         }
+#       ],
+#       memory: 512,
+#       cpu: 256
+#     }
+#   ])
+#   requires_compatibilities = ["FARGATE"] # use Fargate as the launch type
+#   network_mode             = "awsvpc"    # add the AWS VPN network mode as this is required for Fargate
+#   memory                   = 2048         # Specify the memory the container requires
+#   cpu                      = 1024         # Specify the CPU the container requires
+#   runtime_platform {
+#     operating_system_family = "LINUX"
+#     cpu_architecture        = "ARM64"
+#   }
+#   execution_role_arn       = data.aws_iam_role.existing.arn
+# }
+
+# resource "aws_ecs_service" "femwell_service" {
+#   name            = "femwell"     # Name the service
+#   cluster         = aws_ecs_cluster.femwell.id   # Reference the created Cluster
+#   task_definition = aws_ecs_task_definition.femwell_task.arn # Reference the task that the service will spin up
+#   launch_type     = "FARGATE"
+#   desired_count   = 1
+
+#   network_configuration {
+#     subnets          = module.vpc.public_subnets 
+#     assign_public_ip = true     # Provide the containers with public IPs
+#     security_groups  = [aws_security_group.alb.id] # Set up the security group
+#   }
+# }
 
 resource "aws_alb" "femwell_load_balancer" {
   name               = "load-balancer-dev"
@@ -269,10 +342,6 @@ resource "aws_security_group" "alb" {
     }
 }
 
-data "aws_key_pair" "existing_key_pair" {
-   key_name = "my-key-pair"
- }
-
 resource "aws_security_group" "service_security_group" {
   name = "sg_service"
   vpc_id = module.vpc.vpc_id
@@ -297,19 +366,7 @@ resource "aws_security_group" "service_security_group" {
     }
 }
 
-resource "aws_ecs_service" "femwell_service" {
-  name            = "femwell"     # Name the service
-  cluster         = aws_ecs_cluster.femwell.id   # Reference the created Cluster
-  task_definition = aws_ecs_task_definition.femwell_task.arn # Reference the task that the service will spin up
-  launch_type     = "FARGATE"
-  desired_count   = 1
 
-  network_configuration {
-    subnets          = module.vpc.public_subnets 
-    assign_public_ip = true     # Provide the containers with public IPs
-    security_groups  = [aws_security_group.alb.id] # Set up the security group
-  }
-}
 
 output "femwell_url" {
   value = aws_alb.femwell_load_balancer.dns_name

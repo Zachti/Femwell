@@ -7,7 +7,7 @@ import {
   useMediaQuery,
   useDisclosure,
 } from "@chakra-ui/react";
-import Header from "../components/Header";
+
 import "../assets/App.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -18,6 +18,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import LogoSvg from "../components/Menus/LogoSvg";
 import LoginForm from "../components/Forms/LoginForm";
+import QuestionnaireSignUp from "../components/Forms/QuestionnaireSignUp";
 
 const MotionButton = motion(Button);
 
@@ -30,7 +31,17 @@ const Welcome = () => {
   );
   const [isLargerThan460] = useMediaQuery("(min-width: 460px)");
   const [isLargerThan945] = useMediaQuery("(min-width: 945px)");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const {
+    isOpen: isSignUpOpen,
+    onOpen: onSignUpOpen,
+    onClose: onSignUpClose,
+  } = useDisclosure();
+  const {
+    isOpen: isLoginOpen,
+    onOpen: onLoginOpen,
+    onClose: onLoginClose,
+  } = useDisclosure();
 
   return (
     <div className="page">
@@ -132,6 +143,7 @@ const Welcome = () => {
                 transition: { duration: 0.25 },
               }}
               whileTap={{ y: "10px", transition: { duration: 0.05 } }}
+              onClick={onSignUpOpen}
               onHoverStart={() => setButtonSignUpText("Lets Get Started!")}
               onHoverEnd={() => setButtonSignUpText("Click Here To Begin!")}
               transition={{ duration: 0.3 }}
@@ -223,7 +235,7 @@ const Welcome = () => {
                 transition: { duration: 0.25 },
               }}
               whileTap={{ y: "10px", transition: { duration: 0.05 } }}
-              onClick={onOpen}
+              onClick={onLoginOpen}
               onHoverStart={() => setButtonLoginText("Welcome Back!")}
               onHoverEnd={() => setButtonLoginText("Click Here To Sign In!")}
               colorScheme={"pink"}
@@ -254,7 +266,16 @@ const Welcome = () => {
         <path d="M0,160L60,170.7C120,181,240,203,360,176C480,149,600,75,720,69.3C840,64,960,128,1080,154.7C1200,181,1320,171,1380,165.3L1440,160L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z"></path>
       </svg>
 
-      <LoginForm isOpen={isOpen} onOpen={onOpen} onClose={onClose} />
+      <LoginForm
+        isOpen={isLoginOpen}
+        onOpen={onLoginOpen}
+        onClose={onLoginClose}
+      />
+      <QuestionnaireSignUp
+        isOpen={isSignUpOpen}
+        onOpen={onSignUpOpen}
+        onClose={onSignUpClose}
+      />
     </div>
   );
 };
