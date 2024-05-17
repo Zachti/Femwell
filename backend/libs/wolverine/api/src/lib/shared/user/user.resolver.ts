@@ -1,7 +1,6 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { User } from '../../index';
-import { CreateUserInput, UpdateUserInput } from '../../index';
+import { CreateUserInput, UpdateUserInput, User } from '../../index';
 import { GraphQLUUID } from 'graphql-scalars';
 
 @Resolver(() => User)

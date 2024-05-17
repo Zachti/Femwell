@@ -44,7 +44,6 @@ export class GqlConfigService
     };
   }
 
-  // REMEMBER THIS
   private async getRequestContext(
     expressContext: any,
   ): Promise<RequestContext> {
@@ -63,10 +62,6 @@ export class GqlConfigService
         requestId,
       };
     }
-    return {
-      userPayload: null,
-      requestId,
-    };
-    //throw new UnauthorizedException('Unauthorized: Invalid token');
+    throw new UnauthorizedException('Unauthorized: Invalid token');
   }
 }
