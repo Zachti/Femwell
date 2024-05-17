@@ -9,6 +9,8 @@ import { DeploymentEnv } from './configuration/types';
 import { OrbsService } from './orbs/orbs.service';
 import { KnownApp } from './types';
 import { AppBuilderService } from './builders/appBuilder.service';
+import { DEPLOY_CONFIG_PROVIDER } from './configuration/deploy-config.provider';
+import { ORBS_PROVIDER } from './orbs/orbs.provider';
 
 @Injectable()
 @Command({
@@ -19,7 +21,8 @@ export class CreateDeploymentCiConfigCommand extends CommandRunner {
   private readonly logger = new Logger(CreateDeploymentCiConfigCommand.name);
 
   constructor(
-    private readonly orbService: OrbsService,
+    @Inject(ORBS_PROVIDER) private readonly orbService: OrbsService,
+    @Inject(DEPLOY_CONFIG_PROVIDER)
     private readonly deployConfigService: DeployConfigService,
     private readonly appBuilderService: AppBuilderService,
   ) {
