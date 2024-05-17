@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { LoggerModule } from '@backend/logger';
 import {
   /**awsConfig**/ awsConfigObject,
@@ -10,10 +10,9 @@ import {
   wolverineConfigObject,
   PrismaModule,
 } from '@backend/wolverine';
-import { HealthModule } from '@backend/infrastructure';
+import { HealthModule, LoggerMiddleware } from '@backend/infrastructure';
 import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
-import { GraphqlCoreModule } from '@backend/wolverine';
-import { ErrorModule } from '../../../../libs/wolverine/api/src/lib/shared/error/error.module';
+import { GraphqlCoreModule, ErrorModule } from '@backend/wolverine';
 // import { AWSSdkModule } from '@backend/awsModule';
 // import { ConfigType } from '@nestjs/config';
 
@@ -46,4 +45,8 @@ import { ErrorModule } from '../../../../libs/wolverine/api/src/lib/shared/error
     ErrorModule,
   ],
 })
-export class WolverineMainModule {}
+export class WolverineMainModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

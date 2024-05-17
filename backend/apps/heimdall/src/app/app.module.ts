@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import {
   UploadModule,
   ExporterModule,
@@ -12,7 +12,7 @@ import {
   commonConfig,
   ConfigCoreModule,
 } from '@backend/config';
-import { HealthModule } from '@backend/infrastructure';
+import { HealthModule, LoggerMiddleware } from '@backend/infrastructure';
 import { AWSSdkModule } from '@backend/awsModule';
 import { ConfigType } from '@nestjs/config';
 import { S3 } from '@aws-sdk/client-s3';
@@ -41,4 +41,8 @@ import { SES } from '@aws-sdk/client-ses';
     ExporterModule,
   ],
 })
-export class HeimdallMainModule {}
+export class HeimdallMainModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

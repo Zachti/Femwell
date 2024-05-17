@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import {
   ApolloFederationDriver,
@@ -11,6 +11,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { join } from 'path';
 import { AuditModule } from '@backend/auditService';
 import { ConfigType } from '@nestjs/config';
+import { LoggerMiddleware } from '@backend/infrastructure';
 
 @Module({
   imports: [
@@ -45,4 +46,8 @@ import { ConfigType } from '@nestjs/config';
     }),
   ],
 })
-export class VaultMainModule {}
+export class VaultMainModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

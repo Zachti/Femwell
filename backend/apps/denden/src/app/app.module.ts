@@ -1,11 +1,20 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { LoggerModule } from '@backend/logger';
-import {awsConfig, awsConfigObject, commonConfig, ConfigCoreModule} from '@backend/config';
-import { HealthModule } from '@backend/infrastructure';
-import { dendenConfigObject, DendenHealthIndicatorsProvider, VideoStreamModule } from '@backend/denden';
-import {AWSSdkModule} from "@backend/awsModule";
-import {ConfigType} from "@nestjs/config";
-import {CloudFront} from "@aws-sdk/client-cloudfront";
+import {
+  awsConfig,
+  awsConfigObject,
+  commonConfig,
+  ConfigCoreModule,
+} from '@backend/config';
+import { HealthModule, LoggerMiddleware } from '@backend/infrastructure';
+import {
+  dendenConfigObject,
+  DendenHealthIndicatorsProvider,
+  VideoStreamModule,
+} from '@backend/denden';
+import { AWSSdkModule } from '@backend/awsModule';
+import { ConfigType } from '@nestjs/config';
+import { CloudFront } from '@aws-sdk/client-cloudfront';
 
 @Module({
   imports: [
@@ -27,6 +36,10 @@ import {CloudFront} from "@aws-sdk/client-cloudfront";
       },
       inject: [awsConfig.KEY, commonConfig.KEY],
     }),
-    ],
+  ],
 })
-export class DendenMainModule {}
+export class DendenMainModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}
