@@ -11,6 +11,7 @@ import { KnownApp } from './types';
 import { AppBuilderService } from './builders/appBuilder.service';
 import { DEPLOY_CONFIG_PROVIDER } from './configuration/deploy-config.provider';
 import { ORBS_PROVIDER } from './orbs/orbs.provider';
+import { CreateWorkflowAndJobsResponse } from './interface';
 
 @Injectable()
 @Command({
@@ -155,9 +156,4 @@ export class CreateDeploymentCiConfigCommand extends CommandRunner {
     });
     fs.writeFileSync(path, JSON.stringify(config.generate()));
   }
-}
-
-interface CreateWorkflowAndJobsResponse {
-  workflow: CircleCI.Workflow;
-  jobs: Array<CircleCI.Job>;
 }
