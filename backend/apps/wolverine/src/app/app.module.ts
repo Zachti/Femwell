@@ -13,6 +13,7 @@ import {
 import { HealthModule, LoggerMiddleware } from '@backend/infrastructure';
 import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
 import { GraphqlCoreModule, ErrorModule } from '@backend/wolverine';
+import { HttpModule } from '@nestjs/axios';
 // import { AWSSdkModule } from '@backend/awsModule';
 // import { ConfigType } from '@nestjs/config';
 
@@ -43,6 +44,7 @@ import { GraphqlCoreModule, ErrorModule } from '@backend/wolverine';
     QuestionnaireModule,
     PrismaModule,
     ErrorModule,
+    HttpModule,
   ],
 })
 export class WolverineMainModule implements NestModule {
