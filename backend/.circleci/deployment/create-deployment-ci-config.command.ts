@@ -83,7 +83,12 @@ export class CreateDeploymentCiConfigCommand extends CommandRunner {
     const appCommand = `./node_modules/.bin/nx print-affected --type=app ${nxDiffFlags}`;
     this.logger.debug('calculating affected apps', { appCommand });
     const affectedAppsStr = child_process.execSync(appCommand);
-    const parsedApps = JSON.parse(affectedAppsStr.toString() ?? '{}');
+    const fixedOutput =
+      affectedAppsStr
+        .toString()
+        .trim()
+        .replace(/(,)\s*$/, '') + '}}}';
+    const parsedApps = JSON.parse(fixedOutput ?? '{}');
     return parsedApps.projects ?? [];
   }
 

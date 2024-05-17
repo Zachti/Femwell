@@ -9,6 +9,7 @@ import { WolverineBuilder } from './ecs/wolverine.builder';
 
 @Module({
   providers: [
+    AppBuilderService,
     WolverineBuilder,
     DendenBuilder,
     HeimdallBuilder,
