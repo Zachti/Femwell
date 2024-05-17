@@ -25,8 +25,6 @@ const CommunityHub: FC<{}> = ({}) => {
         <Sidebar />
 
         <Container
-          justifyContent={"center"}
-          alignContent={"center"}
           maxW={isLargerThan750 ? "lg" : "md"}
           py={isLargerThan500 ? 10 : 4}
           px={isLargerThan500 ? 7 : 3}

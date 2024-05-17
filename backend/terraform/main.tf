@@ -35,6 +35,12 @@ data "aws_iam_role" "existing" {
   name = "LabRole"
 }
 
+resource "aws_s3_bucket" "bucket" {
+  bucket = "femwell-main-bucket"
+  acl    = "private"
+
+}
+
 resource "aws_cognito_user_pool" "femwell_user_pool" {
   name = "femwell-user-pool"
 
@@ -79,6 +85,30 @@ resource "aws_cognito_user_pool_client" "femwell_client_pool" {
   generate_secret                      = false
 }
 
+# resource "aws_rds_cluster" "aurora_cluster" {
+#   cluster_identifier      = "aurora-cluster"
+#   engine                  = "aurora-postgresql"
+#   engine_version          = "15.4"
+#   availability_zones      = ["us-east-1a"]
+#   database_name           = "femdb"
+#   master_username         = "zach"
+#   master_password         = "zach1234"
+#   backup_retention_period = 2
+#   preferred_backup_window = "07:00-09:00"
+#   skip_final_snapshot     = true
+# }
+
+# resource "aws_rds_cluster_instance" "aurora_instance" {
+#   identifier         = "aurora-instance"
+#   cluster_identifier = aws_rds_cluster.aurora_cluster.id
+#   instance_class     = "db.t3.medium"
+#   engine             = "aurora-postgresql"
+# }
+
+resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
+  name = "/ecs/femwell-task"
+}
+
 
 # resource "aws_ecs_task_definition" "femwell_task" {
 #   family                   = "femwell-task"
@@ -87,73 +117,247 @@ resource "aws_cognito_user_pool_client" "femwell_client_pool" {
 #     {
 #       name: "femwell-task-wolverine",
 #       image: aws_ecr_repository.wolverine_ecr_repo.repository_url,
-#       essential: false,
+#       essential: true,
 #       portMappings: [
 #         {
 #           "containerPort": 3001,
 #           "hostPort": 3001
 #         }
 #       ],
-#       memory: 512,
-#       cpu: 256
-#     },
-#     {
-#       name: "femwell-task-vault",
-#       image: aws_ecr_repository.vault_ecr_repo.repository_url,
-#       essential: true,
-#       portMappings: [
-#         {
-#           "containerPort": 3002,
-#           "hostPort": 3002
-#         }
-#       ],
 #       environment = [
 #         {
-#           name  = "COGNITO_USER_POOL_ID",
+#           name = "AWS_REGION"
+#           value = "us-east-1"
+#         },
+#         {
+#           name = "AWS_ACCESS_KEY"
+#           value = "xxxxx"
+#         },
+#         {
+#           name = "AWS_SECRET_KEY"
+#           value = "xxxxx"
+#         },
+#         {
+#           name = "AWS_SESSION_TOKEN"
+#           value = "xxxxx"
+#         },
+#         {
+#           name  = "LOG_LEVEL"
+#           value = var.LOG_LEVEL
+#         },
+#         {
+#           name  = "NODE_ENV"
+#           value = var.NODE_ENV
+#         },
+#         {
+#           name  = "STREAM_ARN"
+#           value = var.STREAM_ARN
+#         },
+#         {
+#           name  = "COGNITO_USER_POOL_ID"
 #           value = aws_cognito_user_pool.femwell_user_pool.id
 #         },
 #         {
-#           name  = "COGNITO_CLIENT_ID",
+#           name  = "COGNITO_CLIENT_ID"
 #           value = aws_cognito_user_pool_client.femwell_client_pool.id
+#         },
+#         {
+#           name  = "PORT"
+#           value = var.WOLVERINE_PORT
+#         },
+#         {
+#           name  = "AWS_AURORA_URL"
+#           value = "mysql://leibo-secure.fake.com"
 #         }
 #       ],
+#       logConfiguration: {
+#         logDriver: "awslogs",
+#         options: {
+#           "awslogs-group": "/ecs/femwell-task",
+#           "awslogs-region": "us-east-1", // replace with your region
+#           "awslogs-stream-prefix": "ecs"
+#         }
+#       },
 #       memory: 512,
 #       cpu: 256
 #     },
-#     {
-#       name: "femwell-task-heimdall",
-#       image: aws_ecr_repository.heimdall_ecr_repo.repository_url,
-#       essential: false,
-#       portMappings: [
-#         {
-#           "containerPort": 3003,
-#           "hostPort": 3003
-#         }
-#       ],
-#       memory: 512,
-#       cpu: 256
-#     },
-#     {
-#       name: "femwell-task-denden",
-#       image: aws_ecr_repository.denden_ecr_repo.repository_url,
-#       essential: false,
-#       portMappings: [
-#         {
-#           "containerPort": 3004,
-#           "hostPort": 3004
-#         }
-#       ],
-#       memory: 512,
-#       cpu: 256
-#     }
+    # {
+    #   name: "femwell-task-vault",
+    #   image: aws_ecr_repository.vault_ecr_repo.repository_url,
+    #   essential: true,
+    #   portMappings: [
+    #     {
+    #       "containerPort": 3002,
+    #       "hostPort": 3002
+    #     }
+    #   ],
+    #   environment = [
+    #     {
+    #       name  = "LOG_LEVEL"
+    #       value = var.LOG_LEVEL
+    #     },
+    #     {
+    #       name  = "NODE_ENV"
+    #       value = var.NODE_ENV
+    #     },
+    #     {
+    #       name  = "STREAM_ARN"
+    #       value = var.STREAM_ARN
+    #     },
+    #     {
+    #       name  = "COGNITO_USER_POOL_ID"
+    #       value = aws_cognito_user_pool.femwell_user_pool.id
+    #     },
+    #     {
+    #       name  = "COGNITO_CLIENT_ID"
+    #       value = aws_cognito_user_pool_client.femwell_client_pool.id
+    #     },
+    #     {
+    #       name  = "PORT"
+    #       value = var.VAULT_PORT
+    #     },
+    #     {
+    #       name  = "WOLVERINE_ENDPOINT"
+    #       value = var.WOLVERINE_ENDPOINT
+    #     }
+    #   ],
+    #   memory: 512,
+    #   cpu: 256
+    #   logConfiguration: {
+    #     logDriver: "awslogs",
+    #     options: {
+    #       "awslogs-group": "/ecs/femwell-task",
+    #       "awslogs-region": "us-east-1", // replace with your region
+    #       "awslogs-stream-prefix": "ecs"
+    #     }
+    #   },
+    # },
+    # {
+    #   name: "femwell-task-heimdall",
+    #   image: aws_ecr_repository.heimdall_ecr_repo.repository_url,
+    #   essential: true,
+    #   portMappings: [
+    #     {
+    #       "containerPort": 3003,
+    #       "hostPort": 3003
+    #     }
+    #   ],
+    #    environment = [
+    #     {
+    #       name  = "LOG_LEVEL"
+    #       value = var.LOG_LEVEL
+    #     },
+    #     {
+    #       name  = "NODE_ENV"
+    #       value = var.NODE_ENV
+    #     },
+    #     {
+    #       name  = "STREAM_ARN"
+    #       value = var.STREAM_ARN
+    #     },
+    #     {
+    #       name  = "COGNITO_USER_POOL_ID"
+    #       value = aws_cognito_user_pool.femwell_user_pool.id
+    #     },
+    #     {
+    #       name  = "COGNITO_CLIENT_ID"
+    #       value = aws_cognito_user_pool_client.femwell_client_pool.id
+    #     },
+    #     {
+    #       name  = "PORT"
+    #       value = var.HEIMDALL_PORT
+    #     },
+    #     {
+    #       name  = "AWS_BUCKET"
+    #       value = aws_s3_bucket.bucket.bucket
+    #     },
+    #     {
+    #       name  = "BUCKET_LOCATION_BASE_FOLDER"
+    #       value = var.BUCKET_LOCATION_BASE_FOLDER
+    #     },
+    #     { 
+    #       name  = "MAX_FILE_SIZE"
+    #       value = var.MAX_FILE_SIZE
+    #     },
+    #     {
+    #       name  = "AWS_S3_ENDPOINT"
+    #       value = "s3.us-east-1.amazonaws.com"
+    #     },
+    #     {
+    #       name  = "S3_CHECKLIST_KEY"
+    #       value = var.S3_CHECKLIST_KEY
+    #     },
+    #     {
+    #       name  = "SUPPORT_EMAIL"
+    #       value = var.SUPPORT_EMAIL
+    #     }
+    #   ],
+    #   memory: 512,
+    #   cpu: 256
+    #   logConfiguration: {
+    #     logDriver: "awslogs",
+    #     options: {
+    #       "awslogs-group": "/ecs/femwell-task",
+    #       "awslogs-region": "us-east-1", // replace with your region
+    #       "awslogs-stream-prefix": "ecs"
+    #     }
+    #   },
+    # },
+    # {
+    #   name: "femwell-task-denden",
+    #   image: aws_ecr_repository.denden_ecr_repo.repository_url,
+    #   essential: false,
+    #   portMappings: [
+    #     {
+    #       "containerPort": 3004,
+    #       "hostPort": 3004
+    #     }
+    #   ],
+    #    environment = [
+    #     {
+    #       name  = "LOG_LEVEL"
+    #       value = var.LOG_LEVEL
+    #     },
+    #     {
+    #       name  = "NODE_ENV"
+    #       value = var.NODE_ENV
+    #     },
+    #     {
+    #       name  = "STREAM_ARN"
+    #       value = var.STREAM_ARN
+    #     },
+    #     {
+    #       name  = "COGNITO_USER_POOL_ID"
+    #       value = aws_cognito_user_pool.femwell_user_pool.id
+    #     },
+    #     {
+    #       name  = "COGNITO_CLIENT_ID"
+    #       value = aws_cognito_user_pool_client.femwell_client_pool.id
+    #     },
+    #     {
+    #       name  = "PORT"
+    #       value = var.DENDEN_PORT
+    #     },
+    #     {
+    #       name  = "AWS_CLOUD_FRONT_ENDPOINT"
+    #       value = var.AWS_CLOUD_FRONT_ENDPOINT
+    #     },
+    #     {
+    #       name  = "AWS_CLOUD_FRONT_DISTRIBUTION_ID"
+    #       value = var.AWS_CLOUD_FRONT_DISTRIBUTION_ID
+    #     }
+    #   ],
+    #   memory: 512,
+    #   cpu: 256
+    # }
 #   ])
 #   requires_compatibilities = ["FARGATE"] # use Fargate as the launch type
 #   network_mode             = "awsvpc"    # add the AWS VPN network mode as this is required for Fargate
 #   memory                   = 2048         # Specify the memory the container requires
 #   cpu                      = 1024         # Specify the CPU the container requires
 #   runtime_platform {
-#     operating_system_family = "LINUX"
-#     cpu_architecture        = "ARM64"
+#   operating_system_family = "LINUX"
+#   cpu_architecture        = "X86_64"
 #   }
 #   execution_role_arn       = data.aws_iam_role.existing.arn
 # }
@@ -165,6 +369,13 @@ resource "aws_cognito_user_pool_client" "femwell_client_pool" {
 #   launch_type     = "FARGATE"
 #   desired_count   = 1
 
+#   deployment_controller {
+#     type = "ECS"
+#   }
+
+#   deployment_maximum_percent         = 100
+#   deployment_minimum_healthy_percent = 0
+
 #   network_configuration {
 #     subnets          = module.vpc.public_subnets 
 #     assign_public_ip = true     # Provide the containers with public IPs
@@ -173,7 +384,7 @@ resource "aws_cognito_user_pool_client" "femwell_client_pool" {
 # }
 
 resource "aws_alb" "femwell_load_balancer" {
-  name               = "load-balancer-dev"
+  name               = "load-balancer-femwell"
   load_balancer_type = "application"
   subnets = module.vpc.public_subnets
   security_groups = [aws_security_group.alb.id]
@@ -366,8 +577,11 @@ resource "aws_security_group" "service_security_group" {
     }
 }
 
-
-
 output "femwell_url" {
   value = aws_alb.femwell_load_balancer.dns_name
 }
+
+
+# output "aurora_endpoint" {
+#   value = aws_rds_cluster.aurora_cluster.endpoint
+# }
