@@ -10,6 +10,7 @@ node_modules
 .terraform
 .terraform.lock.hcl
 terraform.tfstate.backup
+terraform.tfstate
 prisma/migrations
 
 # IDEs and editors
@@ -55,6 +56,3 @@ apps/vt
 *.key
 
 .nx/cache
-
-#terraform
-terraform/terraform.tfstate
