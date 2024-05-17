@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:18.16.1-alpine as builder
+FROM node:18.16.1-alpine as builder
 
 WORKDIR /home/node
 
@@ -23,7 +23,5 @@ COPY --from=builder /home/node/test.js /home/app/
 RUN npm ci --ignore-scripts
 
 RUN apk --no-cache add curl
-
-RUN npm install @nx/nx-linux-x64-gnu
 
 CMD ["sh", "-c", "node dist/apps/wolverine/main.js"]
