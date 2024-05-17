@@ -4,15 +4,12 @@ import { Comment } from '../../index';
 import { CreateCommentInput, UpdateCommentInput } from '../../index';
 import { GraphQLUUID, GraphQLPositiveInt } from 'graphql-scalars';
 import { Role, Roles } from '@backend/infrastructure';
-import { UsePipes } from '@nestjs/common';
-import { ValidateInputPipe } from '../../shared/pipes/validateInput.pipe';
 
 @Resolver(() => Comment)
 export class CommentResolver {
   constructor(private readonly commentService: CommentService) {}
 
   @Roles([Role.Padulla, Role.Premium, Role.User])
-  @UsePipes(new ValidateInputPipe())
   @Mutation(() => Comment)
   async createComment(
     @Args('createCommentInput')
@@ -22,7 +19,6 @@ export class CommentResolver {
   }
 
   @Roles([Role.Padulla, Role.Premium, Role.User])
-  @UsePipes(new ValidateInputPipe())
   @Mutation(() => Comment)
   async updateComment(
     @Args('updateCommentInput') updateCommentInput: UpdateCommentInput,
