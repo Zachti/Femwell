@@ -32,6 +32,7 @@ export class GqlConfigService
       context: this.createContext.bind(this),
       playground: false,
       csrfPrevention: false,
+      useGlobalPrefix: true,
     };
   }
 

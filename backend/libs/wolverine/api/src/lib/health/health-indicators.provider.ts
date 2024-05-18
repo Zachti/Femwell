@@ -10,8 +10,8 @@ export class WolverineHealthIndicatorsProvider
 
   async getIndicators(): Promise<Array<HealthIndicatorFunction>> {
     return [
-      () =>
-        this.http.pingCheck('aurora', process.env['AWS_AURORA_URL'] as string),
+      // () =>
+      //   this.http.pingCheck('aurora', process.env['AWS_AURORA_URL'] as string),
     ];
   }
 }
