@@ -14,8 +14,8 @@ export class EventResolver {
   }
 
   @Query(() => [Event], { name: 'event' })
-  findAll() {
-    return this.eventService.findAll();
+  findAllUserEvents(@Args('userId') userId: number) {
+    return this.eventService.findAll(userId);
   }
 
   @Query(() => Event, { name: 'event' })

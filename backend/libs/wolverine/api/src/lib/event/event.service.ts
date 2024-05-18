@@ -3,7 +3,7 @@ import { CreateEventInput } from './dto/create-event.input';
 import { UpdateEventInput } from './dto/update-event.input';
 import { NotificationService } from '../sns/sns.service';
 import { ConfigType } from '@nestjs/config';
-import { wolverineConfig } from '@backend/wolverine';
+import { wolverineConfig } from '../config/wolverine.config';
 import { PrismaService } from '../shared/prisma/prisma.service';
 import { Event } from '@prisma/client';
 
@@ -46,8 +46,8 @@ export class EventService {
     return createdEvent;
   }
 
-  findAll(): Promise<Event[]> {
-    return this.prisma.event.findMany();
+  findAll(userId: number): Promise<Event[]> {
+    return this.prisma.event.findMany({ where: userId });
   }
 
   findOne(id: number): Promise<Event> {
