@@ -75,6 +75,12 @@ export class UserService {
           posts: true,
           comments: true,
           likes: true,
+          events: true,
+          liveChats: {
+            include: {
+              messages: true,
+            },
+          },
           questionnaire: {
             include: {
               responses: true,
@@ -98,6 +104,12 @@ export class UserService {
           posts: true,
           comments: true,
           likes: true,
+          events: true,
+          liveChats: {
+            include: {
+              messages: true,
+            },
+          },
           questionnaire: {
             include: {
               responses: true,

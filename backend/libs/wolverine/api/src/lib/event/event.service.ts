@@ -6,6 +6,7 @@ import { ConfigType } from '@nestjs/config';
 import { wolverineConfig } from '../config/wolverine.config';
 import { PrismaService } from '../shared/prisma/prisma.service';
 import { Event } from '@prisma/client';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class EventService {
@@ -46,8 +47,8 @@ export class EventService {
     return createdEvent;
   }
 
-  findAll(userId: number): Promise<Event[]> {
-    return this.prisma.event.findMany({ where: userId });
+  findAll(userId: string): Promise<Event[]> {
+    return this.prisma.event.findMany({ where: { userId } });
   }
 
   findOne(id: number): Promise<Event> {
@@ -60,5 +61,70 @@ export class EventService {
 
   remove(id: number): Promise<Event> {
     return this.prisma.event.delete({ where: { id } });
+  }
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  async sendNotificationsForEventsWithin24Hours() {
+    const events = await this.getEventsWithin24Hours();
+    events.forEach((event: Event) => {
+      const eventMessage = `Reminder: Event "${event.title}" is scheduled for ${event.date}.`;
+      this.notificationService.sendNotification(
+        this.Cfg.snsTopicArn,
+        eventMessage,
+      );
+      this.prisma.event.update({
+        where: { id: event.id },
+        data: { is24HourNotificationSent: true },
+      });
+    });
+  }
+
+  @Cron(CronExpression.EVERY_MINUTE)
+  async sendNotificationsForEventsWithinHour() {
+    const events = await this.getEventsWithinHour();
+    events.forEach((event: Event) => {
+      const eventMessage = `One hour left for Event: "${event.title}".`;
+      this.notificationService.sendNotification(
+        this.Cfg.snsTopicArn,
+        eventMessage,
+      );
+      this.prisma.event.update({
+        where: { id: event.id },
+        data: { is1HourNotificationSent: true },
+      });
+    });
+  }
+
+  private getEventsWithin24Hours(): Promise<Event[]> {
+    const { currentDate, twentyFourHoursLater } = this.getDates(24);
+    return this.prisma.event.findMany({
+      where: {
+        date: {
+          gte: currentDate,
+          lte: twentyFourHoursLater,
+        },
+        is24HourNotificationSent: false,
+      },
+    });
+  }
+
+  private getEventsWithinHour(): Promise<Event[]> {
+    const { currentDate, twentyFourHoursLater } = this.getDates(1);
+    return this.prisma.event.findMany({
+      where: {
+        date: {
+          gte: currentDate,
+          lte: twentyFourHoursLater,
+        },
+        is1HourNotificationSent: false,
+      },
+    });
+  }
+
+  private getDates(diff: number) {
+    const currentDate = new Date();
+    const twentyFourHoursLater = new Date();
+    twentyFourHoursLater.setHours(twentyFourHoursLater.getHours() + diff);
+    return { currentDate, twentyFourHoursLater };
   }
 }
