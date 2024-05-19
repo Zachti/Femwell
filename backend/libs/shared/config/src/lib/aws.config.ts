@@ -17,10 +17,6 @@ export const awsConfig = registerAs('aws', () => ({
 }));
 
 const awsConfigurationValidationSchema = Joi.object({
-  AWS_REGION: Joi.string(),
-  AWS_ACCESS_KEY: Joi.string(),
-  AWS_SECRET_KEY: Joi.string(),
-  AWS_SESSION_TOKEN: Joi.string(),
   STREAM_ARN: Joi.string().required(),
   COGNITO_USER_POOL_ID: Joi.string().required(),
   COGNITO_CLIENT_ID: Joi.string().required(),
