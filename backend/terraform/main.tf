@@ -105,6 +105,16 @@ resource "aws_cognito_user_pool_client" "femwell_client_pool" {
 #   engine             = "aurora-postgresql"
 # }
 
+resource "aws_elasticache_cluster" "wolverineCache" {
+  cluster_id           = "wolverine-cluster"
+  engine               = "redis"
+  node_type            = "cache.m4.large"
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis3.2"
+  engine_version       = "3.2.10"
+  port                 = 6379
+}
+
 resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
   name = "/ecs/femwell-task"
 }
@@ -168,7 +178,17 @@ resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
 #         {
 #           name  = "AWS_AURORA_URL"
 #           value = "mysql://leibo-secure.fake.com"
-#         }
+#         },
+#         {
+#           name  = "REDIS_HOST"
+#           value = aws_elasticache_cluster.wolverineCache.cache_nodes.0.address
+#         },
+#           name  = "REDIS_PORT"
+#           value = aws_elasticache_cluster.wolverineCache.port
+#         },
+#           name  = "CACHE_TTL"
+#           value = "1000"
+#         },
 #       ],
 #       logConfiguration: {
 #         logDriver: "awslogs",
@@ -275,7 +295,7 @@ resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
     #       name  = "BUCKET_LOCATION_BASE_FOLDER"
     #       value = var.BUCKET_LOCATION_BASE_FOLDER
     #     },
-    #     { 
+    #     {
     #       name  = "MAX_FILE_SIZE"
     #       value = var.MAX_FILE_SIZE
     #     },
@@ -377,7 +397,7 @@ resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
 #   deployment_minimum_healthy_percent = 0
 
 #   network_configuration {
-#     subnets          = module.vpc.public_subnets 
+#     subnets          = module.vpc.public_subnets
 #     assign_public_ip = true     # Provide the containers with public IPs
 #     security_groups  = [aws_security_group.alb.id] # Set up the security group
 #   }
@@ -584,4 +604,8 @@ output "femwell_url" {
 
 # output "aurora_endpoint" {
 #   value = aws_rds_cluster.aurora_cluster.endpoint
+# }
+
+# output "wolverine_cache_endpoint" {
+#  value = aws_elasticache_cluster.wolverineCache.cache_nodes.0.address
 # }
