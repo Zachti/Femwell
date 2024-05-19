@@ -16,6 +16,7 @@ import { join } from 'path';
 import { AuditModule } from '@backend/auditService';
 import { ConfigType } from '@nestjs/config';
 import { HealthModule, LoggerMiddleware } from '@backend/infrastructure';
+import {HttpModule} from "@nestjs/axios";
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { HealthModule, LoggerMiddleware } from '@backend/infrastructure';
       inject: [awsConfig.KEY],
     }),
     HealthModule.forRoot(VaultHealthIndicatorsProvider),
+    HttpModule,
   ],
 })
 export class VaultMainModule implements NestModule {

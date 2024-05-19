@@ -17,6 +17,7 @@ import { AWSSdkModule } from '@backend/awsModule';
 import { ConfigType } from '@nestjs/config';
 import { S3 } from '@aws-sdk/client-s3';
 import { SES } from '@aws-sdk/client-ses';
+import {HttpModule} from "@nestjs/axios";
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { SES } from '@aws-sdk/client-ses';
       inject: [awsConfig.KEY, commonConfig.KEY],
     }),
     ExporterModule,
+    HttpModule,
   ],
 })
 export class HeimdallMainModule implements NestModule {

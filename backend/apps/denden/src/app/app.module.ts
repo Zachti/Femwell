@@ -15,6 +15,7 @@ import {
 import { AWSSdkModule } from '@backend/awsModule';
 import { ConfigType } from '@nestjs/config';
 import { CloudFront } from '@aws-sdk/client-cloudfront';
+import {HttpModule} from "@nestjs/axios";
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CloudFront } from '@aws-sdk/client-cloudfront';
       },
       inject: [awsConfig.KEY, commonConfig.KEY],
     }),
+    HttpModule,
   ],
 })
 export class DendenMainModule implements NestModule {
