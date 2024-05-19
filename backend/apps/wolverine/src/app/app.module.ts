@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { LoggerModule } from '@backend/logger';
 import {
   /**awsConfig**/ awsConfigObject,
-  ConfigCoreModule,
+  ConfigCoreModule, redisConfigObject,
 } from '@backend/config';
 import {
   QuestionnaireModule,
@@ -14,6 +14,7 @@ import { HealthModule, LoggerMiddleware } from '@backend/infrastructure';
 import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
 import { GraphqlCoreModule, ErrorModule } from '@backend/wolverine';
 import { HttpModule } from '@nestjs/axios';
+import { CacheCoreModule } from '@backend/infrastructure';
 // import { AWSSdkModule } from '@backend/awsModule';
 // import { ConfigType } from '@nestjs/config';
 
@@ -23,7 +24,7 @@ import { HttpModule } from '@nestjs/axios';
     LoggerModule.forRoot({ serviceName: 'wolverine' }),
     ConfigCoreModule.forRoot({
       isGlobal: true,
-      configObjects: [wolverineConfigObject, awsConfigObject],
+      configObjects: [wolverineConfigObject, awsConfigObject, redisConfigObject],
       validationOptions: { presence: 'required' },
     }),
     HealthModule.forRoot(WolverineHealthIndicatorsProvider),
@@ -45,6 +46,7 @@ import { HttpModule } from '@nestjs/axios';
     PrismaModule,
     ErrorModule,
     HttpModule,
+    CacheCoreModule,
   ],
 })
 export class WolverineMainModule implements NestModule {
