@@ -161,7 +161,7 @@ resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
 #         },
 #         {
 #           name  = "STREAM_ARN"
-#           value = var.STREAM_ARN
+#           value = audit_logs_stream.arn
 #         },
 #         {
 #           name  = "COGNITO_USER_POOL_ID"
@@ -222,7 +222,7 @@ resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
     #     },
     #     {
     #       name  = "STREAM_ARN"
-    #       value = var.STREAM_ARN
+    #       value = audit_logs_stream.arn
     #     },
     #     {
     #       name  = "COGNITO_USER_POOL_ID"
@@ -273,7 +273,7 @@ resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
     #     },
     #     {
     #       name  = "STREAM_ARN"
-    #       value = var.STREAM_ARN
+    #       value = audit_logs_stream.arn
     #     },
     #     {
     #       name  = "COGNITO_USER_POOL_ID"
@@ -344,7 +344,7 @@ resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
     #     },
     #     {
     #       name  = "STREAM_ARN"
-    #       value = var.STREAM_ARN
+    #       value = audit_logs_stream.arn
     #     },
     #     {
     #       name  = "COGNITO_USER_POOL_ID"
@@ -599,6 +599,23 @@ resource "aws_security_group" "service_security_group" {
 
 output "femwell_url" {
   value = aws_alb.femwell_load_balancer.dns_name
+}
+
+resource "aws_s3_bucket" "kinesis" {
+  bucket = "auditLogs"
+  acl    = "private"
+}
+
+resource "aws_kinesis_firehose_delivery_stream" "audit_logs_stream" {
+  name        = "audit-logs-stream"
+  destination = "extended_s3"
+
+  extended_s3_configuration {
+    role_arn   = data.aws_iam_role.existing.arn
+    bucket_arn = aws_s3_bucket.bucket.arn
+    buffer_size = 1
+    buffer_interval = 60
+  }
 }
 
 
