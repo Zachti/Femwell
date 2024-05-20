@@ -67,6 +67,7 @@ export class AuthService {
               },
               this.logger,
             );
+            await this.sendConfirmationCode(email);
             resolve({
               email,
               id,
@@ -92,14 +93,14 @@ export class AuthService {
     this.logger.info(`${authenticateRequest.username} tries to log in.`);
     return new Promise((resolve, reject) => {
       return cognitoUser.authenticateUser(authDetails, {
-        onSuccess: (result) =>
+        onSuccess: result =>
           resolve({
             id: result.getIdToken().decodePayload()['sub'],
             isValid: result.isValid(),
             refreshToken: result.getRefreshToken().getToken(),
             jwt: result.getAccessToken().getJwtToken(),
           }),
-        onFailure: (err) => reject(err),
+        onFailure: err => reject(err),
       });
     });
   }
