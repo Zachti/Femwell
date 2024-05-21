@@ -14,11 +14,11 @@ export class VaultHealthIndicatorsProvider implements HealthIndicatorsProvider {
 
   async getIndicators(): Promise<Array<HealthIndicatorFunction>> {
     return [
-      () =>
-        this.http.pingCheck(
-          'wolverine',
-          this.vaultCfg.wolverineGraphqlEndpoint,
-        ),
+      // () =>
+      //   this.http.pingCheck(
+      //     'wolverine',
+      //     this.vaultCfg.wolverineGraphqlEndpoint,
+      //   ),
     ];
   }
 }

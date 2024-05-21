@@ -8,7 +8,7 @@ import { VaultMainModule } from './app/app.module';
 import { appsPrefix } from '@backend/infrastructure';
 
 async function bootstrap() {
-  const app = await NestFactory.create(VaultMainModule);
+  const app = await NestFactory.create(VaultMainModule , {cors: true});
   const port = process.env.PORT || 3000;
   app.setGlobalPrefix(appsPrefix.Vault);
   await app.listen(port);
