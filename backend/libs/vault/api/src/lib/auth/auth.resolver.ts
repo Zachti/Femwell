@@ -55,7 +55,7 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(() => GraphQLVoid)
+  @Mutation(() => AuthUser)
   async confirm(
     @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,
   ): Promise<userSession> {
