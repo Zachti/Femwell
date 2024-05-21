@@ -1,6 +1,11 @@
 import { useState, useEffect, FC } from "react";
 import { Link } from "react-router-dom";
-import { useColorModeValue, useDisclosure } from "@chakra-ui/react";
+import {
+  useColorModeValue,
+  useDisclosure,
+  useMediaQuery,
+  Text,
+} from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../../assets/Navbar.css";
 import {
@@ -14,6 +19,7 @@ import useAuthStore from "../../store/authStore";
 import useLogout from "../../hooks/useLogout";
 import ColorModeSwitch from "../ColorModeSwitch";
 import { Colors } from "../../utils/colorsConstants";
+import LogoSvg from "./LogoSvg";
 
 const Navbar: FC<{}> = () => {
   const {
@@ -27,9 +33,9 @@ const Navbar: FC<{}> = () => {
     onClose: onInputFormClose,
   } = useDisclosure();
   const authUser = useAuthStore((state) => state.user);
-  const [logoText, setLogoText] = useState<string>("FemWell");
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const { logout, isLoggingOut } = useLogout();
+  const [isLargerThan500] = useMediaQuery("(min-width: 500px)");
   const navFadeColor = useColorModeValue(
     Colors.primaryColor,
     Colors.secondaryColor,
@@ -43,28 +49,6 @@ const Navbar: FC<{}> = () => {
     }
   };
 
-  //on mount
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (windowWidth > 930) {
-      onSideMenuClose();
-    }
-    if (windowWidth < 500) {
-      setLogoText("FW");
-    } else {
-      setLogoText("FemWell");
-    }
-  }, [windowWidth]);
-
   return (
     <>
       <nav
@@ -75,8 +59,14 @@ const Navbar: FC<{}> = () => {
       >
         <div className="navbar-container">
           <Link to="/" className="navbar-logo" onClick={onSideMenuClose}>
-            {logoText}
-            <FontAwesomeIcon icon={faHeartCircleCheck} />
+            <LogoSvg
+              fillColor="white"
+              mt="0"
+              width={isLargerThan500 ? "100px" : "80px"}
+            />
+            <Text mt={"6px"} fontSize={24} fontFamily={"kalam"}>
+              {isLargerThan500 ? "Femwell " : ""}
+            </Text>
           </Link>
           <ColorModeSwitch />
           <div className="nav-right-section">

@@ -19,6 +19,8 @@ import { useState } from "react";
 import LogoSvg from "../components/Menus/LogoSvg";
 import LoginForm from "../components/Forms/LoginForm";
 import QuestionnaireSignUp from "../components/Forms/QuestionnaireSignUp";
+import EmailCodeVerification from "../components/Forms/EmailCodeVerification";
+import useSignupEmailPassword from "../hooks/useSignupEmailPassword";
 
 const MotionButton = motion(Button);
 
