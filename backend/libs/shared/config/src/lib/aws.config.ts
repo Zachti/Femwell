@@ -1,5 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import * as Joi from 'joi';
+import { ConfigObject } from './configModuleOptions';
 
 export const awsConfig = registerAs('aws', () => ({
   localDevConfigOverride: {
@@ -16,16 +17,12 @@ export const awsConfig = registerAs('aws', () => ({
 }));
 
 const awsConfigurationValidationSchema = Joi.object({
-  AWS_REGION: Joi.string(),
-  AWS_ACCESS_KEY: Joi.string(),
-  AWS_SECRET_KEY: Joi.string(),
-  AWS_SESSION_TOKEN: Joi.string(),
   STREAM_ARN: Joi.string().required(),
   COGNITO_USER_POOL_ID: Joi.string().required(),
   COGNITO_CLIENT_ID: Joi.string().required(),
 });
 
-export const awsConfigObject = {
+export const awsConfigObject: ConfigObject = {
   config: awsConfig,
   validationSchema: awsConfigurationValidationSchema,
 };

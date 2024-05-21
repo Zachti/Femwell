@@ -10,8 +10,8 @@ export class WolverineHealthIndicatorsProvider
 
   async getIndicators(): Promise<Array<HealthIndicatorFunction>> {
     return [
-      () =>
-        this.http.pingCheck('dynamoDB', process.env['AWS_DYNAMO_DB_ENDPOINT']!),
+      // () =>
+      //   this.http.pingCheck('aurora', process.env['AWS_AURORA_URL'] as string),
     ];
   }
 }

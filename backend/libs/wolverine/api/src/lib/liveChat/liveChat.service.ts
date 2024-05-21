@@ -7,6 +7,7 @@ import {
   InternalServerError,
   NotFoundError,
 } from '../shared/error/customErrors';
+import { CacheService } from '@backend/infrastructure';
 
 @Injectable()
 export class LiveChatService {
@@ -14,21 +15,24 @@ export class LiveChatService {
     private readonly prisma: PrismaService,
     private readonly logger: LoggerService,
     private readonly error: ErrorService,
+    private readonly cacheService: CacheService,
   ) {}
 
   async getLiveChat(livechatId: number) {
     try {
-      return await this.prisma.liveChat.findUnique({
-        where: {
-          id: livechatId,
-        },
-        include: {
-          users: true,
-          messages: true,
-        },
+      return this.cacheService.wrap(`${livechatId}`, async () => {
+        return this.prisma.liveChat.findUniqueOrThrow({
+          where: {
+            id: livechatId,
+          },
+          include: {
+            users: true,
+            messages: true,
+          },
+        })
       });
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundError()) ;
     }
   }
 
@@ -46,6 +50,7 @@ export class LiveChatService {
         },
       });
       this.logger.info(`New LiveChat created: ${JSON.stringify(res)}`);
+      await this.cacheService.set(`${res.id}`, res);
       return res;
     } catch (e) {
       this.error.handleError(new InternalServerError());
@@ -75,33 +80,35 @@ export class LiveChatService {
       this.logger.info(`Padulla added to LiveChat. Padulla id: ${padullaId}`);
       return res;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new InternalServerError());
     }
   }
 
   async getPreviousChatsForUser(userId: string): Promise<LiveChat[]> {
-    return this.prisma.liveChat.findMany({
-      where: {
-        users: {
-          some: {
-            id: userId,
+    return this.cacheService.wrap(userId, async () => {
+      return this.prisma.liveChat.findMany({
+        where: {
+          users: {
+            some: {
+              id: userId,
+            },
           },
-        },
-      }, // find all chat rooms that the user is in
-      include: {
-        users: {
-          orderBy: {
-            id: 'desc',
-          },
-        }, // show all users in the liveChat (padulla and client) order by id number.
+        }, // find all chat rooms that the user is in
+        include: {
+          users: {
+            orderBy: {
+              id: 'desc',
+            },
+          }, // show all users in the liveChat (padulla and client) order by id number.
 
-        messages: {
-          take: 1,
-          orderBy: {
-            createdAt: 'desc',
-          },
-        }, // display last message in the chat room
-      },
+          messages: {
+            take: 1,
+            orderBy: {
+              createdAt: 'desc',
+            },
+          }, // display last message in the chat room
+        },
+      });
     });
   }
 
@@ -123,6 +130,7 @@ export class LiveChatService {
         },
       });
       this.logger.info(`New message sent: ${JSON.stringify(res)}`);
+      await this.cacheService.del(`${liveChatId}_messages`);
       return res;
     } catch (e) {
       this.error.handleError(new InternalServerError());
@@ -130,22 +138,24 @@ export class LiveChatService {
   }
 
   async getMessagesForLiveChat(liveChatId: number): Promise<Message[]> {
-    return this.prisma.message.findMany({
-      where: {
-        liveChatId: liveChatId,
-      },
-      include: {
-        liveChat: {
-          include: {
-            users: {
-              orderBy: {
-                id: 'asc',
+    return this.cacheService.wrap(`${liveChatId}_messages`, async () => {
+      return this.prisma.message.findMany({
+        where: {
+          liveChatId: liveChatId,
+        },
+        include: {
+          liveChat: {
+            include: {
+              users: {
+                orderBy: {
+                  id: 'asc',
+                },
               },
             },
           },
+          user: true,
         },
-        user: true,
-      },
+      });
     });
   }
 

@@ -9,7 +9,7 @@ export class LiveChat {
   @Field(() => ID)
   id!: string;
 
-  @Field(() => GraphQLString, { nullable: true })
+  @Field(() => GraphQLString, { nullable: true }) // title of the live chat
   name!: string;
 
   @Field(() => GraphQLDate)

@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 import * as Joi from 'joi';
 
 export const vaultConfig = registerAs('vault', () => ({
-  wolverineGraphqlEndpoint: process.env['WOLVERINE_ENDPOINT'],
+  wolverineGraphqlEndpoint: process.env['WOLVERINE_ENDPOINT'] ?? '',
 }));
 
 const vaultConfigurationValidationSchema = Joi.object({

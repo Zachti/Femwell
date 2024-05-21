@@ -2,13 +2,9 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
-
-// datasource db {
-//   provider = "postgres"
-//   url      = env("DATABASE_URL")
-// }
 
 datasource db {
   provider = "postgresql"
@@ -20,6 +16,7 @@ model User {
   username      String
   email         String
   phoneNumber   String?
+  profilePic    String?
   posts         Post[]
   comments      Comment[]      @relation("UserComments")
   likes         Like[]         @relation("UserLikes")
@@ -27,6 +24,7 @@ model User {
   liveChats     LiveChat[]
   messages      Message[]      @relation("UserMessages")
   readLater     String[]       @default([])
+  events        Event[]
 }
 
 model Post {
@@ -56,10 +54,11 @@ model Comment {
   id      Int    @id @default(autoincrement())
   content String
 
-  user   User   @relation("UserComments", fields: [userId], references: [id])
-  userId String
-  post   Post   @relation(fields: [postId], references: [id])
-  postId String
+  user     User   @relation("UserComments", fields: [userId], references: [id])
+  userId   String
+  username String
+  post     Post   @relation(fields: [postId], references: [id])
+  postId   String
 }
 
 model Questionnaire {
@@ -98,4 +97,17 @@ model Message {
   user       User     @relation("UserMessages", fields: [userId], references: [id], onDelete: Cascade)
   liveChat   LiveChat @relation(fields: [liveChatId], references: [id], onDelete: Cascade)
   seen       Boolean  @default(false)
+}
+
+model Event {
+  id                       Int      @id @default(autoincrement())
+  title                    String
+  date                     DateTime @map("date")
+  duration                 String
+  userId                   String
+  info                     String?  @default("")
+  is24HourNotificationSent Boolean  @default(false)
+  is1HourNotificationSent  Boolean  @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

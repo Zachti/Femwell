@@ -5,7 +5,7 @@ import { GraphQLUUID, GraphQLPositiveInt } from 'graphql-scalars';
 @ObjectType()
 export class Comment {
   @Field(() => GraphQLPositiveInt)
-  id!: string;
+  id!: number;
 
   @Field(() => GraphQLString)
   content!: string;
@@ -15,4 +15,7 @@ export class Comment {
 
   @Field(() => GraphQLUUID)
   postId!: string;
+
+  @Field(() => GraphQLString)
+  username!: string;
 }

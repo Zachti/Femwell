@@ -1,16 +1,9 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { IsNotEmpty, IsString, IsArray } from 'class-validator';
+import { InputType, Field, PickType } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
+import { LiveChat } from '../entities/liveChat.entity';
 
 @InputType()
-export class CreateLiveChatDto {
-  @Field()
-  @IsString()
-  @IsNotEmpty({ message: 'Name is required.' })
-  name!: string;
-
-  @IsArray()
-  @IsNotEmpty({ message: 'Users Ids required.' })
+export class CreateLiveChatDto extends PickType(LiveChat, ['name']) {
   @Field(() => [GraphQLString])
   userIds!: string[];
 }

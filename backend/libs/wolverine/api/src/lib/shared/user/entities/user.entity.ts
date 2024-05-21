@@ -2,7 +2,7 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
 import {
   GraphQLEmailAddress,
-  GraphQLPhoneNumber,
+  GraphQLPhoneNumber, GraphQLURL,
   GraphQLUUID,
 } from 'graphql-scalars';
 import {
@@ -48,4 +48,7 @@ export class User {
 
   @Field(() => [GraphQLString])
   readLater!: string[];
+
+  @Field(() => [GraphQLURL], { nullable: true })
+  profilePic?: URL
 }

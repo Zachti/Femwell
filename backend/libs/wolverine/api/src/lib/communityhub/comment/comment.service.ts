@@ -24,6 +24,7 @@ export class CommentService {
           content: input.content,
           userId: input.userId,
           postId: input.postId,
+          username: input.username,
         },
       });
       this.logger.info(`Comment created successfully with id: ${result.id}.`);
@@ -39,7 +40,7 @@ export class CommentService {
         `Updating comment with id: ${input.id}. on post ${input.postId}`,
       );
       const result = await this.prisma.comment.update({
-        where: { id: input.id, userId: input.userId },
+        where: { id: input.id },
         data: { content: input.content },
       });
       this.logger.info(`Comment with id: ${input.id} updated successfully`);

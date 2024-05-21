@@ -10,8 +10,8 @@ import { AuthUser } from '../authUser/authUser.entity';
 import { AuditService, InjectAuditService } from '@backend/auditService';
 import { DeleteUserRequest } from './dto/deleteUserRequest.input';
 import { randomUUID } from 'node:crypto';
-import { GraphQLVoid } from 'graphql-scalars';
 import { SignedUpUser } from '../authUser/signedUpUser.entity';
+import { userSession } from './interfaces/inrefaces';
 
 @Resolver(() => AuthUser)
 export class AuthResolver {
@@ -27,7 +27,7 @@ export class AuthResolver {
     const signUpResult = await this.authService.registerUser(registerRequest);
     const user = {
       id: signUpResult.id,
-      username: registerRequest.email,
+      email: registerRequest.email,
     };
     await this.sendAuditLog(user, 'registration');
     return user;
@@ -44,7 +44,7 @@ export class AuthResolver {
       const res = await this.authService.authenticateUser(authenticateRequest);
       return {
         id: res.id,
-        username: authenticateRequest.username,
+        email: authenticateRequest.username,
         jwt: res.jwt,
         refreshToken: res.refreshToken,
         isValid: res.isValid,
@@ -54,10 +54,10 @@ export class AuthResolver {
     }
   }
 
-  @Mutation(() => GraphQLVoid)
+  @Mutation(() => AuthUser)
   async confirm(
     @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,
-  ) {
+  ): Promise<userSession> {
     try {
       return await this.authService.confirmUser(confirmUserRequest);
     } catch (e: any) {

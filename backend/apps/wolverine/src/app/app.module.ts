@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { LoggerModule } from '@backend/logger';
 import {
   /**awsConfig**/ awsConfigObject,
   ConfigCoreModule,
+  redisConfigObject,
 } from '@backend/config';
 import {
   QuestionnaireModule,
@@ -10,10 +11,11 @@ import {
   wolverineConfigObject,
   PrismaModule,
 } from '@backend/wolverine';
-import { HealthModule } from '@backend/infrastructure';
+import { HealthModule, LoggerMiddleware } from '@backend/infrastructure';
 import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
-import { GraphqlCoreModule } from '@backend/wolverine';
-import { ErrorModule } from '../../../../libs/wolverine/api/src/lib/shared/error/error.module';
+import { GraphqlCoreModule, ErrorModule } from '@backend/wolverine';
+import { HttpModule } from '@nestjs/axios';
+import { CacheCoreModule } from '@backend/infrastructure';
 // import { AWSSdkModule } from '@backend/awsModule';
 // import { ConfigType } from '@nestjs/config';
 
@@ -23,7 +25,11 @@ import { ErrorModule } from '../../../../libs/wolverine/api/src/lib/shared/error
     LoggerModule.forRoot({ serviceName: 'wolverine' }),
     ConfigCoreModule.forRoot({
       isGlobal: true,
-      configObjects: [wolverineConfigObject, awsConfigObject],
+      configObjects: [
+        wolverineConfigObject,
+        awsConfigObject,
+        redisConfigObject,
+      ],
       validationOptions: { presence: 'required' },
     }),
     HealthModule.forRoot(WolverineHealthIndicatorsProvider),
@@ -44,6 +50,12 @@ import { ErrorModule } from '../../../../libs/wolverine/api/src/lib/shared/error
     QuestionnaireModule,
     PrismaModule,
     ErrorModule,
+    HttpModule,
+    CacheCoreModule,
   ],
 })
-export class WolverineMainModule {}
+export class WolverineMainModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*');
+  }
+}

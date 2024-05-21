@@ -45,6 +45,7 @@ export class UserService {
           username: input.newUsername || undefined,
           readLater: input.readLater || undefined,
           phoneNumber: input.phoneNumber || undefined,
+          profilePic: input.profilePic.toString() || undefined,
         },
       });
       this.logger.info(
@@ -75,6 +76,12 @@ export class UserService {
           posts: true,
           comments: true,
           likes: true,
+          events: true,
+          liveChats: {
+            include: {
+              messages: true,
+            },
+          },
           questionnaire: {
             include: {
               responses: true,
@@ -98,6 +105,12 @@ export class UserService {
           posts: true,
           comments: true,
           likes: true,
+          events: true,
+          liveChats: {
+            include: {
+              messages: true,
+            },
+          },
           questionnaire: {
             include: {
               responses: true,

@@ -7,6 +7,7 @@ export class UpdateUserInput extends PickType(User, [
   'id',
   'username',
   'phoneNumber',
+  'profilePic',
 ]) {
   @Field(() => GraphQLString, {
     description: 'The new username of the user',

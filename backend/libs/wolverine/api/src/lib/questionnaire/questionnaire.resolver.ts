@@ -2,14 +2,11 @@ import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { QuestionnaireService } from './questionnaire.service';
 import { Questionnaire, CreateQuestionnaireInput } from '../index';
 import { GraphQLUUID } from 'graphql-scalars';
-import { UsePipes } from '@nestjs/common';
-import { ValidateInputPipe } from '../shared/pipes/validateInput.pipe';
 
 @Resolver(() => Questionnaire)
 export class QuestionnaireResolver {
   constructor(private readonly questionnaireService: QuestionnaireService) {}
 
-  @UsePipes(new ValidateInputPipe())
   @Mutation(() => Questionnaire)
   async createQuestionnaire(
     @Args('createQuestionnaireInput')

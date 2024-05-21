@@ -1,15 +1,5 @@
-import { InputType, Field } from '@nestjs/graphql';
-import { IsString, IsNotEmpty } from 'class-validator';
-import { GraphQLString } from 'graphql/type';
+import { InputType, PickType } from '@nestjs/graphql';
+import { Response } from '../entities/response.entity';
 
 @InputType()
-export class ResponseInput {
-  @IsString()
-  @IsNotEmpty()
-  @Field(() => GraphQLString)
-  question!: string;
-
-  @IsString()
-  @Field(() => GraphQLString, { nullable: true })
-  answer?: string;
-}
+export class ResponseInput extends PickType(Response, ['question', 'answer']) {}

@@ -7,3 +7,10 @@ export enum Role {
 }
 
 registerEnumType(Role, { name: 'RoleType' });
+
+export enum appsPrefix {
+  Heimdall = 'heimdall',
+  Wolverine = 'wolverine',
+  Vault = 'vault',
+  Denden = 'denden',
+}

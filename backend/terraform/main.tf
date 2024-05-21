@@ -142,6 +142,16 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
 #   port                 = 6379
 # }
 
+resource "aws_elasticache_cluster" "wolverineCache" {
+  cluster_id           = "wolverine-cluster"
+  engine               = "redis"
+  node_type            = "cache.m4.large"
+  num_cache_nodes      = 1
+  parameter_group_name = "default.redis3.2"
+  engine_version       = "3.2.10"
+  port                 = 6379
+}
+
 resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
   name = "/ecs/femwell-task"
 }
@@ -246,7 +256,7 @@ resource "aws_ecs_task_definition" "wolverine_task" {
     #     },
     #     {
     #       name  = "STREAM_ARN"
-    #       value = var.STREAM_ARN
+    #       value = audit_logs_stream.arn
     #     },
     #     {
     #       name  = "COGNITO_USER_POOL_ID"

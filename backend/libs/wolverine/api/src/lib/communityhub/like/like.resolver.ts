@@ -2,17 +2,14 @@ import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { LikeService } from './like.service';
 import { Like } from '../../index';
 import { CreateLikeInput } from '../../index';
-import { GraphQLUUID, GraphQLPositiveInt } from 'graphql-scalars';
+import { GraphQLUUID } from 'graphql-scalars';
 import { Role, Roles } from '@backend/infrastructure';
-import { UsePipes } from '@nestjs/common';
-import { ValidateInputPipe } from '../../shared/pipes/validateInput.pipe';
 
 @Resolver(() => Like)
 export class LikeResolver {
   constructor(private readonly likeService: LikeService) {}
 
   @Roles([Role.Padulla, Role.Premium, Role.User])
-  @UsePipes(new ValidateInputPipe())
   @Mutation(() => Like)
   async createLike(
     @Args('createLikeInput')

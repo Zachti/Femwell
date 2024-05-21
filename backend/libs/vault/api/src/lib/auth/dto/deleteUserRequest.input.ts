@@ -4,5 +4,5 @@ import { GraphQLEmailAddress } from 'graphql-scalars';
 @InputType()
 export class DeleteUserRequest {
   @Field(() => GraphQLEmailAddress)
-  username!: string;
+  email!: string;
 }

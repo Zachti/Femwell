@@ -67,6 +67,7 @@ export class AuthService {
               },
               this.logger,
             );
+            await this.sendConfirmationCode(email);
             resolve({
               email,
               id,
@@ -104,7 +105,7 @@ export class AuthService {
     });
   }
 
-  confirmUser(confirmUserRequest: ConfirmUserRequest) {
+  confirmUser(confirmUserRequest: ConfirmUserRequest): Promise<userSession> {
     const userData: ICognitoUserData = {
       Username: confirmUserRequest.email,
       Pool: this.userPool,
@@ -119,9 +120,13 @@ export class AuthService {
       cognitoUser.confirmRegistration(
         confirmUserRequest.code,
         true,
-        (err, result) => {
+        async (err, result) => {
           if (err) reject(err);
-          resolve(result);
+          const res = await this.authenticateUser({
+            username: confirmUserRequest.email,
+            password: confirmUserRequest.password,
+          });
+          resolve(res);
         },
       );
     });
@@ -144,7 +149,7 @@ export class AuthService {
 
   async deleteUser(deleteUserRequest: DeleteUserRequest): Promise<string> {
     const deleteUserData = {
-      Username: deleteUserRequest.username,
+      Username: deleteUserRequest.email,
       UserPoolId: this.awsCfg.userPoolId,
     };
 
@@ -161,7 +166,7 @@ export class AuthService {
       return cognito.adminDeleteUser(deleteUserData, (err: any) => {
         if (err) reject(err);
         this.logger.info(
-          `${deleteUserRequest.username} account deleted from cognito.`,
+          `${deleteUserRequest.email} account deleted from cognito.`,
         );
         this.wolverineSdk.sendWolverineMutation('delete', { id }, this.logger);
         resolve('User deleted successfully!');
