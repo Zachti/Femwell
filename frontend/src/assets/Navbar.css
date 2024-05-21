@@ -29,10 +29,6 @@
   align-items: center;
 }
 
-.navbar-logo:hover {
-  color: #f8abe8;
-}
-
 .nav-menu {
   display: grid;
   grid-template-columns: repeat(5, auto);

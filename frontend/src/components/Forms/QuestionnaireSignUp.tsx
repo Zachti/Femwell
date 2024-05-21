@@ -57,8 +57,8 @@ import {
   validateConfirmPassword,
   validatePhone,
 } from "../../utils/formValidations";
-import { Questionnare } from "../../models/questionnaire.model";
 import useGoogleAuth from "../../hooks/useGoogleAuth";
+import EmailCodeVerification from "./EmailCodeVerification";
 import useSignupEmailPassword from "../../hooks/useSignupEmailPassword";
 
 interface InputFormProps {
@@ -82,8 +82,15 @@ const QuestionnaireSignUp: FC<InputFormProps> = ({
   const [passValue, setPassValue] = useState("");
   const [show, setShow] = useState(false);
   const handleShowClick = () => setShow(!show);
-  const { signup, isSigningUp } = useSignupEmailPassword();
   const { handleGoogleAuth } = useGoogleAuth();
+
+  const {
+    showEmailVerifyPage,
+    signup,
+    isConfirmingCode,
+    handleVerification,
+    isSigningUp,
+  } = useSignupEmailPassword();
 
   const { activeStep, goToNext, goToPrevious } = useSteps({
     index: 0,
@@ -102,6 +109,12 @@ const QuestionnaireSignUp: FC<InputFormProps> = ({
   const handlePrevious = () => {
     setCurrentStep(currentStep - 1);
     goToPrevious();
+  };
+
+  const handleCodeSubmit = async (code: string) => {
+    const success = await handleVerification(code);
+    if (success) onClose();
+    else goToPrevious();
   };
 
   return (
@@ -176,6 +189,7 @@ const QuestionnaireSignUp: FC<InputFormProps> = ({
                   phone: values.phone,
                   responses,
                 };
+
                 const success = await signup(data);
                 if (success) {
                   onClose();
@@ -661,7 +675,14 @@ const QuestionnaireSignUp: FC<InputFormProps> = ({
                             setFieldValue("question6", value);
                           }}
                         >
-                          <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+                          <Grid
+                            templateColumns={
+                              isLargerThan460
+                                ? "repeat(3, 1fr)"
+                                : "repeat(2, 1fr)"
+                            }
+                            gap={6}
+                          >
                             <Checkbox
                               value="natural"
                               colorScheme="pink"
@@ -1025,6 +1046,11 @@ const QuestionnaireSignUp: FC<InputFormProps> = ({
           </ModalBody>
         </ModalContent>
       </Modal>
+      <EmailCodeVerification
+        showEmailVerifyPage={showEmailVerifyPage}
+        handleCodeSubmit={handleCodeSubmit}
+        isConfirmingCode={isConfirmingCode}
+      />
     </>
   );
 };
