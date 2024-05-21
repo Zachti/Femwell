@@ -9,4 +9,7 @@ export class ConfirmUserRequest {
 
   @Field(() => GraphQLEmailAddress)
   email!: string;
+
+  @Field(() => GraphQLString)
+  password!: string;
 }

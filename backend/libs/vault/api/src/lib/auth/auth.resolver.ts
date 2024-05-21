@@ -12,6 +12,7 @@ import { DeleteUserRequest } from './dto/deleteUserRequest.input';
 import { randomUUID } from 'node:crypto';
 import { GraphQLVoid } from 'graphql-scalars';
 import { SignedUpUser } from '../authUser/signedUpUser.entity';
+import { userSession } from './interfaces/inrefaces';
 
 @Resolver(() => AuthUser)
 export class AuthResolver {
@@ -57,7 +58,7 @@ export class AuthResolver {
   @Mutation(() => GraphQLVoid)
   async confirm(
     @Args('confirmUserRequest') confirmUserRequest: ConfirmUserRequest,
-  ) {
+  ): Promise<userSession> {
     try {
       return await this.authService.confirmUser(confirmUserRequest);
     } catch (e: any) {

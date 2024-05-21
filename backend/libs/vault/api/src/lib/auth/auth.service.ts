@@ -105,7 +105,7 @@ export class AuthService {
     });
   }
 
-  confirmUser(confirmUserRequest: ConfirmUserRequest) {
+  confirmUser(confirmUserRequest: ConfirmUserRequest): Promise<userSession> {
     const userData: ICognitoUserData = {
       Username: confirmUserRequest.email,
       Pool: this.userPool,
@@ -120,9 +120,13 @@ export class AuthService {
       cognitoUser.confirmRegistration(
         confirmUserRequest.code,
         true,
-        (err, result) => {
+        async (err, result) => {
           if (err) reject(err);
-          resolve(result);
+          const res = await this.authenticateUser({
+            username: confirmUserRequest.email,
+            password: confirmUserRequest.password,
+          });
+          resolve(res);
         },
       );
     });
