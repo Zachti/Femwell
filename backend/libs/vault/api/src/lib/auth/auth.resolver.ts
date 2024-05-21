@@ -10,7 +10,6 @@ import { AuthUser } from '../authUser/authUser.entity';
 import { AuditService, InjectAuditService } from '@backend/auditService';
 import { DeleteUserRequest } from './dto/deleteUserRequest.input';
 import { randomUUID } from 'node:crypto';
-import { GraphQLVoid } from 'graphql-scalars';
 import { SignedUpUser } from '../authUser/signedUpUser.entity';
 import { userSession } from './interfaces/inrefaces';
 
