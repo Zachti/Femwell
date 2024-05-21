@@ -1,7 +1,4 @@
-import { useColorModeValue } from "@chakra-ui/react";
-import { color } from "framer-motion";
 import { FC } from "react";
-import { Colors } from "../../utils/colorsConstants";
 
 interface FemwellSVGProps {
   fillColor: string;
@@ -10,8 +7,6 @@ interface FemwellSVGProps {
 }
 
 const FemwellSVG: FC<FemwellSVGProps> = ({ fillColor, width, mt }) => {
-  //const fillColor = useColorModeValue("white", Colors.color5);
-
   return (
     <svg
       version="1.1"
