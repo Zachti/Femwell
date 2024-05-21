@@ -2,7 +2,8 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { LoggerModule } from '@backend/logger';
 import {
   /**awsConfig**/ awsConfigObject,
-  ConfigCoreModule, redisConfigObject,
+  ConfigCoreModule,
+  redisConfigObject,
 } from '@backend/config';
 import {
   QuestionnaireModule,
@@ -24,7 +25,11 @@ import { CacheCoreModule } from '@backend/infrastructure';
     LoggerModule.forRoot({ serviceName: 'wolverine' }),
     ConfigCoreModule.forRoot({
       isGlobal: true,
-      configObjects: [wolverineConfigObject, awsConfigObject, redisConfigObject],
+      configObjects: [
+        wolverineConfigObject,
+        awsConfigObject,
+        redisConfigObject,
+      ],
       validationOptions: { presence: 'required' },
     }),
     HealthModule.forRoot(WolverineHealthIndicatorsProvider),

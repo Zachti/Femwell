@@ -8,7 +8,7 @@ export class AuthUser {
   id!: string;
 
   @Field(() => GraphQLEmailAddress)
-  username!: string;
+  email!: string;
 
   @Field(() => GraphQLJWT)
   jwt!: string;

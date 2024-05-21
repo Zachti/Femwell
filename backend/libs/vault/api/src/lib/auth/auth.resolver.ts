@@ -28,7 +28,7 @@ export class AuthResolver {
     const signUpResult = await this.authService.registerUser(registerRequest);
     const user = {
       id: signUpResult.id,
-      username: registerRequest.email,
+      email: registerRequest.email,
     };
     await this.sendAuditLog(user, 'registration');
     return user;
@@ -45,7 +45,7 @@ export class AuthResolver {
       const res = await this.authService.authenticateUser(authenticateRequest);
       return {
         id: res.id,
-        username: authenticateRequest.username,
+        email: authenticateRequest.username,
         jwt: res.jwt,
         refreshToken: res.refreshToken,
         isValid: res.isValid,

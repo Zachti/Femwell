@@ -149,7 +149,7 @@ export class AuthService {
 
   async deleteUser(deleteUserRequest: DeleteUserRequest): Promise<string> {
     const deleteUserData = {
-      Username: deleteUserRequest.username,
+      Username: deleteUserRequest.email,
       UserPoolId: this.awsCfg.userPoolId,
     };
 
@@ -166,7 +166,7 @@ export class AuthService {
       return cognito.adminDeleteUser(deleteUserData, (err: any) => {
         if (err) reject(err);
         this.logger.info(
-          `${deleteUserRequest.username} account deleted from cognito.`,
+          `${deleteUserRequest.email} account deleted from cognito.`,
         );
         this.wolverineSdk.sendWolverineMutation('delete', { id }, this.logger);
         resolve('User deleted successfully!');
