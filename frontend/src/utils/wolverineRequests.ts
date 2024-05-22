@@ -55,6 +55,32 @@ const FIND_ONE_USER_QUERY = gql`
     }
 `;
 
+// dtos -
+
+interface CreateUserInput {
+    cognitoUserId: string;
+
+    email: string;
+
+    profileUsername: string;
+
+    phoneNumber?: string;
+}
+
+interface UpdateUserInput {
+    id: string;
+
+    email: string;
+
+    username: string;
+
+    phoneNumber?: string;
+
+    newUsername?: string;
+
+    readLater?: string[];
+}
+
 // QUESTIONNAIRE RESOLVER REQUESTS -
 
 const CREATE_QUESTIONNAIRE_MUTATION = gql`
@@ -116,6 +142,34 @@ const FIND_QUESTIONNAIRE_BY_USER_QUERY = gql`
         }
     }
 `;
+
+// dtos -
+
+interface Response {
+    id: string;
+
+    question: string;
+
+    answer?: string;
+
+    questionnaireId: string;
+}
+
+interface CreateQuestionnaireInput {
+    userId: string;
+
+    responses: Response[];
+
+    username: string;
+}
+
+interface createResponseInput {
+
+    question: string;
+
+    answer?: string;
+
+}
 
 // COMMENT RESOLVER REQUESTS -
 

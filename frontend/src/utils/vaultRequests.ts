@@ -40,3 +40,33 @@ const DELETE_USER_MUTATION = gql`
         delete(deleteUserRequest: $deleteUserRequest)
     }
 `;
+
+// dtos -
+
+interface AuthenticateRequest {
+    username: string;
+
+    password: string;
+}
+
+interface RegisterRequest {
+    profileUsername: string;
+
+    email: string;
+
+    password: string;
+
+    phoneNumber?: string;
+}
+
+interface ConfirmUserRequest {
+    code: string;
+
+    email: string;
+
+    password: string;
+}
+
+interface DeleteUserRequest {
+    email: string;
+}
