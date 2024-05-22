@@ -1,7 +1,7 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
 import { GraphQLUUID } from 'graphql-scalars';
-import { Response } from '../entities/response.entity';
+import { ResponseInput } from './createResponse.input';
 
 @InputType()
 export class CreateQuestionnaireInput {
@@ -11,6 +11,6 @@ export class CreateQuestionnaireInput {
   @Field(() => GraphQLUUID)
   userId!: string;
 
-  @Field(() => [Response])
-  responses!: Response[];
+  @Field(() => [ResponseInput])
+  responses!: ResponseInput[];
 }
