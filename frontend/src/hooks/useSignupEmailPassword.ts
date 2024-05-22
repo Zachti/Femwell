@@ -119,7 +119,6 @@ const useSignupEmailPassword = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showEmailVerifyPage, setShowEmailVerifyPage] = useState(false);
-  const [verificationCode, setVerificationCode] = useState<string>("");
 
   const signup = async (data: any) => {
     if (
@@ -148,11 +147,6 @@ const useSignupEmailPassword = () => {
           query: print(REGISTER_REQUEST_MUTATION),
           variables: { registerRequest },
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
       );
 
       if (registerResponse.status !== 200) {
@@ -180,11 +174,6 @@ const useSignupEmailPassword = () => {
             confirmUserRequest: { code, email, password },
           },
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
       );
 
       if (confirmUserResponse.status !== 200) {
@@ -198,7 +187,6 @@ const useSignupEmailPassword = () => {
         method: "get",
         url: `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
         headers: {
-          "Content-Type": "application/json",
           authorization: `Bearer ${confirmResult.jwt}`,
         },
         data: {
