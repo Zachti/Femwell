@@ -15,7 +15,7 @@ import { Role } from '@backend/infrastructure';
 import { InjectCognitoToken } from './providers/cognito.provider';
 import { signUpUser, userSession } from './interfaces/inrefaces';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
-import { awsConfig } from '@backend/config';
+import { awsConfig, commonConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
 import { InjectWolverineSdk, Sdk } from '../wolverine-datasource';
 
@@ -29,6 +29,8 @@ export class AuthService {
     private readonly logger: LoggerService,
     @Inject(awsConfig.KEY)
     private readonly awsCfg: ConfigType<typeof awsConfig>,
+    @Inject(commonConfig.KEY)
+    private readonly cfg: ConfigType<typeof commonConfig>,
   ) {}
 
   registerUser(registerRequest: RegisterRequest): Promise<signUpUser> {
@@ -156,7 +158,7 @@ export class AuthService {
     };
 
     const cognito = new CognitoIdentityProvider(
-      this.awsCfg.localDevConfigOverride,
+      this.cfg.isLiveEnv ? this.awsCfg.localDevConfigOverride : {},
     );
 
     const userData = await cognito.adminGetUser(deleteUserData);
