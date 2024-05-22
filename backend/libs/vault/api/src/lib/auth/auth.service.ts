@@ -17,7 +17,7 @@ import { signUpUser, userSession } from './interfaces/inrefaces';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { awsConfig, commonConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
-import { InjectWolverineSdk, Sdk } from '../wolverine-datasource';
+import { InjectWolverineSdk, Sdk, mutationType } from '../wolverine-datasource';
 
 @Injectable()
 export class AuthService {
@@ -60,7 +60,7 @@ export class AuthService {
             );
             const id = result.userSub;
             await this.wolverineSdk.sendWolverineMutation(
-              'create',
+              mutationType.create,
               {
                 createUserInput: {
                   email,
@@ -172,7 +172,11 @@ export class AuthService {
         this.logger.info(
           `${deleteUserRequest.email} account deleted from cognito.`,
         );
-        this.wolverineSdk.sendWolverineMutation('delete', { id }, this.logger);
+        this.wolverineSdk.sendWolverineMutation(
+          mutationType.delete,
+          { id },
+          this.logger,
+        );
         resolve('User deleted successfully!');
       });
     });
