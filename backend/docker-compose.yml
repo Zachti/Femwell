@@ -63,7 +63,7 @@ services:
       context: ./
       dockerfile: './apps/wolverine/dockerfile'
       target: 'builder'
-    command: sh -c "npm run start:wolverine:dev"
+    command: sh -c "npx prisma generate dev && npx prisma db push && npm run start:wolverine:dev"
     restart: 'unless-stopped'
     volumes:
       - .:/home/node

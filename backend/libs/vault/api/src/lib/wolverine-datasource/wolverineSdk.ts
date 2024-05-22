@@ -45,6 +45,7 @@ export function getSdk(client: GraphQLClient) {
     } catch (e) {
       logger.error(
         ` Couldn't ${mutation} user at wolverine DB. user args: ${args}`,
+        { e },
       );
       throw new GraphQLError(
         ` Couldn't ${mutation} user at wolverine DB. user args: ${args}`,
