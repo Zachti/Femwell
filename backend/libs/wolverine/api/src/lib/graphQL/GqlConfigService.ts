@@ -51,7 +51,8 @@ export class GqlConfigService
     const requestId = expressContext.req['id'] || randomUUID();
     const requestContext = expressContext.req.headers['context'] as string;
     const jwt = expressContext.req.headers['authorization'] as string;
-    if (requestContext) return JSON.parse(requestContext);
+    if (requestContext)
+      return { userPayload: JSON.parse(requestContext), requestId };
     if (jwt) {
       const verifier = CognitoJwtVerifier.create({
         userPoolId: this.awsCfg.userPoolId!,
