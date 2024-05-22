@@ -2,7 +2,8 @@ import { ObjectType, Field } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
 import {
   GraphQLEmailAddress,
-  GraphQLPhoneNumber, GraphQLURL,
+  GraphQLPhoneNumber,
+  GraphQLURL,
   GraphQLUUID,
 } from 'graphql-scalars';
 import {
