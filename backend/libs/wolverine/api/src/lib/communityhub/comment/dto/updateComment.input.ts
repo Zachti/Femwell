@@ -1,9 +1,15 @@
-import { InputType, PickType } from '@nestjs/graphql';
-import { Comment } from '../entities/comment.entity';
+import { Field, InputType } from '@nestjs/graphql';
+import { GraphQLPositiveInt, GraphQLUUID } from 'graphql-scalars';
+import { GraphQLString } from 'graphql/type';
 
 @InputType()
-export class UpdateCommentInput extends PickType(Comment, [
-  'id',
-  'content',
-  'postId',
-]) {}
+export class UpdateCommentInput {
+  @Field(() => GraphQLPositiveInt)
+  id!: number;
+
+  @Field(() => GraphQLString)
+  content!: string;
+
+  @Field(() => GraphQLUUID)
+  postId!: string;
+}

@@ -26,6 +26,7 @@ export class QuestionnaireService {
       const responsesData = input.responses.map((response) => ({
         question: response.question,
         answer: response.answer || '',
+        questionnaireId: response.questionnaireId,
       }));
       const result = await this.prisma.questionnaire.create({
         data: {

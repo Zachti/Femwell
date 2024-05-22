@@ -1,9 +1,15 @@
-import { InputType, PickType } from '@nestjs/graphql';
-import { Post } from '../entities/post.entity';
+import { Field, InputType } from '@nestjs/graphql';
+import { GraphQLUUID } from 'graphql-scalars';
+import { GraphQLString } from 'graphql/type';
 
 @InputType()
-export class UpdatePostInput extends PickType(Post, [
-  'id',
-  'content',
-  'userId',
-]) {}
+export class UpdatePostInput {
+  @Field(() => GraphQLUUID)
+  id!: string;
+
+  @Field(() => GraphQLString)
+  content!: string;
+
+  @Field(() => GraphQLUUID)
+  userId!: string;
+}

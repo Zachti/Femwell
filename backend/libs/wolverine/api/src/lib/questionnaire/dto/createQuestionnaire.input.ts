@@ -1,12 +1,16 @@
-import { InputType, Field, PickType } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
-import { Questionnaire } from '../entities/questionnaire.entity';
+import { GraphQLUUID } from 'graphql-scalars';
+import { ResponseInput } from './createResponse.input';
 
 @InputType()
-export class CreateQuestionnaireInput extends PickType(Questionnaire, [
-  'userId',
-  'responses',
-]) {
+export class CreateQuestionnaireInput {
   @Field(() => GraphQLString, { description: 'Username of the respondent' })
   username!: string;
+
+  @Field(() => GraphQLUUID)
+  userId!: string;
+
+  @Field(() => [ResponseInput])
+  responses!: ResponseInput[];
 }

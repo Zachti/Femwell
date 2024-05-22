@@ -1,9 +1,15 @@
-import { InputType, PickType } from '@nestjs/graphql';
-import { Like } from '../entities/like.entity';
+import { Field, InputType } from '@nestjs/graphql';
+import { GraphQLString } from 'graphql/type';
+import { GraphQLUUID } from 'graphql-scalars';
 
 @InputType()
-export class CreateLikeInput extends PickType(Like, [
-  'username',
-  'postId',
-  'userId',
-]) {}
+export class CreateLikeInput {
+  @Field(() => GraphQLString)
+  username!: string;
+
+  @Field(() => GraphQLUUID)
+  userId!: string;
+
+  @Field(() => GraphQLUUID)
+  postId!: string;
+}

@@ -1,9 +1,11 @@
-import { InputType, Field, PickType } from '@nestjs/graphql';
+import { InputType, Field } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
-import { LiveChat } from '../entities/liveChat.entity';
 
 @InputType()
-export class CreateLiveChatDto extends PickType(LiveChat, ['name']) {
+export class CreateLiveChatDto {
   @Field(() => [GraphQLString])
   userIds!: string[];
+
+  @Field(() => GraphQLString, { nullable: true }) // title of the live chat
+  name!: string;
 }

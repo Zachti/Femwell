@@ -1,6 +1,7 @@
 import { gql, GraphQLClient, Variables } from 'graphql-request';
 import { GraphQLError } from 'graphql/index';
 import { LoggerService } from '@backend/logger';
+import { mutationType } from './enums';
 
 const createUserMutation = gql`
   mutation createUser($createUserInput: CreateUserInput!) {
@@ -18,11 +19,14 @@ const deleteUserMutation = gql`
 `;
 
 export function getSdk(client: GraphQLClient) {
-  const getWolverineMutation = (mutation: string, logger: LoggerService) => {
+  const getWolverineMutation = (
+    mutation: mutationType,
+    logger: LoggerService,
+  ) => {
     switch (mutation) {
-      case 'create':
+      case mutationType.create:
         return createUserMutation;
-      case 'delete':
+      case mutationType.delete:
         return deleteUserMutation;
       default:
         logger.error(`Not Allowed mutation: ${mutation}.`);
@@ -35,7 +39,7 @@ export function getSdk(client: GraphQLClient) {
   };
 
   const sendWolverineMutation = async (
-    mutation: string,
+    mutation: mutationType,
     args: Variables,
     logger: LoggerService,
   ) => {
@@ -45,6 +49,7 @@ export function getSdk(client: GraphQLClient) {
     } catch (e) {
       logger.error(
         ` Couldn't ${mutation} user at wolverine DB. user args: ${args}`,
+        { e },
       );
       throw new GraphQLError(
         ` Couldn't ${mutation} user at wolverine DB. user args: ${args}`,

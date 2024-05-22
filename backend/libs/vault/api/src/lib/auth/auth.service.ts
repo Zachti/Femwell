@@ -15,9 +15,9 @@ import { Role } from '@backend/infrastructure';
 import { InjectCognitoToken } from './providers/cognito.provider';
 import { signUpUser, userSession } from './interfaces/inrefaces';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
-import { awsConfig } from '@backend/config';
+import { awsConfig, commonConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
-import { InjectWolverineSdk, Sdk } from '../wolverine-datasource';
+import { InjectWolverineSdk, Sdk, mutationType } from '../wolverine-datasource';
 
 @Injectable()
 export class AuthService {
@@ -29,6 +29,8 @@ export class AuthService {
     private readonly logger: LoggerService,
     @Inject(awsConfig.KEY)
     private readonly awsCfg: ConfigType<typeof awsConfig>,
+    @Inject(commonConfig.KEY)
+    private readonly cfg: ConfigType<typeof commonConfig>,
   ) {}
 
   registerUser(registerRequest: RegisterRequest): Promise<signUpUser> {
@@ -58,12 +60,14 @@ export class AuthService {
             );
             const id = result.userSub;
             await this.wolverineSdk.sendWolverineMutation(
-              'create',
+              mutationType.create,
               {
-                email,
-                cognitoUserId: id,
-                profileUsername,
-                phoneNumber,
+                createUserInput: {
+                  email,
+                  cognitoUserId: id,
+                  profileUsername,
+                  phoneNumber,
+                },
               },
               this.logger,
             );
@@ -154,7 +158,7 @@ export class AuthService {
     };
 
     const cognito = new CognitoIdentityProvider(
-      this.awsCfg.localDevConfigOverride,
+      this.cfg.isLiveEnv ? this.awsCfg.localDevConfigOverride : {},
     );
 
     const userData = await cognito.adminGetUser(deleteUserData);
@@ -168,7 +172,11 @@ export class AuthService {
         this.logger.info(
           `${deleteUserRequest.email} account deleted from cognito.`,
         );
-        this.wolverineSdk.sendWolverineMutation('delete', { id }, this.logger);
+        this.wolverineSdk.sendWolverineMutation(
+          mutationType.delete,
+          { id },
+          this.logger,
+        );
         resolve('User deleted successfully!');
       });
     });
