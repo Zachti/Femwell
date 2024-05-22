@@ -1,14 +1,21 @@
-import { Field, InputType, PickType } from '@nestjs/graphql';
-import { User } from '../entities/user.entity';
+import { Field, InputType } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
+import { GraphQLPhoneNumber, GraphQLURL, GraphQLUUID } from 'graphql-scalars';
 
 @InputType()
-export class UpdateUserInput extends PickType(User, [
-  'id',
-  'username',
-  'phoneNumber',
-  'profilePic',
-]) {
+export class UpdateUserInput {
+  @Field(() => GraphQLUUID)
+  id!: string;
+
+  @Field(() => GraphQLString)
+  username!: string;
+
+  @Field(() => [GraphQLURL], { nullable: true })
+  profilePic?: URL;
+
+  @Field(() => GraphQLPhoneNumber, { nullable: true })
+  phoneNumber?: string;
+
   @Field(() => GraphQLString, {
     description: 'The new username of the user',
   })

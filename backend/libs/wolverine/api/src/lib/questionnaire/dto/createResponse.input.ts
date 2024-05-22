@@ -1,5 +1,11 @@
-import { InputType, PickType } from '@nestjs/graphql';
-import { Response } from '../entities/response.entity';
+import { Field, InputType } from '@nestjs/graphql';
+import { GraphQLString } from 'graphql/type';
 
 @InputType()
-export class ResponseInput extends PickType(Response, ['question', 'answer']) {}
+export class ResponseInput {
+  @Field(() => GraphQLString)
+  question!: string;
+
+  @Field(() => GraphQLString, { nullable: true })
+  answer?: string;
+}
