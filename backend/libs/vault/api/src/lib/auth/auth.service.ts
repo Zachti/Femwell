@@ -60,10 +60,12 @@ export class AuthService {
             await this.wolverineSdk.sendWolverineMutation(
               'create',
               {
-                email,
-                cognitoUserId: id,
-                profileUsername,
-                phoneNumber,
+                createUserInput: {
+                  email,
+                  cognitoUserId: id,
+                  profileUsername,
+                  phoneNumber,
+                },
               },
               this.logger,
             );
