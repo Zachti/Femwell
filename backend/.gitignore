@@ -56,3 +56,4 @@ apps/vt
 *.key
 
 .nx/cache
+development/deployEcrImages.sh
