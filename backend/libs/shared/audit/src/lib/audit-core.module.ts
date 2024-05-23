@@ -8,7 +8,6 @@ import { AUDIT_STORE_PROVIDER } from './constants';
 import { ConfigType } from '@nestjs/config';
 import { awsConfig, commonConfig } from '@backend/config';
 import { Kinesis } from '@aws-sdk/client-kinesis';
-import { fromEnv } from '@aws-sdk/credential-providers';
 
 @Global()
 @Module({
@@ -20,9 +19,9 @@ import { fromEnv } from '@aws-sdk/credential-providers';
         awsCfg: ConfigType<typeof awsConfig>,
         config: ConfigType<typeof commonConfig>,
       ) => {
-        return config.isLiveEnv
-          ? {}
-          : new Kinesis(awsCfg.localDevConfigOverride);
+        return new Kinesis(
+          config.isLiveEnv ? {} : awsCfg.localDevConfigOverride,
+        );
       },
       inject: [awsConfig.KEY, commonConfig.KEY],
     },
