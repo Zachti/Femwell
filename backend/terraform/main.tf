@@ -115,22 +115,22 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   }
 }
 
-# resource "aws_s3_bucket" "kinesis" {
-#   bucket = "auditLogs"
-#   acl    = "private"
-# }
+resource "aws_s3_bucket" "kinesis" {
+  bucket = "auditLogs"
+  acl    = "private"
+}
 
-# resource "aws_kinesis_firehose_delivery_stream" "audit_logs_stream" {
-#   name        = "audit-logs-stream"
-#   destination = "extended_s3"
+resource "aws_kinesis_firehose_delivery_stream" "audit_logs_stream" {
+  name        = "audit-logs-stream"
+  destination = "extended_s3"
 
-#   extended_s3_configuration {
-#     role_arn   = data.aws_iam_role.existing.arn
-#     bucket_arn = aws_s3_bucket.kinesis.arn
-#     buffer_size = 1
-#     buffer_interval = 60
-#   }
-# }
+  extended_s3_configuration {
+    role_arn   = data.aws_iam_role.existing.arn
+    bucket_arn = aws_s3_bucket.kinesis.arn
+    buffer_size = 1
+    buffer_interval = 60
+  }
+}
 
 # resource "aws_elasticache_cluster" "wolverineCache" {
 #   cluster_id           = "wolverine-cluster"
@@ -142,15 +142,15 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
 #   port                 = 6379
 # }
 
-resource "aws_elasticache_cluster" "wolverineCache" {
-  cluster_id           = "wolverine-cluster"
-  engine               = "redis"
-  node_type            = "cache.m4.large"
-  num_cache_nodes      = 1
-  parameter_group_name = "default.redis3.2"
-  engine_version       = "3.2.10"
-  port                 = 6379
-}
+# resource "aws_elasticache_cluster" "wolverineCache" {
+#   cluster_id           = "wolverine-cluster"
+#   engine               = "redis"
+#   node_type            = "cache.m4.large"
+#   num_cache_nodes      = 1
+#   parameter_group_name = "default.redis3.2"
+#   engine_version       = "3.2.10"
+#   port                 = 6379
+# }
 
 resource "aws_cloudwatch_log_group" "femwell_task_log_group" {
   name = "/ecs/femwell-task"
@@ -467,7 +467,8 @@ resource "aws_ecs_task_definition" "vault_task" {
         },
         {
           name  = "STREAM_ARN"
-          value = var.STREAM_ARN
+          value = aws_kinesis_firehose_delivery_stream.audit_logs_stream.arn
+          # value = var.STREAM_ARN
         },
         {
           name  = "COGNITO_USER_POOL_ID"
@@ -694,7 +695,7 @@ module "vpc" {
 
   resource "aws_db_subnet_group" "aurora_subnet_group" {
   name       = "aurora-subnet-group"
-  subnet_ids = module.vpc.private_subnets
+  subnet_ids = module.vpc.public_subnets
 
   tags = {
     Name = "aurora-subnet-group"
@@ -703,14 +704,13 @@ module "vpc" {
 
 resource "aws_security_group" "aurora_security_group" {
   name        = "aurora-security-group"
-  description = "Allow inbound traffic from ALB"
   vpc_id      = module.vpc.vpc_id
 
   ingress {
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    security_groups = [aws_security_group.alb.id]
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -823,4 +823,8 @@ output "s3_endpoint" {
 
 output "aurora_endpoint" {
   value = aws_rds_cluster.aurora_cluster.endpoint
+}
+output "kinses_Arn"{
+  value = aws_kinesis_firehose_delivery_stream.audit_logs_stream.arn
+
 }
