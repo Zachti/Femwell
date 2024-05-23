@@ -69,45 +69,11 @@ import useShowToast from "./useShowToast";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { print } from "graphql";
-import { gql } from "@apollo/client";
-
-const REGISTER_REQUEST_MUTATION = gql`
-  mutation Register($registerRequest: RegisterRequest!) {
-    register(registerRequest: $registerRequest) {
-      id
-    }
-  }
-`;
-
-const CONFIRM_USER_MUTATION = gql`
-  mutation Confirm($confirmUserRequest: ConfirmUserRequest!) {
-    confirm(confirmUserRequest: $confirmUserRequest) {
-      id
-      jwt
-      refreshToken
-      username
-    }
-  }
-`;
-
-//this needs to have pfpURL and comments to have their usernames
-const GET_USER_PROFILE_QUERY = gql`
-  query GetUserProfile($id: ID!) {
-    oneUser(id: $id) {
-      username
-      posts {
-        username
-        content
-        comments {
-          content
-          postId
-        }
-      }
-      phoneNumber
-      readLater
-    }
-  }
-`;
+import {
+  CONFIRM_USER_MUTATION,
+  REGISTER_REQUEST_MUTATION,
+} from "../utils/vaultRequests";
+import { GET_USER_PROFILE_QUERY } from "../utils/wolverineRequests";
 
 const useSignupEmailPassword = () => {
   const loginUser = userAuthStore((state) => state.login);

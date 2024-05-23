@@ -1,72 +1,73 @@
-const REGISTER_REQUEST_MUTATION = gql`
-    mutation Register($registerRequest: RegisterRequest!) {
-        register(registerRequest: $registerRequest) {
-            id
-        }
+import { gql } from "@apollo/client";
+export const REGISTER_REQUEST_MUTATION = gql`
+  mutation Register($registerRequest: RegisterRequest!) {
+    register(registerRequest: $registerRequest) {
+      id
     }
+  }
 `;
 
-const CONFIRM_USER_MUTATION = gql`
-    mutation Confirm($confirmUserRequest: ConfirmUserRequest!) {
-        confirm(confirmUserRequest: $confirmUserRequest) {
-            id
-            jwt
-            refreshToken
-            username
-        }
+export const CONFIRM_USER_MUTATION = gql`
+  mutation Confirm($confirmUserRequest: ConfirmUserRequest!) {
+    confirm(confirmUserRequest: $confirmUserRequest) {
+      id
+      jwt
+      refreshToken
+      username
     }
+  }
 `;
 
-const LOGIN_MUTATION = gql`
-    mutation Login($authenticateRequest: AuthenticateRequest!) {
-        login(authenticateRequest: $authenticateRequest) {
-            id
-            email
-            jwt
-            refreshToken
-            isValid
-        }
+export const LOGIN_MUTATION = gql`
+  mutation Login($authenticateRequest: AuthenticateRequest!) {
+    login(authenticateRequest: $authenticateRequest) {
+      id
+      email
+      jwt
+      refreshToken
+      isValid
     }
+  }
 `;
 
-const SEND_CONFIRMATION_CODE_MUTATION = gql`
-    mutation SendConfirmationCode($email: String!) {
-        sendConfirmationCode(email: $email)
-    }
+export const SEND_CONFIRMATION_CODE_MUTATION = gql`
+  mutation SendConfirmationCode($email: String!) {
+    sendConfirmationCode(email: $email)
+  }
 `;
 
-const DELETE_USER_MUTATION = gql`
-    mutation DeleteUser($deleteUserRequest: DeleteUserRequest!) {
-        delete(deleteUserRequest: $deleteUserRequest)
-    }
+export const DELETE_USER_MUTATION = gql`
+  mutation DeleteUser($deleteUserRequest: DeleteUserRequest!) {
+    delete(deleteUserRequest: $deleteUserRequest)
+  }
 `;
 
 // dtos -
 
 interface AuthenticateRequest {
-    username: string;
+  username: string;
 
-    password: string;
+  password: string;
 }
 
 interface RegisterRequest {
-    profileUsername: string;
+  profileUsername: string;
 
-    email: string;
+  email: string;
 
-    password: string;
+  password: string;
 
-    phoneNumber?: string;
+  phoneNumber?: string;
 }
 
 interface ConfirmUserRequest {
-    code: string;
+  code: string;
 
-    email: string;
+  email: string;
 
-    password: string;
+  password: string;
 }
 
 interface DeleteUserRequest {
-    email: string;
+  email: string;
 }
