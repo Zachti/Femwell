@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserInput, UpdateUserInput } from '../../index';
 import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
-import { ErrorService } from '../error/error.service';
 import { User } from '@prisma/client';
-import { InternalServerError, NotFoundError } from '../error/customErrors';
+import { ErrorService } from '../error/error.service';
 
 @Injectable()
 export class UserService {
@@ -30,7 +33,7 @@ export class UserService {
       this.logger.info(`User created successfully with id: ${result.id}.`);
       return result;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -53,7 +56,7 @@ export class UserService {
       );
       return result;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 
@@ -64,7 +67,7 @@ export class UserService {
       this.logger.info(`User deleted successfully with id: ${id}.`);
       return result;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 
@@ -92,7 +95,7 @@ export class UserService {
       this.logger.info(`Successfully retrieved ${result.length} users.`);
       return result;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 
@@ -121,7 +124,7 @@ export class UserService {
       this.logger.info('User found successfully.');
       return result;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 }

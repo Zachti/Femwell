@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../shared/prisma/prisma.service';
 import { ErrorService } from '../shared/error/error.service';
 import { LoggerService } from '@backend/logger';
 import { LiveChat, Message } from '@prisma/client';
-import {
-  InternalServerError,
-  NotFoundError,
-} from '../shared/error/customErrors';
 import { CacheService } from '@backend/infrastructure';
 
 @Injectable()
@@ -29,10 +29,10 @@ export class LiveChatService {
             users: true,
             messages: true,
           },
-        })
+        });
       });
     } catch (e) {
-      this.error.handleError(new NotFoundError()) ;
+      this.error.handleError(new NotFoundException(e));
     }
   }
 
@@ -53,7 +53,7 @@ export class LiveChatService {
       await this.cacheService.set(`${res.id}`, res);
       return res;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -80,7 +80,7 @@ export class LiveChatService {
       this.logger.info(`Padulla added to LiveChat. Padulla id: ${padullaId}`);
       return res;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -133,7 +133,7 @@ export class LiveChatService {
       await this.cacheService.del(`${liveChatId}_messages`);
       return res;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -170,7 +170,7 @@ export class LiveChatService {
       this.logger.info(`LiveChat deleted: ${JSON.stringify(res)}`);
       return res;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 

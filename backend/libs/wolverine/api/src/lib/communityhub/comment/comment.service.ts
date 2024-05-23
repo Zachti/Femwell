@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateCommentInput, UpdateCommentInput } from '../../index';
 import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { ErrorService } from '../../shared/error/error.service';
 import { Comment } from '@prisma/client';
-import {
-  InternalServerError,
-  NotFoundError,
-} from '../../shared/error/customErrors';
 
 @Injectable()
 export class CommentService {
@@ -30,7 +30,7 @@ export class CommentService {
       this.logger.info(`Comment created successfully with id: ${result.id}.`);
       return result;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -46,7 +46,7 @@ export class CommentService {
       this.logger.info(`Comment with id: ${input.id} updated successfully`);
       return result;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 
@@ -59,7 +59,7 @@ export class CommentService {
       this.logger.info(`Comment deleted successfully with id: ${id}.`);
       return result;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 
@@ -70,7 +70,7 @@ export class CommentService {
       this.logger.info(`Successfully retrieved ${result.length} comments.`);
       return result;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 }

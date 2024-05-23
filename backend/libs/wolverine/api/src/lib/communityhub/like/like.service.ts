@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateLikeInput } from '../../index';
 import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { ErrorService } from '../../shared/error/error.service';
 import { Like } from '@prisma/client';
-import {
-  InternalServerError,
-  NotFoundError,
-} from '../../shared/error/customErrors';
 
 @Injectable()
 export class LikeService {
@@ -29,7 +29,7 @@ export class LikeService {
       this.logger.info(`Like created successfully with id: ${result.id}.`);
       return result;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -39,12 +39,13 @@ export class LikeService {
       const result = await this.prisma.like.deleteMany({
         where: { postId, userId },
       });
-      if (result.count !== 0) {
+      if (result.count) {
         this.logger.info(`Like deleted successfully on post: ${postId}.`);
         return true;
       }
+      return false;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -55,7 +56,7 @@ export class LikeService {
       this.logger.info(`Successfully retrieved ${result.length} likes.`);
       return result;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 }

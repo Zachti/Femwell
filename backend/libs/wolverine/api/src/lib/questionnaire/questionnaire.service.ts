@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateQuestionnaireInput } from './dto/createQuestionnaire.input';
 import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../shared/prisma/prisma.service';
-import { ErrorService } from '../shared/error/error.service';
-import {
-  InternalServerError,
-  NotFoundError,
-} from '../shared/error/customErrors';
 import { Questionnaire } from '@prisma/client';
+import { ErrorService } from '../shared/error/error.service';
 
 @Injectable()
 export class QuestionnaireService {
@@ -46,7 +46,7 @@ export class QuestionnaireService {
       );
       return result;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -59,7 +59,7 @@ export class QuestionnaireService {
       );
       return result;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -73,7 +73,7 @@ export class QuestionnaireService {
       this.logger.info('Questionnaire found successfully.');
       return result;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 
@@ -90,7 +90,7 @@ export class QuestionnaireService {
       this.logger.error(
         `Failed to find questionnaire with for the user: ${userId}, possibly haven't created one.`,
       );
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 }

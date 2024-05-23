@@ -1,13 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreatePostInput, UpdatePostInput } from '../../index';
 import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { ErrorService } from '../../shared/error/error.service';
 import { Post } from '@prisma/client';
-import {
-  InternalServerError,
-  NotFoundError,
-} from '../../shared/error/customErrors';
 
 @Injectable()
 export class PostService {
@@ -29,7 +29,7 @@ export class PostService {
       this.logger.info(`Post created successfully with id: ${result.id}.`);
       return result;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -43,7 +43,7 @@ export class PostService {
       this.logger.info(`Post with id: ${input.id} updated successfully`);
       return result;
     } catch (e) {
-      this.error.handleError(new InternalServerError());
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 
@@ -54,7 +54,7 @@ export class PostService {
       this.logger.info(`Post deleted successfully with id: ${id}.`);
       return result;
     } catch (e) {
-      this.error.handleError(new NotFoundError());
+      this.error.handleError(new NotFoundException(e));
     }
   }
 }

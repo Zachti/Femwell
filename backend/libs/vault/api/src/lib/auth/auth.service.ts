@@ -59,18 +59,24 @@ export class AuthService {
               `user created in cognito user pool: ${this.userPool.getUserPoolId()}`,
             );
             const id = result.userSub;
-            await this.wolverineSdk.sendWolverineMutation(
-              mutationType.create,
-              {
-                createUserInput: {
-                  email,
-                  cognitoUserId: id,
-                  profileUsername,
-                  phoneNumber,
+            try {
+              await this.wolverineSdk.sendWolverineMutation(
+                mutationType.create,
+                {
+                  createUserInput: {
+                    email,
+                    cognitoUserId: id,
+                    profileUsername,
+                    phoneNumber,
+                  },
                 },
-              },
-              this.logger,
-            );
+                this.logger,
+              );
+            } catch (e: any) {
+              this.logger.error(e.message);
+              await this.deleteUser({ email });
+              reject(e);
+            }
             await this.sendConfirmationCode(email);
             resolve({
               email,
