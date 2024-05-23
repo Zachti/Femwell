@@ -18,6 +18,8 @@ import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provid
 import { awsConfig, commonConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
 import { InjectWolverineSdk, Sdk, mutationType } from '../wolverine-datasource';
+import {randomUUID} from "node:crypto";
+import {AuditService, InjectAuditService} from "@backend/auditService";
 
 @Injectable()
 export class AuthService {
@@ -31,6 +33,7 @@ export class AuthService {
     private readonly awsCfg: ConfigType<typeof awsConfig>,
     @Inject(commonConfig.KEY)
     private readonly cfg: ConfigType<typeof commonConfig>,
+    @InjectAuditService('auth') private readonly auditService: AuditService,
   ) {}
 
   registerUser(registerRequest: RegisterRequest): Promise<signUpUser> {
@@ -78,6 +81,10 @@ export class AuthService {
               reject(e);
             }
             await this.sendConfirmationCode(email);
+            await this.sendAuditLog({
+              email,
+              id,
+            } , 'registration');
             resolve({
               email,
               id,
@@ -164,7 +171,7 @@ export class AuthService {
     };
 
     const cognito = new CognitoIdentityProvider(
-      this.cfg.isLiveEnv ? this.awsCfg.localDevConfigOverride : {},
+      this.cfg.isLiveEnv ? {} : this.awsCfg.localDevConfigOverride,
     );
 
     const userData = await cognito.adminGetUser(deleteUserData);
@@ -173,18 +180,36 @@ export class AuthService {
     )?.Value;
 
     return new Promise((resolve, reject) => {
-      return cognito.adminDeleteUser(deleteUserData, (err: any) => {
+      return cognito.adminDeleteUser(deleteUserData, async (err: any) => {
         if (err) reject(err);
         this.logger.info(
           `${deleteUserRequest.email} account deleted from cognito.`,
         );
-        this.wolverineSdk.sendWolverineMutation(
+        await this.wolverineSdk.sendWolverineMutation(
           mutationType.delete,
           { id },
           this.logger,
         );
+        await this.sendAuditLog({id, email: deleteUserRequest.email}, 'delete');
         resolve('User deleted successfully!');
       });
+    });
+  }
+
+  private async sendAuditLog(user: {id: string | undefined , email: string}, eventType: string): Promise<string> {
+    return this.auditService.auditEvent({
+      trigger: {
+        id: { type: 'email', value: user.email },
+        type: 'External',
+      },
+      subject: {
+        type: 'auth',
+        id: `${user.id ?? randomUUID()}`,
+        event: {
+          type: eventType,
+          metaData: { user },
+        },
+      },
     });
   }
 }
