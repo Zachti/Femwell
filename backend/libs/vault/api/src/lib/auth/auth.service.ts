@@ -18,8 +18,8 @@ import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provid
 import { awsConfig, commonConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
 import { InjectWolverineSdk, Sdk, mutationType } from '../wolverine-datasource';
-import {randomUUID} from "node:crypto";
-import {AuditService, InjectAuditService} from "@backend/auditService";
+import { randomUUID } from 'node:crypto';
+import { AuditService, InjectAuditService } from '@backend/auditService';
 
 @Injectable()
 export class AuthService {
@@ -81,10 +81,13 @@ export class AuthService {
               reject(e);
             }
             await this.sendConfirmationCode(email);
-            await this.sendAuditLog({
-              email,
-              id,
-            } , 'registration');
+            await this.sendAuditLog(
+              {
+                email,
+                id,
+              },
+              'registration',
+            );
             resolve({
               email,
               id,
@@ -190,13 +193,19 @@ export class AuthService {
           { id },
           this.logger,
         );
-        await this.sendAuditLog({id, email: deleteUserRequest.email}, 'delete');
+        await this.sendAuditLog(
+          { id, email: deleteUserRequest.email },
+          'delete',
+        );
         resolve('User deleted successfully!');
       });
     });
   }
 
-  private async sendAuditLog(user: {id: string | undefined , email: string}, eventType: string): Promise<string> {
+  private async sendAuditLog(
+    user: { id: string | undefined; email: string },
+    eventType: string,
+  ): Promise<string> {
     return this.auditService.auditEvent({
       trigger: {
         id: { type: 'email', value: user.email },
