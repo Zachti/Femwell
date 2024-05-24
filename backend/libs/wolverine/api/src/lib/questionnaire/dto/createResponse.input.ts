@@ -8,7 +8,4 @@ export class ResponseInput {
 
   @Field(() => GraphQLString, { nullable: true })
   answer?: string;
-
-  @Field(() => GraphQLString)
-  questionnaireId!: string;
 }
