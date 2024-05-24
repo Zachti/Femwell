@@ -13,7 +13,7 @@ export const CREATE_USER_MUTATION = gql`
 
 //this needs to have pfpURL and comments to have their usernames
 export const GET_USER_PROFILE_QUERY = gql`
-  query GetUserProfile($id: ID!) {
+  query GetUserProfile($id: UUID!) {
     oneUser(id: $id) {
       username
       posts {
@@ -110,10 +110,8 @@ export const CREATE_QUESTIONNAIRE_MUTATION = gql`
       id
       userId
       responses {
-        id
         question
         answer
-        questionnaireId
       }
     }
   }
@@ -128,7 +126,6 @@ export const FIND_ALL_QUESTIONNAIRES_QUERY = gql`
         id
         question
         answer
-        questionnaireId
       }
     }
   }
@@ -143,7 +140,6 @@ export const FIND_ONE_QUESTIONNAIRE_QUERY = gql`
         id
         question
         answer
-        questionnaireId
       }
     }
   }

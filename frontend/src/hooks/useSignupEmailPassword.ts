@@ -4,7 +4,7 @@
 // import { set } from "date-fns";
 import userAuthStore from "../store/authStore";
 import useShowToast from "./useShowToast";
-// import { Response } from "../models/reponse.model";
+import { Response } from "../models/reponse.model";
 
 // const useSignupEmailPassword = () => {
 //   const [createUserWithEmailAndPassword, , isSigningUp, errorSU] =
@@ -67,13 +67,16 @@ import useShowToast from "./useShowToast";
 // export default useSignupEmailPassword;
 
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { print } from "graphql";
 import {
   CONFIRM_USER_MUTATION,
   REGISTER_REQUEST_MUTATION,
 } from "../utils/vaultRequests";
-import { GET_USER_PROFILE_QUERY } from "../utils/wolverineRequests";
+import {
+  CREATE_QUESTIONNAIRE_MUTATION,
+  GET_USER_PROFILE_QUERY,
+} from "../utils/wolverineRequests";
 
 const useSignupEmailPassword = () => {
   const loginUser = userAuthStore((state) => state.login);
@@ -84,9 +87,12 @@ const useSignupEmailPassword = () => {
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [createQuestionnaireInput, setDtoQuestionnaire] = useState({});
   const [showEmailVerifyPage, setShowEmailVerifyPage] = useState(false);
 
   const signup = async (data: any) => {
+    console.log("Signup invoked");
+    setIsSigningUp(true);
     if (
       !data.email ||
       !data.username ||
@@ -94,11 +100,12 @@ const useSignupEmailPassword = () => {
       !data.confirmPassword
     ) {
       showToast("Error", "Please enter all required fields", "error");
+      setIsSigningUp(false);
       return false;
     }
     setEmail(data.email);
     setPassword(data.password);
-    setIsSigningUp(true);
+
     const registerRequest = {
       profileUsername: data.username,
       email: data.email,
@@ -115,12 +122,24 @@ const useSignupEmailPassword = () => {
         },
       );
 
-      if (registerResponse.status !== 200) {
-        throw new Error("Failed to create user in vault");
+      const registerResult = await registerResponse.data;
+      console.log("registerResult", registerResult);
+      console.log("--------------------");
+
+      let questionnaire = {};
+      if (
+        data.responses.some((response: Response) => response.answer) &&
+        registerResponse.data
+      ) {
+        questionnaire = {
+          username: data.username,
+          responses: data.responses,
+          userId: registerResult.data.register.id,
+        };
+        setDtoQuestionnaire(questionnaire);
       }
 
       setShowEmailVerifyPage(true);
-      console.log("HERE", registerResponse.data);
     } catch (error: any) {
       showToast("Error", "User creation failed", "error");
       setShowEmailVerifyPage(false);
@@ -132,48 +151,67 @@ const useSignupEmailPassword = () => {
   const handleVerification = async (code: string) => {
     setIsConfirmingCode(true);
     try {
+      const confirmUserRequest = {
+        code,
+        email,
+        password,
+      };
+      console.log("confirmUserRequest", confirmUserRequest);
+
       const confirmUserResponse = await axios.post(
         `${import.meta.env.VITE_VAULT_ENDPOINT}/graphql`,
         {
           query: print(CONFIRM_USER_MUTATION),
-          variables: {
-            confirmUserRequest: { code, email, password },
+          variables: { confirmUserRequest },
+        },
+      );
+
+      const confirmResult = await confirmUserResponse.data;
+      console.log("confirmUserResponse", confirmResult);
+      console.log("--------------------");
+
+      if (createQuestionnaireInput) {
+        console.log("createQuestionnaireInput", createQuestionnaireInput);
+        const setQuesionnaireResponse = await axios.post(
+          `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+          {
+            query: print(CREATE_QUESTIONNAIRE_MUTATION),
+            variables: { createQuestionnaireInput },
+          },
+          {
+            headers: {
+              authorization: confirmResult.data.confirm.jwt,
+            },
+          },
+        );
+
+        const questionnaireResult = await setQuesionnaireResponse.data;
+        console.log("questionnaireResult", questionnaireResult);
+        console.log("--------------------");
+      }
+
+      console.log("user id", confirmResult.data.confirm.id);
+      const getUserResponse = await axios.get(
+        `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+        {
+          params: {
+            query: print(GET_USER_PROFILE_QUERY),
+            variables: { UUID: { id: confirmResult.data.confirm.id } },
+          },
+          headers: {
+            authorization: confirmResult.data.confirm.jwt,
           },
         },
       );
 
-      if (confirmUserResponse.status !== 200) {
-        showToast("Error", "invalid code", "error");
-        throw new Error("Failed to verify user in vault");
-      }
-
-      const confirmResult = await confirmUserResponse.data;
-
-      const getUserResponse = await axios({
-        method: "get",
-        url: `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
-        headers: {
-          authorization: `Bearer ${confirmResult.jwt}`,
-        },
-        data: {
-          query: print(GET_USER_PROFILE_QUERY),
-          variables: {
-            ID: { id: confirmResult.id },
-          },
-        },
-      });
-
-      if (getUserResponse.status !== 200) {
-        throw new Error("Unexpected error");
-      }
-
       const userResult = await getUserResponse.data;
-      console.log(userResult);
-
-      if (userResult) {
-        localStorage.setItem("user", JSON.stringify(userResult));
-        loginUser(userResult);
-      }
+      console.log("userResult", userResult);
+      console.log("userResult.data", userResult.data);
+      console.log("--------------------");
+      // if (userResult) {
+      //   localStorage.setItem("user", JSON.stringify(userResult));
+      //   loginUser(userResult);
+      // }
 
       setShowEmailVerifyPage(false);
       return true;
@@ -183,7 +221,6 @@ const useSignupEmailPassword = () => {
     } finally {
       setIsSigningUp(false);
       setIsConfirmingCode(false);
-      setShowEmailVerifyPage(false);
       return false;
     }
   };

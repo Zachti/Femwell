@@ -13,7 +13,6 @@ export const CONFIRM_USER_MUTATION = gql`
       id
       jwt
       refreshToken
-      username
     }
   }
 `;
