@@ -8,7 +8,6 @@ import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../shared/prisma/prisma.service';
 import { Questionnaire } from '@prisma/client';
 import { ErrorService } from '../shared/error/error.service';
-import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class QuestionnaireService {
@@ -24,15 +23,12 @@ export class QuestionnaireService {
       this.logger.info(
         `Creating new questionnaire for user: ${input.username}.`,
       );
-      const id = randomUUID();
       const responsesData = input.responses.map((response) => ({
         question: response.question,
         answer: response.answer || '',
-        questionnaireId: id,
       }));
       const result = await this.prisma.questionnaire.create({
         data: {
-          id,
           userId: input.userId,
           responses: {
             createMany: {
