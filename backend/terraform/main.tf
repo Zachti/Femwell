@@ -115,22 +115,20 @@ resource "aws_rds_cluster_instance" "aurora_instance" {
   }
 }
 
-resource "aws_s3_bucket" "kinesis" {
-  bucket = "auditLogs"
-  acl    = "private"
-}
+# resource "aws_s3_bucket" "kinesis" {
+#   bucket = "femwell-audit-logs"
+#   acl    = "private"
+# }
 
-resource "aws_kinesis_firehose_delivery_stream" "audit_logs_stream" {
-  name        = "audit-logs-stream"
-  destination = "extended_s3"
+# resource "aws_kinesis_firehose_delivery_stream" "audit_logs_stream" {
+#   name        = "audit-logs-stream"
+#   destination = "extended_s3"
 
-  extended_s3_configuration {
-    role_arn   = data.aws_iam_role.existing.arn
-    bucket_arn = aws_s3_bucket.kinesis.arn
-    buffer_size = 1
-    buffer_interval = 60
-  }
-}
+#   extended_s3_configuration {
+#     role_arn   = data.aws_iam_role.existing.arn
+#     bucket_arn = aws_s3_bucket.kinesis.arn
+#   }
+# }
 
 # resource "aws_elasticache_cluster" "wolverineCache" {
 #   cluster_id           = "wolverine-cluster"
@@ -467,8 +465,8 @@ resource "aws_ecs_task_definition" "vault_task" {
         },
         {
           name  = "STREAM_ARN"
-          value = aws_kinesis_firehose_delivery_stream.audit_logs_stream.arn
-          # value = var.STREAM_ARN
+          # value = aws_kinesis_firehose_delivery_stream.audit_logs_stream.arn
+          value = var.STREAM_ARN
         },
         {
           name  = "COGNITO_USER_POOL_ID"
@@ -824,7 +822,4 @@ output "s3_endpoint" {
 output "aurora_endpoint" {
   value = aws_rds_cluster.aurora_cluster.endpoint
 }
-output "kinses_Arn"{
-  value = aws_kinesis_firehose_delivery_stream.audit_logs_stream.arn
 
-}

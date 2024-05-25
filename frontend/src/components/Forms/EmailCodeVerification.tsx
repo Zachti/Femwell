@@ -24,7 +24,7 @@ const EmailCodeVerification: FC<EmailCodeVerificationProps> = ({
 }) => {
   const [code, setCode] = useState("");
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { onClose } = useDisclosure();
 
   return (
     <>

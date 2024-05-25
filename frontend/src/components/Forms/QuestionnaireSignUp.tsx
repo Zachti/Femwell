@@ -114,7 +114,7 @@ const QuestionnaireSignUp: FC<InputFormProps> = ({
   const handleCodeSubmit = async (code: string) => {
     const success = await handleVerification(code);
     if (success) onClose();
-    else goToPrevious();
+    else if (currentStep >= 2) goToPrevious();
   };
 
   return (
@@ -168,6 +168,7 @@ const QuestionnaireSignUp: FC<InputFormProps> = ({
                 question10: "",
               }}
               onSubmit={async (values) => {
+                console.log("formik submit");
                 goToNext();
                 const responses = Object.keys(values)
                   .filter((key) => key.startsWith("question")) // Only process keys that represent questions
