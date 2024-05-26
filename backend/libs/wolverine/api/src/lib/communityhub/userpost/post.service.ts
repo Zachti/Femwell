@@ -75,6 +75,10 @@ export class PostService {
           createdAt: 'desc', // Sort by createdAt in descending order fot the most recent posts
         },
         take: this.Cfg.postLimit, // Limit the result to 50 posts
+        include: {
+          comments: true,
+          likes: true,
+        },
       });
       this.logger.info('Posts fetched successfully.');
       return result;
