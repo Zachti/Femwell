@@ -21,4 +21,7 @@ export class Comment {
 
   @Field(() => GraphQLDate)
   createdAt!: Date;
+
+  @Field(() => GraphQLString, { nullable: true })
+  userProfilePic?: string;
 }
