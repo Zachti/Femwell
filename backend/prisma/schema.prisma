@@ -57,12 +57,12 @@ model Comment {
   id        Int      @id @default(autoincrement())
   content   String
   createdAt DateTime @default(now())
+  username  String
 
-  user     User   @relation("UserComments", fields: [userId], references: [id])
-  userId   String
-  username String
-  post     Post   @relation(fields: [postId], references: [id])
-  postId   String
+  user   User   @relation("UserComments", fields: [userId], references: [id])
+  userId String
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String
 }
 
 model Questionnaire {
