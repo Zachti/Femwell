@@ -303,8 +303,16 @@ export const GET_POSTS_QUERY = gql`
     getPosts(filter: $filter) {
     id
     username
-    comments
-    likes
+    comments {
+      id
+      content
+      username
+      userProfilePic
+    }
+    likes {
+      id
+      username
+    }
     userId
     imageUrl
     isAnonymous
