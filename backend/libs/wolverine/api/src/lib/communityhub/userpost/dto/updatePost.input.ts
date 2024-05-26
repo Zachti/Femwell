@@ -12,4 +12,7 @@ export class UpdatePostInput {
 
   @Field(() => GraphQLUUID)
   userId!: string;
+
+  @Field(() => GraphQLString)
+  imageUrl?: string;
 }

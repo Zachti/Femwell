@@ -1,6 +1,6 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
-import { GraphQLUUID, GraphQLPositiveInt } from 'graphql-scalars';
+import { GraphQLUUID, GraphQLPositiveInt, GraphQLDate } from 'graphql-scalars';
 
 @ObjectType()
 export class Comment {
@@ -18,4 +18,7 @@ export class Comment {
 
   @Field(() => GraphQLString)
   username!: string;
+
+  @Field(() => GraphQLDate)
+  createdAt!: Date;
 }
