@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { SNS } from '@aws-sdk/client-sns';
-import {InjectAwsService} from "../../libs/shared/aws/src";
+import { InjectAwsService } from '@backend/awsModule';
 
 @Injectable()
 export class NotificationService {
-
   constructor(@InjectAwsService(SNS) private sns: SNS) {}
 
   async sendNotification(topicArn: string, message: string): Promise<void> {

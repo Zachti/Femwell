@@ -1,4 +1,5 @@
 import {
+  Inject,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -8,6 +9,8 @@ import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { ErrorService } from '../../shared/error/error.service';
 import { Post } from '@prisma/client';
+import { wolverineConfig } from '../../config/wolverine.config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class PostService {
@@ -15,6 +18,8 @@ export class PostService {
     private readonly logger: LoggerService,
     private readonly prisma: PrismaService,
     private readonly error: ErrorService,
+    @Inject(wolverineConfig.KEY)
+    private readonly Cfg: ConfigType<typeof wolverineConfig>,
   ) {}
   async createPost(input: CreatePostInput): Promise<Post> {
     try {
@@ -55,6 +60,22 @@ export class PostService {
       return result;
     } catch (e) {
       this.error.handleError(new NotFoundException(e));
+    }
+  }
+
+  async getPost(): Promise<Post[]> {
+    try {
+      this.logger.info('Fetching all posts.');
+      const result = await this.prisma.post.findMany({
+        orderBy: {
+          createdAt: 'desc', // Sort by createdAt in descending order fot the most recent posts
+        },
+        take: this.Cfg.postLimit, // Limit the result to 50 posts
+      });
+      this.logger.info('Posts fetched successfully.');
+      return result;
+    } catch (e) {
+      this.error.handleError(new InternalServerErrorException(e));
     }
   }
 }

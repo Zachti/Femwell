@@ -1,7 +1,9 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { LoggerModule } from '@backend/logger';
 import {
-  /**awsConfig**/ awsConfigObject,
+  awsConfig,
+  awsConfigObject,
+  commonConfig,
   ConfigCoreModule,
   redisConfigObject,
 } from '@backend/config';
@@ -16,8 +18,9 @@ import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
 import { GraphqlCoreModule, ErrorModule } from '@backend/wolverine';
 import { HttpModule } from '@nestjs/axios';
 import { CacheCoreModule } from '@backend/infrastructure';
-// import { AWSSdkModule } from '@backend/awsModule';
-// import { ConfigType } from '@nestjs/config';
+import { AWSSdkModule } from '@backend/awsModule';
+import { ConfigType } from '@nestjs/config';
+import { SNS } from '@aws-sdk/client-sns';
 
 @Module({
   imports: [
@@ -33,19 +36,16 @@ import { CacheCoreModule } from '@backend/infrastructure';
       validationOptions: { presence: 'required' },
     }),
     HealthModule.forRoot(WolverineHealthIndicatorsProvider),
-    // AWSSdkModule.forRootWithAsyncOptions({
-    //   serviceObjects: [{ client: '' }],
-    //   useFactory: (config: ConfigType<typeof awsConfig>) => {
-    //     return {
-    //       region: config.region,
-    //       credentials: {
-    //         secretAccessKey: config.secretKey,
-    //         accessKeyId: config.accessKey,
-    //       },
-    //     };
-    //   },
-    //   inject: [awsConfig.KEY],
-    // }),
+    AWSSdkModule.forRootWithAsyncOptions({
+      serviceObjects: [{ client: SNS }],
+      useFactory: (
+        commonCfg: ConfigType<typeof commonConfig>,
+        awsCfg: ConfigType<typeof awsConfig>,
+      ) => {
+        return commonCfg.isLiveEnv ? {} : awsCfg.localDevConfigOverride;
+      },
+      inject: [commonConfig.KEY, awsConfig.KEY],
+    }),
     LiveChatModule,
     QuestionnaireModule,
     PrismaModule,
