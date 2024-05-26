@@ -11,6 +11,8 @@ import { ErrorService } from '../../shared/error/error.service';
 import { Post } from '@prisma/client';
 import { wolverineConfig } from '../../config/wolverine.config';
 import { ConfigType } from '@nestjs/config';
+import { PostsFilter } from './dto/posts.filter.input';
+import { Post as PostModel } from './entities/post.entity';
 
 @Injectable()
 export class PostService {
@@ -63,10 +65,12 @@ export class PostService {
     }
   }
 
-  async getPost(): Promise<Post[]> {
+  async getPosts(filter: PostsFilter): Promise<Post[]> {
     try {
       this.logger.info('Fetching all posts.');
+      const where = PostModel.buildFilter(filter);
       const result = await this.prisma.post.findMany({
+        where,
         orderBy: {
           createdAt: 'desc', // Sort by createdAt in descending order fot the most recent posts
         },
