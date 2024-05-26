@@ -55,7 +55,7 @@ const useCreatePost = () => {
         createPost({
           ...newPost,
           id: postDocRef.id,
-          pfpURL: post.username === "Anonymous" ? "" : authUser.pfpURL,
+          profilePic: post.username === "Anonymous" ? "" : authUser.profilePic,
         });
 
         setIsLoadingPost(false);

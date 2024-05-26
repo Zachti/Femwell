@@ -19,7 +19,7 @@ const useEditProfile = () => {
       data.email === authUser.email &&
       data.username === authUser.username &&
       data.phone === authUser.phone &&
-      data.pfpURL === authUser.pfpURL
+      data.profilePic === authUser.profilePic
     )
       return false;
     setIsUpdating(true);
@@ -38,7 +38,7 @@ const useEditProfile = () => {
         email: authUser.email,
         username: data.username || authUser.username,
         phone: data.phone || authUser.phone,
-        pfpURL: URL || authUser.pfpURL,
+        profilePic: URL || authUser.profilePic,
       };
 
       if (data.email !== authUser.email && auth.currentUser) {

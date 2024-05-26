@@ -137,7 +137,7 @@ const AccountSettings: FC<{}> = () => {
                             <Avatar
                               size={"xl"}
                               name={`${authUser?.username}`}
-                              src={selectedFile || `${authUser?.pfpURL}`}
+                              src={selectedFile || `${authUser?.profilePic}`}
                             />
                             <Box
                               position="absolute"

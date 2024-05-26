@@ -11,21 +11,29 @@ export const CREATE_USER_MUTATION = gql`
   }
 `;
 
-//this needs to have pfpURL and comments to have their usernames
+//this needs to have profilePic and comments to have their usernames
 export const GET_USER_PROFILE_QUERY = gql`
   query GetUserProfile($id: UUID!) {
     oneUser(id: $id) {
+      id
+      email
       username
+      likes {
+        postId
+      }
       posts {
+        id
         username
         content
         comments {
+          username
           content
           postId
         }
       }
       phoneNumber
       readLater
+      profilePic
     }
   }
 `;
