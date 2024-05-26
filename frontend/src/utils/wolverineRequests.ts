@@ -306,6 +306,34 @@ export const DELETE_POST_MUTATION = gql`
   }
 `;
 
+export const GET_POSTS_QUERY = gql`
+  mutation getPosts($filter: PostsFilter) { 
+    getPosts(filter: $filter) {
+    id
+    username
+    comments {
+      id
+      content
+      username
+      userProfilePic
+    }
+    likes {
+      id
+      username
+    }
+    userId
+    imageUrl
+    isAnonymous
+    content
+    createdAt
+  }
+  }`;
+
+interface postsFilter {
+  ids: string[]
+  usernames: string[]
+}
+
 // LIKES RESOLVER REQUESTS -
 
 export const CREATE_LIKE_MUTATION = gql`

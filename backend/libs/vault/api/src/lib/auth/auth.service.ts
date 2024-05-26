@@ -141,7 +141,7 @@ export class AuthService {
         confirmUserRequest.code,
         true,
         async (err, result) => {
-          if (err) reject(err);
+          if (err) return reject(err);
           const res = await this.authenticateUser({
             username: confirmUserRequest.email,
             password: confirmUserRequest.password,
@@ -161,7 +161,7 @@ export class AuthService {
     const cognitoUser = new CognitoUser(userData);
     return new Promise((resolve, reject) => {
       return cognitoUser.resendConfirmationCode((err) => {
-        if (err) reject(err);
+        if (err) return reject(err);
         resolve('Verification code sent!');
       });
     });
@@ -184,7 +184,7 @@ export class AuthService {
 
     return new Promise((resolve, reject) => {
       return cognito.adminDeleteUser(deleteUserData, async (err: any) => {
-        if (err) reject(err);
+        if (err) return reject(err);
         this.logger.info(
           `${deleteUserRequest.email} account deleted from cognito.`,
         );

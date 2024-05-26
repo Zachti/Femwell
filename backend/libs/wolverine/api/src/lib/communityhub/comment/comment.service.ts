@@ -66,7 +66,16 @@ export class CommentService {
   async getComments(postId: string): Promise<Comment[]> {
     try {
       this.logger.info(`fetching all comments from post with id: ${postId}.`);
-      const result = await this.prisma.comment.findMany({ where: { postId } });
+      const result = await this.prisma.comment.findMany(
+        { where: { postId },
+        include: {
+          user: {
+            select: {
+              profilePic: true,
+            },
+          },
+        },
+      });
       this.logger.info(`Successfully retrieved ${result.length} comments.`);
       return result;
     } catch (e) {

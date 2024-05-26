@@ -8,27 +8,27 @@ export class QuestionnaireResolver {
   constructor(private readonly questionnaireService: QuestionnaireService) {}
 
   @Mutation(() => Questionnaire)
-  async createQuestionnaire(
+  createQuestionnaire(
     @Args('createQuestionnaireInput')
     createQuestionnaireInput: CreateQuestionnaireInput,
   ) {
-    return await this.questionnaireService.createQuestionnaire(
+    return this.questionnaireService.createQuestionnaire(
       createQuestionnaireInput,
     );
   }
 
   @Query(() => [Questionnaire], { name: 'questionnaire' })
-  async findAll() {
-    return await this.questionnaireService.findAll();
+  findAll() {
+    return this.questionnaireService.findAll();
   }
 
   @Query(() => Questionnaire, { name: 'oneQuestionnaire' })
-  async findOne(@Args('id', { type: () => GraphQLUUID }) id: string) {
-    return await this.questionnaireService.findOne(id);
+  findOne(@Args('id', { type: () => GraphQLUUID }) id: string) {
+    return this.questionnaireService.findOne(id);
   }
 
   @Query(() => Questionnaire, { name: 'questionnaireByUserId' })
-  async findOneByUser(@Args('id', { type: () => GraphQLUUID }) userId: string) {
-    return await this.questionnaireService.findOneByUser(userId);
+  findOneByUser(@Args('id', { type: () => GraphQLUUID }) userId: string) {
+    return this.questionnaireService.findOneByUser(userId);
   }
 }

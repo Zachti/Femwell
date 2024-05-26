@@ -4,7 +4,7 @@ import { Post } from '../../index';
 import { CreatePostInput, UpdatePostInput } from '../../index';
 import { GraphQLUUID } from 'graphql-scalars';
 import { Role, Roles } from '@backend/infrastructure';
-import { UsePipes } from '@nestjs/common';
+import { PostsFilter } from './dto/posts.filter.input';
 
 @Resolver(() => Post)
 export class PostResolver {
@@ -29,5 +29,11 @@ export class PostResolver {
   @Mutation(() => Post)
   async deletePost(@Args('id', { type: () => GraphQLUUID }) id: string) {
     return await this.postService.deletePost(id);
+  }
+
+  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Mutation(() => [Post])
+  async getPosts(@Args('filter', { nullable: true }) filter: PostsFilter) {
+    return await this.postService.getPosts(filter);
   }
 }

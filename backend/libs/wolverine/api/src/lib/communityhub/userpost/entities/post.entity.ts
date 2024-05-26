@@ -1,7 +1,9 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
-import { GraphQLUUID } from 'graphql-scalars';
+import { GraphQLDate, GraphQLUUID } from 'graphql-scalars';
 import { Like, Comment } from '../../../index';
+import { PostsFilter } from '../dto/posts.filter.input';
+import { Prisma } from '@prisma/client';
 
 @ObjectType()
 export class Post {
@@ -22,4 +24,21 @@ export class Post {
 
   @Field(() => GraphQLUUID)
   userId!: string;
+
+  @Field(() => GraphQLString, { nullable: true })
+  imageUrl?: string;
+
+  @Field(() => Boolean)
+  isAnonymous!: boolean;
+
+  @Field(() => GraphQLDate)
+  createdAt!: Date;
+
+  static buildFilter(filter: PostsFilter): Prisma.PostWhereInput {
+    if (!filter) return {};
+    return {
+      ...(filter.ids && { id: { in: filter.ids } }),
+      ...(filter.usernames && { username: { in: filter.usernames } }),
+    };
+  }
 }
