@@ -19,8 +19,8 @@ export class UploadService {
     private readonly logger: LoggerService,
   ) {}
 
-  async upload(file: UploadFile, username: string): Promise<UploadResult> {
-    const keyName = `${this.heimdallCfg.baseFolderLocation}/${username}/${file.key}`;
+  async upload(file: UploadFile, filePath: string): Promise<UploadResult> {
+    const keyName = `${this.heimdallCfg.baseFolderLocation}/${filePath}/${file.key}`;
     this.logger.info('uploading file to s3.');
     try {
       await this.s3.send(
@@ -38,7 +38,7 @@ export class UploadService {
     this.logger.info('file uploaded successfully.');
     return {
       type: file.mimeType,
-      id: `${username}/${file.key}`,
+      id: `${this.heimdallCfg.baseFolderLocation}/${filePath}/${file.key}`,
       error: 0,
     } as UploadResult;
   }
