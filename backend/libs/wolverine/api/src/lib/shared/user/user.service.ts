@@ -48,7 +48,7 @@ export class UserService {
           username: input.newUsername || undefined,
           readLater: input.readLater || undefined,
           phoneNumber: input.phoneNumber || undefined,
-          profilePic: input.profilePic.toString() || undefined,
+          profilePic: input.profilePic?.toString() || undefined,
         },
       });
       this.logger.info(
