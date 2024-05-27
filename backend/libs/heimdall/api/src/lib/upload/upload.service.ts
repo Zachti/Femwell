@@ -38,7 +38,7 @@ export class UploadService {
     this.logger.info('file uploaded successfully.');
     return {
       type: file.mimeType,
-      id: `${this.heimdallCfg.awsBucket}/${filePath}/${file.key}`,
+      id: `${filePath}/${file.key}`,
       error: 0,
     } as UploadResult;
   }
