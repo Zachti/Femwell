@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   MaxFileSizeValidator,
   ParseFilePipe,
@@ -35,7 +34,6 @@ export class uploadController {
       }),
     )
     file: Express.Multer.File,
-    @Body('postId') postId: string | null,
   ): Promise<UploadResult> {
     return await this.uploadService.upload(
       {
@@ -43,7 +41,7 @@ export class uploadController {
         data: file.buffer,
         mimeType: file.mimetype,
       },
-      postId || req.user.username,
+      req.body.path,
     );
   }
 }

@@ -17,7 +17,7 @@ import { AWSSdkModule } from '@backend/awsModule';
 import { ConfigType } from '@nestjs/config';
 import { S3 } from '@aws-sdk/client-s3';
 import { SES } from '@aws-sdk/client-ses';
-import {HttpModule} from "@nestjs/axios";
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
