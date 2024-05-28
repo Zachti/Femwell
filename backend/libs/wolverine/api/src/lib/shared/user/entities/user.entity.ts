@@ -50,6 +50,6 @@ export class User {
   @Field(() => [GraphQLString])
   readLater!: string[];
 
-  @Field(() => [GraphQLURL], { nullable: true })
+  @Field(() => GraphQLURL, { nullable: true })
   profilePic?: URL;
 }

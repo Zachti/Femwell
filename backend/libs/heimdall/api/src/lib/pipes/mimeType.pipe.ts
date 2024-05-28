@@ -4,8 +4,6 @@ import { MimeTypes } from '../inetrfaces/interfaces';
 
 @Injectable()
 export class mimeTypePipe implements PipeTransform<Request, Promise<Request>> {
-  constructor() {}
-
   async transform(request: Request): Promise<Request> {
     const file = request.file;
 
@@ -18,10 +16,6 @@ export class mimeTypePipe implements PipeTransform<Request, Promise<Request>> {
   }
 
   isNotValidMimeType(mimeType: string) {
-    return (
-      mimeType !== MimeTypes.PDF &&
-      mimeType !== MimeTypes.JPG &&
-      mimeType !== MimeTypes.PNG
-    );
+    return !Object.keys(MimeTypes).includes(mimeType);
   }
 }

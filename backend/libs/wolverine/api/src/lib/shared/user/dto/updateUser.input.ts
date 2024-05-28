@@ -18,6 +18,7 @@ export class UpdateUserInput {
 
   @Field(() => GraphQLString, {
     description: 'The new username of the user',
+    nullable: true,
   })
   newUsername?: string;
 
