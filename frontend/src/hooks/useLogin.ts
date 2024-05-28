@@ -52,11 +52,14 @@ const useLogin = () => {
         const userResult = await getUserResponse.data;
         console.log("userResult", userResult.data);
         if (userResult) {
+          const jwt = await authenticateResult.data.login.jwt;
+          const refreshToken = await authenticateResult.data.login.refreshToken;
+          console.log(jwt);
           localStorage.setItem("user", JSON.stringify(userResult.data.oneUser));
           loginUser({
             ...userResult.data.oneUser,
-            jwt: authenticateResult.data.jwt,
-            refreshToken: authenticateResult.data.refreshToken,
+            jwt: jwt,
+            refreshToken: refreshToken,
           });
           showToast("Success", "Logged in successfully", "success");
           return true;

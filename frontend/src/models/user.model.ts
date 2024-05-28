@@ -7,7 +7,7 @@ export interface User {
   username: string;
   jwt: string;
   refreshToken: string;
-  phone?: string;
+  phoneNumber?: string;
   posts?: Post[];
   likedPosts?: Post[];
   questionnaire?: Questionnare;
