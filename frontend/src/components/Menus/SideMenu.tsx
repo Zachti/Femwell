@@ -65,7 +65,7 @@ const SideMenu: FC<SideMenuProps> = ({
                   color={"white"}
                   name={`${authUser.username}`}
                   size="lg"
-                  src={`${authUser.pfpURL}`}
+                  src={`${authUser.profilePic}`}
                   ml="auto"
                 />
               </Flex>

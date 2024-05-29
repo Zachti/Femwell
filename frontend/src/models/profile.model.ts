@@ -5,5 +5,5 @@ export interface Profile {
   username: string;
   posts?: Post[];
   likedPosts?: Post[];
-  pfpURL?: string;
+  profilePic?: string;
 }

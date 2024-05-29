@@ -77,6 +77,7 @@ import {
   CREATE_QUESTIONNAIRE_MUTATION,
   GET_USER_PROFILE_QUERY,
 } from "../utils/wolverineRequests";
+import { Questionnare } from "../models";
 
 const useSignupEmailPassword = () => {
   const loginUser = userAuthStore((state) => state.login);
@@ -87,7 +88,8 @@ const useSignupEmailPassword = () => {
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [createQuestionnaireInput, setDtoQuestionnaire] = useState({});
+  const [createQuestionnaireInput, setDtoQuestionnaire] =
+    useState<Questionnare | null>(null);
   const [showEmailVerifyPage, setShowEmailVerifyPage] = useState(false);
 
   const signup = async (data: any) => {
@@ -126,7 +128,7 @@ const useSignupEmailPassword = () => {
       console.log("registerResult", registerResult);
       console.log("--------------------");
 
-      let questionnaire = {};
+      let questionnaire = null;
       if (
         data.responses.some((response: Response) => response.answer) &&
         registerResponse.data
@@ -191,13 +193,13 @@ const useSignupEmailPassword = () => {
       }
 
       console.log("user id", confirmResult.data.confirm.id);
-      const getUserResponse = await axios.get(
+      const getUserResponse = await axios.post(
         `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
         {
-          params: {
-            query: print(GET_USER_PROFILE_QUERY),
-            variables: { UUID: { id: confirmResult.data.confirm.id } },
-          },
+          query: print(GET_USER_PROFILE_QUERY),
+          variables: { id: confirmResult.data.confirm.id },
+        },
+        {
           headers: {
             authorization: confirmResult.data.confirm.jwt,
           },
@@ -205,16 +207,26 @@ const useSignupEmailPassword = () => {
       );
 
       const userResult = await getUserResponse.data;
-      console.log("userResult", userResult);
-      console.log("userResult.data", userResult.data);
+      console.log("userResult", userResult.data);
       console.log("--------------------");
-      // if (userResult) {
-      //   localStorage.setItem("user", JSON.stringify(userResult));
-      //   loginUser(userResult);
-      // }
-
       setShowEmailVerifyPage(false);
-      return true;
+      if (userResult) {
+        localStorage.setItem("user", JSON.stringify(userResult.data.oneUser));
+        loginUser({
+          ...userResult.data.oneUser,
+          jwt: confirmResult.data.confirm.jwt,
+          refreshToken: confirmResult.data.confirm.refreshToken,
+        });
+
+        return true;
+      } else {
+        showToast(
+          "Error",
+          "User registration failed, something went wrong while getting the user",
+          "error",
+        );
+        return false;
+      }
     } catch (error: any) {
       showToast("Error", "User verification failed", "error");
       throw new Error(error.message);

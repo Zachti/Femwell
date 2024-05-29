@@ -57,3 +57,4 @@ variable "WOLVERINE_ENDPOINT" {}
 //wolverine container
 variable "WOLVERINE_PORT" {}
 variable "AWS_AURORA_URL" {}
+variable "POST_LIMIT" {}
