@@ -82,7 +82,7 @@ export const FIND_ONE_USER_QUERY = gql`
   }
 `;
 
-// dtos -
+// user dtos -
 
 export interface CreateUserInput {
   cognitoUserId: string;
@@ -168,7 +168,7 @@ export const FIND_QUESTIONNAIRE_BY_USER_QUERY = gql`
   }
 `;
 
-// dtos -
+// questionnaire dtos -
 
 interface Response {
   id: string;
@@ -240,9 +240,26 @@ export const GET_COMMENTS_QUERY = gql`
       userId
       postId
       username
+      createdAt
+      userProfilePic
     }
   }
 `;
+
+// comment dtos -
+
+interface CreateCommentInput {
+  username: string;
+  content: string;
+  userId: string;
+  postId: string;
+}
+
+interface UpdateCommentInput {
+  id: number;
+  content: string;
+  postId: string;
+}
 
 // POST RESOLVER REQUESTS -
 
@@ -253,6 +270,9 @@ export const CREATE_POST_MUTATION = gql`
       content
       userId
       username
+      imageUrl
+      isAnonymous
+      createdAt
       comments {
         id
         content
@@ -273,6 +293,9 @@ export const UPDATE_POST_MUTATION = gql`
       content
       userId
       username
+      imageUrl
+      isAnonymous
+      createdAt
       comments {
         id
         content
@@ -293,6 +316,9 @@ export const DELETE_POST_MUTATION = gql`
       content
       userId
       username
+      imageUrl
+      isAnonymous
+      createdAt
       comments {
         id
         content
@@ -307,38 +333,55 @@ export const DELETE_POST_MUTATION = gql`
 `;
 
 export const GET_POSTS_QUERY = gql`
-  mutation getPosts($filter: PostsFilter) {
+  mutation GetPosts($filter: PostsFilter) {
     getPosts(filter: $filter) {
       id
+      content
+      userId
       username
+      imageUrl
+      isAnonymous
+      createdAt
       comments {
         id
         content
         username
-        userProfilePic
       }
       likes {
         id
         username
       }
-      userId
-      imageUrl
-      isAnonymous
-      content
-      createdAt
     }
   }
 `;
 
-interface postsFilter {
-  ids: string[];
-  usernames: string[];
+// post dtos -
+
+interface CreatePostInput {
+  username: string;
+  content: string;
+  userId: string;
+  imageUrl?: string;
+  isAnonymous?: boolean;
 }
+
+interface UpdatePostInput {
+  id: string;
+  content: string;
+  userId: string;
+  imageUrl?: string;
+}
+
+interface PostsFilter {
+    ids: string[];
+    usernames: string[];
+}
+
 
 // LIKES RESOLVER REQUESTS -
 
 export const CREATE_LIKE_MUTATION = gql`
-  mutation CreateLike($createLikeInput: CreateLikeInput!) {
+  mutation CreateLike($createLikeInput: CreateOrDeleteLikeInput!) {
     createLike(createLikeInput: $createLikeInput) {
       id
       postId
@@ -349,8 +392,8 @@ export const CREATE_LIKE_MUTATION = gql`
 `;
 
 export const DELETE_LIKE_MUTATION = gql`
-  mutation DeleteLike($postId: UUID!, $userId: UUID!) {
-    deleteLike(postId: $postId, userId: $userId)
+  mutation DeleteLike($deleteLikeInput: CreateOrDeleteLikeInput!) {
+    deleteLike(deleteLikeInput: $deleteLikeInput)
   }
 `;
 
@@ -364,6 +407,14 @@ export const GET_LIKES_QUERY = gql`
     }
   }
 `;
+
+// like dtos -
+
+interface CreateOrDeleteLikeInput {
+    postId: string;
+    userId: string;
+    username: string;
+}
 
 // LIVE CHAT RESOLVER REQUESTS -
 

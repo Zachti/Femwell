@@ -11,7 +11,7 @@ export * from './communityhub/userpost/dto/createPost.input';
 export * from './communityhub/userpost/dto/updatePost.input';
 export * from './communityhub/comment/dto/createComment.input';
 export * from './communityhub/comment/dto/updateComment.input';
-export * from './communityhub/like/dto/createLike.input';
+export * from './communityhub/like/dto/createOrDeleteLike.input';
 export * from './questionnaire/dto/createQuestionnaire.input';
 export * from './questionnaire/dto/createResponse.input';
 

@@ -31,6 +31,7 @@ export class PostService {
           username: input.username,
           content: input.content,
           userId: input.userId,
+          isAnonymous: input.isAnonymous,
         },
       });
       this.logger.info(`Post created successfully with id: ${result.id}.`);

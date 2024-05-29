@@ -15,4 +15,7 @@ export class CreatePostInput {
 
   @Field(() => GraphQLString, { nullable: true })
   imageUrl?: string;
+
+  @Field(() => Boolean, { nullable: true })
+  isAnonymous?: boolean;
 }
