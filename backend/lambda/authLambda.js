@@ -14,41 +14,41 @@ const verifier = CognitoJwtVerifier.create({
 exports.handler = async (event) => {
   const token = event.headers.authorization;
 
-  if (!token) {
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ message: 'Missing token' }),
-    };
+  const path = event.rawPath || event.path;
+  const method = event.requestContext.http.method;
+
+  if (!(path === '/vault/graphql')) {
+    if (!token)
+      return {
+        statusCode: 401,
+        body: JSON.stringify({message: 'Missing token'}),
+      };
+    try {
+      await verifier.verify(token);
+    } catch (err) {
+      console.error(err);
+      return {
+        statusCode: 401,
+        body: JSON.stringify({message: 'Invalid access token'}),
+      };
+    }
   }
 
-  try {
-    await verifier.verify(token);
+  const ecsEndpoint = `${ecsBaseUrl}${path}`;
 
-    const path = event.rawPath || event.path;
-    const method = event.requestContext.http.method;
+  const response = await fetch(ecsEndpoint, {
+    method: method,
+    headers: {
+      'authorization': token,
+      ...event.headers,
+    },
+    body: method === 'GET' ? null : JSON.stringify(event.body),
+  });
 
-    const ecsEndpoint = `${ecsBaseUrl}${path}`;
+  const responseBody = await response.text();
 
-    const response = await fetch(ecsEndpoint, {
-      method: method,
-      headers: {
-        'authorization': token,
-        ...event.headers,
-      },
-      body: method === 'GET' ? null : JSON.stringify(event.body),
-    });
-
-    const responseBody = await response.text();
-
-    return {
-      statusCode: response.status,
-      body: responseBody,
-    };
-  } catch (err) {
-    console.error(err);
-    return {
-      statusCode: 401,
-      body: JSON.stringify({ message: 'Invalid token' }),
-    };
-  }
+  return {
+    statusCode: response.status,
+    body: responseBody,
+  };
 };
