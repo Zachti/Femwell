@@ -49,7 +49,7 @@ const Sidebar: FC<SideBarProps> = ({}) => {
               color={"white"}
               name={`${authUser.username}`}
               size={isLargerThan760 ? "lg" : isLargerThan400 ? "md" : "sm"}
-              src={`${authUser.pfpURL}`}
+              src={`${authUser.profilePic}`}
               mb={1}
             />
             <Text

@@ -43,7 +43,7 @@ const useGoogleAuth = () => {
           username: newUser.user.email?.split("@")[0],
           phone: "",
           posts: [],
-          pfpURL: newUser.user.photoURL || "",
+          profilePic: newUser.user.photoURL || "",
           laterArticles: [],
         };
         if (dtoQuestionnaire) userDoc.questionnaire = dtoQuestionnaire;

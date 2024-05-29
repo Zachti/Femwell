@@ -51,7 +51,13 @@ const AccountSettings: FC<{}> = () => {
   const authUser = useAuthStore((state) => state.user);
   const panelBackgoundColor = useColorModeValue("white", "#533142");
   const newPWBackgroundColor = useColorModeValue("lightgray", "dimgray");
-  const { selectedFile, setSelectedFile, handleImageChange } = usePreviewImg();
+  const {
+    selectedFile,
+    setSelectedFile,
+    preflightFile,
+    setPreflightFile,
+    handleImageChange,
+  } = usePreviewImg();
   const { isUpdating, editProfile } = useEditProfile();
 
   const checkPasswordRequirements = (password: string) => {
@@ -107,11 +113,12 @@ const AccountSettings: FC<{}> = () => {
                   initialValues={{
                     username: authUser?.username,
                     email: authUser?.email,
-                    phone: authUser?.phone,
+                    phone: authUser?.phoneNumber,
                   }}
                   onSubmit={async (values) => {
-                    await editProfile(values, selectedFile);
+                    await editProfile(values, preflightFile);
                     setSelectedFile(null);
+                    setPreflightFile(null);
                   }}
                   enableReinitialize
                 >
@@ -137,7 +144,7 @@ const AccountSettings: FC<{}> = () => {
                             <Avatar
                               size={"xl"}
                               name={`${authUser?.username}`}
-                              src={selectedFile || `${authUser?.pfpURL}`}
+                              src={selectedFile || `${authUser?.profilePic}`}
                             />
                             <Box
                               position="absolute"

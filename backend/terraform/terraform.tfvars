@@ -29,3 +29,4 @@ WOLVERINE_ENDPOINT="http://leibo.fake.com"
 //wolverine container
 WOLVERINE_PORT="3001"
 AWS_AURORA_URL="mysql://leibo-secure.fake.com"
+POST_LIMIT="50"

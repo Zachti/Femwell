@@ -5,10 +5,12 @@ export interface User {
   id: string;
   email: string;
   username: string;
-  phone?: string;
+  jwt: string;
+  refreshToken: string;
+  phoneNumber?: string;
   posts?: Post[];
   likedPosts?: Post[];
   questionnaire?: Questionnare;
-  pfpURL?: string;
+  profilePic?: string;
   laterArticles?: string[];
 }

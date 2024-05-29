@@ -33,7 +33,7 @@ const useSearchUser = () => {
         id: data.id,
         username: data.username,
         posts: data.posts,
-        pfpURL: data.pfpURL,
+        profilePic: data.profilePic,
       };
 
       setUserProfile(profileData);

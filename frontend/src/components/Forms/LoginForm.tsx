@@ -105,7 +105,6 @@ const LoginForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                           name="password"
                           type={show ? "text" : "password"}
                           variant="filled"
-                          validate={validatePassword}
                         ></Field>
                         <InputRightElement width="4.5rem">
                           <Button size="sm" onClick={handleShowClick}>

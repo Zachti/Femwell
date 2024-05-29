@@ -11,21 +11,29 @@ export const CREATE_USER_MUTATION = gql`
   }
 `;
 
-//this needs to have pfpURL and comments to have their usernames
+//this needs to have profilePic and comments to have their usernames
 export const GET_USER_PROFILE_QUERY = gql`
   query GetUserProfile($id: UUID!) {
     oneUser(id: $id) {
+      id
+      email
       username
+      likes {
+        postId
+      }
       posts {
+        id
         username
         content
         comments {
+          username
           content
           postId
         }
       }
       phoneNumber
       readLater
+      profilePic
     }
   }
 `;
@@ -89,8 +97,6 @@ export interface CreateUserInput {
 export interface UpdateUserInput {
   id: string;
 
-  email: string;
-
   username: string;
 
   phoneNumber?: string;
@@ -98,6 +104,8 @@ export interface UpdateUserInput {
   newUsername?: string;
 
   readLater?: string[];
+
+  profilePic?: string;
 }
 
 // QUESTIONNAIRE RESOLVER REQUESTS -
@@ -299,31 +307,32 @@ export const DELETE_POST_MUTATION = gql`
 `;
 
 export const GET_POSTS_QUERY = gql`
-  mutation getPosts($filter: PostsFilter) { 
+  mutation getPosts($filter: PostsFilter) {
     getPosts(filter: $filter) {
-    id
-    username
-    comments {
       id
+      username
+      comments {
+        id
+        content
+        username
+        userProfilePic
+      }
+      likes {
+        id
+        username
+      }
+      userId
+      imageUrl
+      isAnonymous
       content
-      username
-      userProfilePic
+      createdAt
     }
-    likes {
-      id
-      username
-    }
-    userId
-    imageUrl
-    isAnonymous
-    content
-    createdAt
   }
-  }`;
+`;
 
 interface postsFilter {
-  ids: string[]
-  usernames: string[]
+  ids: string[];
+  usernames: string[];
 }
 
 // LIKES RESOLVER REQUESTS -

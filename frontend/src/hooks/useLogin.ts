@@ -1,13 +1,13 @@
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
-import { doc, getDoc } from "firebase/firestore";
-import { auth, firestore } from "../firebase/firebase";
 import userAuthStore from "../store/authStore";
 import useShowToast from "./useShowToast";
-import { User } from "../models/user.model";
+import axios from "axios";
+import { print } from "graphql";
+import { LOGIN_MUTATION } from "../utils/vaultRequests";
+import { GET_USER_PROFILE_QUERY } from "../utils/wolverineRequests";
+import { useState } from "react";
 
 const useLogin = () => {
-  const [signInWithEmailAndPassword, , isLoggingIn, errorLI] =
-    useSignInWithEmailAndPassword(auth);
+  const [isLoggingIn, setisLoggingIn] = useState(false);
   const showToast = useShowToast();
   const loginUser = userAuthStore((state) => state.login);
   const login = async (data: any) => {
@@ -15,19 +15,55 @@ const useLogin = () => {
       showToast("Error", "Please enter all the fields", "error");
       return false;
     }
+    setisLoggingIn(true);
     try {
-      const userCred = await signInWithEmailAndPassword(
-        data.email,
-        data.password,
+      const authenticateRequest = {
+        username: data.email,
+        password: data.password,
+      };
+      console.log("authenticateRequest", authenticateRequest);
+
+      const authenticateResponse = await axios.post(
+        `${import.meta.env.VITE_VAULT_ENDPOINT}/graphql`,
+        {
+          query: print(LOGIN_MUTATION),
+          variables: { authenticateRequest },
+        },
       );
-      if (userCred) {
-        const docRef = doc(firestore, "users", userCred.user.uid);
-        const docSnap = await getDoc(docRef);
-        const userDoc = docSnap.data() as User;
-        localStorage.setItem("user", JSON.stringify(userDoc));
-        loginUser(userDoc);
-        showToast("Success", "Logged in successfully", "success");
-        return true;
+
+      const authenticateResult = await authenticateResponse.data;
+      console.log("autheticateResult", authenticateResult);
+
+      if (authenticateResult && authenticateResult.data.login.id) {
+        console.log("user id", authenticateResult.data.login.id);
+        const getUserResponse = await axios.post(
+          `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+          {
+            query: print(GET_USER_PROFILE_QUERY),
+            variables: { id: authenticateResult.data.login.id },
+          },
+          {
+            headers: {
+              authorization: authenticateResult.data.login.jwt,
+            },
+          },
+        );
+
+        const userResult = await getUserResponse.data;
+        console.log("userResult", userResult.data);
+        if (userResult) {
+          const jwt = await authenticateResult.data.login.jwt;
+          const refreshToken = await authenticateResult.data.login.refreshToken;
+          console.log(jwt);
+          localStorage.setItem("user", JSON.stringify(userResult.data.oneUser));
+          loginUser({
+            ...userResult.data.oneUser,
+            jwt: jwt,
+            refreshToken: refreshToken,
+          });
+          showToast("Success", "Logged in successfully", "success");
+          return true;
+        }
       } else {
         showToast("Error", "Failed to login", "error");
         return false;
@@ -35,9 +71,11 @@ const useLogin = () => {
     } catch (error: any) {
       showToast("Error", error.message, "error");
       return false;
+    } finally {
+      setisLoggingIn(false);
     }
   };
-  return { login, isLoggingIn, errorLI };
+  return { login, isLoggingIn };
 };
 
 export default useLogin;

@@ -37,8 +37,6 @@ data "aws_iam_role" "existing" {
 
 resource "aws_s3_bucket" "bucket" {
   bucket = "femwell-main-bucket"
-  acl    = "private"
-
 }
 
 resource "aws_cognito_user_pool" "femwell_user_pool" {
@@ -200,6 +198,10 @@ resource "aws_ecs_task_definition" "wolverine_task" {
           value = var.WOLVERINE_PORT
         },
         {
+          name = "POST_LIMIT"
+          value = var.POST_LIMIT
+        },
+        {
           name  = "AWS_AURORA_URL"
           value = "postgresql://${aws_rds_cluster.aurora_cluster.master_username}:${aws_rds_cluster.aurora_cluster.master_password}@${aws_rds_cluster.aurora_cluster.endpoint}:5432/${aws_rds_cluster.aurora_cluster.database_name}"
         },
@@ -284,77 +286,7 @@ resource "aws_ecs_task_definition" "wolverine_task" {
     #     }
     #   },
     # },
-  #   {
-  #     name: "femwell-task-heimdall",
-  #     image: aws_ecr_repository.heimdall_ecr_repo.repository_url,
-  #     essential: true,
-  #     portMappings: [
-  #       {
-  #         "containerPort": 3003,
-  #         "hostPort": 3003
-  #       }
-  #     ],
-  #      environment = [
-  #       {
-  #         name  = "LOG_LEVEL"
-  #         value = var.LOG_LEVEL
-  #       },
-  #       {
-  #         name  = "NODE_ENV"
-  #         value = var.NODE_ENV
-  #       },
-  #       {
-  #         name  = "STREAM_ARN"
-  #         value = var.STREAM_ARN
-  #       },
-  #       {
-  #         name  = "COGNITO_USER_POOL_ID"
-  #         value = aws_cognito_user_pool.femwell_user_pool.id
-  #       },
-  #       {
-  #         name  = "COGNITO_CLIENT_ID"
-  #         value = aws_cognito_user_pool_client.femwell_client_pool.id
-  #       },
-  #       {
-  #         name  = "PORT"
-  #         value = var.HEIMDALL_PORT
-  #       },
-  #       {
-  #         name  = "AWS_BUCKET"
-  #         value = aws_s3_bucket.bucket.bucket
-  #       },
-  #       {
-  #         name  = "BUCKET_LOCATION_BASE_FOLDER"
-  #         value = "user-uploads"
-  #       },
-  #       { 
-  #         name  = "MAX_FILE_SIZE"
-  #         value = var.MAX_FILE_SIZE
-  #       },
-  #       {
-  #         name  = "AWS_S3_ENDPOINT"
-  #         value = aws_s3_bucket.bucket.bucket_regional_domain_name
-  #       },
-  #       {
-  #         name  = "S3_CHECKLIST_KEY"
-  #         value = var.S3_CHECKLIST_KEY
-  #       },
-  #       {
-  #         name  = "SUPPORT_EMAIL"
-  #         value = var.SUPPORT_EMAIL
-  #       }
-  #     ],
-  #     memory: 512,
-  #     cpu: 256
-  #     logConfiguration: {
-  #       logDriver: "awslogs",
-  #       options: {
-  #         "awslogs-group": "/ecs/femwell-task",
-  #         "awslogs-region": "us-east-1", // replace with your region
-  #         "awslogs-stream-prefix": "ecs"
-  #       }
-  #     },
-  #   },
+ 
   #   {
   #     name: "femwell-task-denden",
   #     image: aws_ecr_repository.denden_ecr_repo.repository_url,
@@ -537,6 +469,120 @@ resource "aws_ecs_service" "femwell_vault_service" {
   }
 }
 
+resource "aws_ecs_task_definition" "heimdall_task" {
+  family                   = "heimdall-task"
+  container_definitions    = jsonencode(
+  [
+    {
+      name: "heimdall",
+      image: aws_ecr_repository.heimdall_ecr_repo.repository_url,
+      essential: true,
+      portMappings: [
+        {
+          "containerPort": 3003,
+          "hostPort": 3003
+        }
+      ],
+      environment = [
+        {
+          name  = "LOG_LEVEL"
+          value = var.LOG_LEVEL
+        },
+        {
+          name  = "NODE_ENV"
+          value = var.NODE_ENV
+        },
+        {
+          name  = "STREAM_ARN"
+          # value = aws_kinesis_firehose_delivery_stream.audit_logs_stream.arn
+          value = var.STREAM_ARN
+        },
+        {
+          name  = "COGNITO_USER_POOL_ID"
+          value = aws_cognito_user_pool.femwell_user_pool.id
+        },
+        {
+          name  = "COGNITO_CLIENT_ID"
+          value = aws_cognito_user_pool_client.femwell_client_pool.id
+        },
+        {
+          name  = "PORT"
+          value = var.HEIMDALL_PORT
+        },
+        {
+          name  = "AWS_BUCKET"
+          value = aws_s3_bucket.bucket.bucket
+        },
+        {
+          name  = "MAX_FILE_SIZE"
+          value = var.MAX_FILE_SIZE
+        },
+        {
+          name  = "AWS_S3_ENDPOINT"
+          value = "http://${aws_s3_bucket.bucket.bucket_domain_name}"
+        },
+        {
+          name  = "S3_CHECKLIST_KEY"
+          value = var.S3_CHECKLIST_KEY
+        },
+        {
+          name  = "SUPPORT_EMAIL"
+          value = var.SUPPORT_EMAIL
+        },
+      ],
+      memory: 512,
+      cpu: 256
+      logConfiguration: {
+        logDriver: "awslogs",
+        options: {
+          "awslogs-group": "/ecs/femwell-task",
+          "awslogs-region": "us-east-1", 
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+    },
+  ])
+  requires_compatibilities = ["FARGATE"] # use Fargate as the launch type
+  network_mode             = "awsvpc"    # add the AWS VPN network mode as this is required for Fargate
+  memory                   = 512        # Specify the memory the container requires
+  cpu                      = 256        
+  runtime_platform {
+  operating_system_family = "LINUX"
+  cpu_architecture        = "X86_64"
+  }
+  execution_role_arn       = data.aws_iam_role.existing.arn
+  task_role_arn            = data.aws_iam_role.existing.arn
+}
+
+
+resource "aws_ecs_service" "femwell_heimdall_service" {
+  name            = "femwell-heimdall"
+  cluster         = aws_ecs_cluster.femwell.id
+  task_definition = aws_ecs_task_definition.heimdall_task.arn
+  depends_on      = [aws_ecs_service.femwell_wolverine_service]
+  launch_type     = "FARGATE"
+  desired_count   = 1
+
+  deployment_controller {
+    type = "ECS"
+  }
+
+  deployment_maximum_percent         = 100
+  deployment_minimum_healthy_percent = 0
+
+  network_configuration {
+    subnets          = module.vpc.public_subnets
+    assign_public_ip = true
+    security_groups  = [aws_security_group.alb.id]
+  }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.heimdall_target_group.arn
+    container_name   = "heimdall"
+    container_port   = 3003
+  }
+}
+
 resource "aws_alb" "femwell_load_balancer" {
   name               = "load-balancer-femwell"
   load_balancer_type = "application"
@@ -583,6 +629,13 @@ resource "aws_lb_target_group" "heimdall_target_group" {
   vpc_id   = module.vpc.vpc_id
   target_type = "ip"
   
+  health_check {
+    path                = "/heimdall/health"
+    interval            = 300
+    timeout             = 3
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }
 
 resource "aws_lb_target_group" "denden_target_group" {

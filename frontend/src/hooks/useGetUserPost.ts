@@ -41,8 +41,8 @@ const useGetUserPost = () => {
           posts.push({
             ...(doc.data() as Post),
             id: doc.id,
-            pfpURL:
-              doc.data().username == "Anonymous" ? "" : userProfile.pfpURL,
+            profilePic:
+              doc.data().username == "Anonymous" ? "" : userProfile.profilePic,
           });
         });
 
