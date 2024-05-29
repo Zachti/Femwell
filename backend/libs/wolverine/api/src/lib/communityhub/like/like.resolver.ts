@@ -1,7 +1,7 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { LikeService } from './like.service';
 import { Like } from '../../index';
-import { CreateLikeInput } from '../../index';
+import { CreateOrDeleteLikeInput } from '../../index';
 import { GraphQLUUID } from 'graphql-scalars';
 import { Role, Roles } from '@backend/infrastructure';
 
@@ -12,8 +12,8 @@ export class LikeResolver {
   @Roles([Role.Padulla, Role.Premium, Role.User])
   @Mutation(() => Like)
   async createLike(
-    @Args('createLikeInput')
-    createLikeInput: CreateLikeInput,
+    @Args('CreateOrDeleteLikeInput')
+    createLikeInput: CreateOrDeleteLikeInput,
   ) {
     return await this.likeService.createLike(createLikeInput);
   }
@@ -21,10 +21,10 @@ export class LikeResolver {
   @Roles([Role.Padulla, Role.Premium, Role.User])
   @Mutation(() => Boolean)
   async deleteLike(
-    @Args('postId', { type: () => GraphQLUUID }) postId: string,
-    @Args('userId', { type: () => GraphQLUUID }) userId: string,
+    @Args('CreateOrDeleteLikeInput')
+    deleteLikeInput: CreateOrDeleteLikeInput,
   ) {
-    return await this.likeService.deleteLike(postId, userId);
+    return await this.likeService.deleteLike(deleteLikeInput);
   }
 
   @Roles([Role.Padulla, Role.Premium, Role.User])

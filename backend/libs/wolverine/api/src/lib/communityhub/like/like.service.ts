@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateLikeInput } from '../../index';
+import { CreateOrDeleteLikeInput } from '../../index';
 import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { ErrorService } from '../../shared/error/error.service';
@@ -16,7 +16,7 @@ export class LikeService {
     private readonly prisma: PrismaService,
     private readonly error: ErrorService,
   ) {}
-  async createLike(input: CreateLikeInput): Promise<Like> {
+  async createLike(input: CreateOrDeleteLikeInput): Promise<Like> {
     try {
       this.logger.info(`Creating a new like on post: ${input.postId}.`);
       const result = await this.prisma.like.create({
@@ -33,14 +33,19 @@ export class LikeService {
     }
   }
 
-  async deleteLike(postId: string, userId: string): Promise<boolean> {
+  async deleteLike(deleteLikeInput: CreateOrDeleteLikeInput): Promise<boolean> {
     try {
-      this.logger.info(`Deleting like on post: ${postId}.`);
+      this.logger.info(`Deleting like on post: ${deleteLikeInput.postId}.`);
       const result = await this.prisma.like.deleteMany({
-        where: { postId, userId },
+        where: {
+          postId: deleteLikeInput.postId,
+          userId: deleteLikeInput.userId,
+        },
       });
       if (result.count) {
-        this.logger.info(`Like deleted successfully on post: ${postId}.`);
+        this.logger.info(
+          `Like deleted successfully on post: ${deleteLikeInput.postId}.`,
+        );
         return true;
       }
       return false;

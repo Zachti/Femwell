@@ -15,7 +15,4 @@ export class CreateCommentInput {
 
   @Field(() => GraphQLUUID)
   postId!: string;
-
-  @Field(() => GraphQLString, { nullable: true })
-  userProfilePic?: string;
 }
