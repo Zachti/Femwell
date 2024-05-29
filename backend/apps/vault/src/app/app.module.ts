@@ -4,7 +4,12 @@ import {
   ApolloFederationDriver,
   ApolloFederationDriverConfig,
 } from '@nestjs/apollo';
-import { awsConfig, awsConfigObject, ConfigCoreModule } from '@backend/config';
+import {
+  awsConfig,
+  awsConfigObject,
+  commonConfig,
+  ConfigCoreModule,
+} from '@backend/config';
 import {
   vaultConfigObject,
   AuthModule,
@@ -16,7 +21,9 @@ import { join } from 'path';
 import { AuditModule } from '@backend/auditService';
 import { ConfigType } from '@nestjs/config';
 import { HealthModule, LoggerMiddleware } from '@backend/infrastructure';
-import {HttpModule} from "@nestjs/axios";
+import { HttpModule } from '@nestjs/axios';
+import { AWSSdkModule } from '@backend/awsModule';
+import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 
 @Module({
   imports: [
@@ -49,6 +56,16 @@ import {HttpModule} from "@nestjs/axios";
         return { streamARN: config.streamARN };
       },
       inject: [awsConfig.KEY],
+    }),
+    AWSSdkModule.forRootWithAsyncOptions({
+      serviceObjects: [{ client: CognitoIdentityProvider }],
+      useFactory: (
+        commonCfg: ConfigType<typeof commonConfig>,
+        awsCfg: ConfigType<typeof awsConfig>,
+      ) => {
+        return commonCfg.isLiveEnv ? {} : awsCfg.localDevConfigOverride;
+      },
+      inject: [commonConfig.KEY, awsConfig.KEY],
     }),
     HealthModule.forRoot(VaultHealthIndicatorsProvider),
     HttpModule,

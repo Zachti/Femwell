@@ -14,12 +14,17 @@ import { LoggerService } from '@backend/logger';
 import { Role } from '@backend/infrastructure';
 import { InjectCognitoToken } from './providers/cognito.provider';
 import { signUpUser, userSession } from './interfaces/inrefaces';
-import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
-import { awsConfig, commonConfig } from '@backend/config';
+import {
+  ChangePasswordCommand,
+  CognitoIdentityProvider,
+} from '@aws-sdk/client-cognito-identity-provider';
+import { awsConfig } from '@backend/config';
 import { ConfigType } from '@nestjs/config';
 import { InjectWolverineSdk, Sdk, mutationType } from '../wolverine-datasource';
 import { randomUUID } from 'node:crypto';
 import { AuditService, InjectAuditService } from '@backend/auditService';
+import { ChangePasswordInput } from './dto/changePassword.input';
+import { InjectAwsService } from '@backend/awsModule';
 
 @Injectable()
 export class AuthService {
@@ -31,12 +36,12 @@ export class AuthService {
     private readonly logger: LoggerService,
     @Inject(awsConfig.KEY)
     private readonly awsCfg: ConfigType<typeof awsConfig>,
-    @Inject(commonConfig.KEY)
-    private readonly cfg: ConfigType<typeof commonConfig>,
     @InjectAuditService('auth') private readonly auditService: AuditService,
+    @InjectAwsService(CognitoIdentityProvider)
+    private readonly cognito: CognitoIdentityProvider,
   ) {}
 
-  registerUser(registerRequest: RegisterRequest): Promise<signUpUser> {
+  async registerUser(registerRequest: RegisterRequest): Promise<signUpUser> {
     const { profileUsername, email, password, phoneNumber } = registerRequest;
     this.logger.info(`${profileUsername} trying to sign up.`);
     const userAttributes = [
@@ -173,17 +178,13 @@ export class AuthService {
       UserPoolId: this.awsCfg.userPoolId,
     };
 
-    const cognito = new CognitoIdentityProvider(
-      this.cfg.isLiveEnv ? {} : this.awsCfg.localDevConfigOverride,
-    );
-
-    const userData = await cognito.adminGetUser(deleteUserData);
+    const userData = await this.cognito.adminGetUser(deleteUserData);
     const id = userData.UserAttributes?.find(
       (attribute) => attribute.Name === 'sub',
     )?.Value;
 
     return new Promise((resolve, reject) => {
-      return cognito.adminDeleteUser(deleteUserData, async (err: any) => {
+      return this.cognito.adminDeleteUser(deleteUserData, async (err: any) => {
         if (err) return reject(err);
         this.logger.info(
           `${deleteUserRequest.email} account deleted from cognito.`,
@@ -200,6 +201,19 @@ export class AuthService {
         resolve('User deleted successfully!');
       });
     });
+  }
+
+  async changePassword(
+    changePasswordDto: ChangePasswordInput,
+  ): Promise<string> {
+    const input = {
+      PreviousPassword: changePasswordDto.previousPassword,
+      ProposedPassword: changePasswordDto.proposedPassword,
+      AccessToken: changePasswordDto.accessToken,
+    };
+    const command = new ChangePasswordCommand(input);
+    await this.cognito.send(command);
+    return 'Password changed successfully!';
   }
 
   private async sendAuditLog(
@@ -221,4 +235,18 @@ export class AuthService {
       },
     });
   }
+
+  // async changeEmail(changeEmailDto: ChangeEmailInput) {
+  //   const input = {
+  //     UserPoolId: this.awsCfg.userPoolId, // required
+  //     Username: changeEmailDto.email, // required
+  //     UserAttributes: [
+  //       {
+  //         Name: 'email',
+  //         Value: changeEmailDto.newEmail,
+  //       },
+  //     ],
+  //   };
+  //   const command = new AdminUpdateUserAttributesCommand(input);
+  //   return await this.cognito.send(command);
 }
