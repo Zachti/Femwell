@@ -12,4 +12,7 @@ export class CreatePostInput {
 
   @Field(() => GraphQLUUID)
   userId!: string;
+
+  @Field(() => GraphQLString, { nullable: true })
+  imageUrl?: string;
 }
