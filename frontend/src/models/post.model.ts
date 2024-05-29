@@ -5,7 +5,7 @@ export interface Post {
   username: string;
   profilePic?: string;
   content: string;
-  imgURL?: string;
+  imageURL?: string;
   likes: number;
   comments: string[];
   createdAt: Timestamp;

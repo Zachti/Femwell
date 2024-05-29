@@ -49,7 +49,7 @@ const CommunityHub: FC<{}> = ({}) => {
                   username={post.username}
                   avatarURL={post.profilePic}
                   content={post.content}
-                  imgURL={post.imgURL}
+                  imageURL={post.imageURL}
                   createdAt={post.createdAt}
                   createdBy={post.createdBy}
                   likes={post.likes}

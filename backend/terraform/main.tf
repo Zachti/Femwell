@@ -36,7 +36,7 @@ data "aws_iam_role" "existing" {
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket = "femwell-main-bucket"
+  bucket = "femwell-bucket"
 }
 
 resource "aws_cognito_user_pool" "femwell_user_pool" {

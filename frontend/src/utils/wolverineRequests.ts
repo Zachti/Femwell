@@ -253,15 +253,8 @@ export const CREATE_POST_MUTATION = gql`
       content
       userId
       username
-      comments {
-        id
-        content
-        username
-      }
-      likes {
-        id
-        username
-      }
+      createdAt
+      isAnonymous
     }
   }
 `;

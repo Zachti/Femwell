@@ -28,7 +28,7 @@ const useCreatePost = () => {
     if (post && post.content.length > 0 && authUser) {
       setIsLoadingPost(true);
       const newPost = {
-        imgURL: "",
+        imageURL: "",
         content: post.content,
         username: post.username,
         createdAt: Timestamp.now(),
@@ -43,12 +43,12 @@ const useCreatePost = () => {
           newPost,
         );
         const userDocRef = doc(firestore, "users", authUser.id);
-        if (post.imgURL) {
+        if (post.imageURL) {
           const imageRef = ref(storage, `posts/${postDocRef.id}/image`);
-          await uploadString(imageRef, post.imgURL, "data_url");
+          await uploadString(imageRef, post.imageURL, "data_url");
           const downloadURL = await getDownloadURL(imageRef);
-          await updateDoc(postDocRef, { imgURL: downloadURL });
-          newPost.imgURL = downloadURL;
+          await updateDoc(postDocRef, { imageURL: downloadURL });
+          newPost.imageURL = downloadURL;
         }
         await updateDoc(userDocRef, { posts: arrayUnion(postDocRef.id) });
 
