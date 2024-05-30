@@ -1,4 +1,5 @@
 export * from './shared/user/entities/user.entity';
+export * from './communityhub/shared/entities/communityHubUser.entity';
 export * from './communityhub/userpost/entities/post.entity';
 export * from './communityhub/comment/entities/comment.entity';
 export * from './communityhub/like/entities/like.entity';

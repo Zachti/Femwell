@@ -86,7 +86,8 @@ export class PostService {
             include: {
               user: {
                 select: {
-                  username: true, // Only select the username field from the related user
+                  username: true, // Only select the username and profilePic fields from the related user
+                  profilePic: true,
                 },
               },
             },
@@ -94,7 +95,8 @@ export class PostService {
           likes: true,
           user: {
             select: {
-              username: true, // Only select the username field from the related user
+              username: true, // Only select the username and profilePic fields from the related user
+              profilePic: true,
             },
           },
         },

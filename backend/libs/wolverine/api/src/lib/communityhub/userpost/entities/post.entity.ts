@@ -1,7 +1,7 @@
 import { ObjectType, Field } from '@nestjs/graphql';
 import { GraphQLString } from 'graphql/type';
 import { GraphQLDate, GraphQLUUID } from 'graphql-scalars';
-import { Like, Comment } from '../../../index';
+import { Like, Comment, CommunityHubUser } from '../../../index';
 import { PostsFilter } from '../dto/posts.filter.input';
 import { Prisma } from '@prisma/client';
 
@@ -10,8 +10,8 @@ export class Post {
   @Field(() => GraphQLUUID)
   id!: string;
 
-  @Field(() => GraphQLString)
-  username!: string;
+  @Field(() => CommunityHubUser)
+  user!: CommunityHubUser;
 
   @Field(() => GraphQLString)
   content!: string;
