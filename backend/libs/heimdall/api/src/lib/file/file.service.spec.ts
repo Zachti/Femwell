@@ -1,17 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UploadService } from './upload.service';
+import { FileService } from './file.service';
 import { heimdallConfig } from '../config/heimdall.config';
 import { LoggerService } from '@backend/logger';
+import { S3 } from '@aws-sdk/client-s3';
+import { getAwsServiceToken } from '@backend/awsModule';
 
-describe('UploadService', () => {
-  let uploadService: UploadService;
+describe('FileService', () => {
+  let fileService: FileService;
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        UploadService,
+        FileService,
         {
           provide: heimdallConfig.KEY,
           useValue: heimdallConfig,
+        },
+        {
+          provide: getAwsServiceToken(S3),
+          useValue: {},
         },
         {
           provide: LoggerService,
@@ -22,10 +28,10 @@ describe('UploadService', () => {
       ],
     }).compile();
 
-    uploadService = module.get<UploadService, UploadService>(UploadService);
+    fileService = module.get<FileService, FileService>(FileService);
   });
 
   it('should be defined', () => {
-    expect(uploadService).toBeDefined();
+    expect(fileService).toBeDefined();
   });
 });

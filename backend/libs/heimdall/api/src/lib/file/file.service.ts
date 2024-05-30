@@ -11,7 +11,7 @@ import { LoggerService } from '@backend/logger';
 import { InjectAwsService } from '@backend/awsModule';
 
 @Injectable()
-export class UploadService {
+export class FileService {
   constructor(
     @Inject(heimdallConfig.KEY)
     private readonly heimdallCfg: ConfigType<typeof heimdallConfig>,
