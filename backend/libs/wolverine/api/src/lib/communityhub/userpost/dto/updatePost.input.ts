@@ -13,6 +13,9 @@ export class UpdatePostInput {
   @Field(() => GraphQLUUID)
   userId!: string;
 
-  @Field(() => GraphQLString)
+  @Field(() => GraphQLString, { nullable: true })
   imageUrl?: string;
+
+  @Field(() => GraphQLUUID, { nullable: true })
+  mentionedUserId?: string;
 }

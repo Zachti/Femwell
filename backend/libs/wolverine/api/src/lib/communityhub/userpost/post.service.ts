@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreatePostInput, UpdatePostInput } from '../../index';
+import { CreatePostInput, UpdatePostInput, UserService } from '../../index';
 import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { ErrorService } from '../../shared/error/error.service';
@@ -13,6 +13,7 @@ import { wolverineConfig } from '../../config/wolverine.config';
 import { ConfigType } from '@nestjs/config';
 import { PostsFilter } from './dto/posts.filter.input';
 import { Post as PostModel } from './entities/post.entity';
+import { SqsService } from '../../sqs/sqs.service';
 
 @Injectable()
 export class PostService {
@@ -22,6 +23,8 @@ export class PostService {
     private readonly error: ErrorService,
     @Inject(wolverineConfig.KEY)
     private readonly Cfg: ConfigType<typeof wolverineConfig>,
+    private readonly sqs: SqsService,
+    private readonly userService: UserService,
   ) {}
   async createPost(input: CreatePostInput): Promise<Post> {
     try {
@@ -35,6 +38,17 @@ export class PostService {
         },
       });
       this.logger.info(`Post created successfully with id: ${result.id}.`);
+      if (input.mentionedUserId) {
+        const userWhoMentioned = await this.userService.findOne(input.userId);
+        const user = await this.userService.findOne(input.mentionedUserId);
+        await this.sqs.sendMessage(
+          JSON.stringify({
+            userWhoMentioned: userWhoMentioned.username,
+            phoneNumber: user.phoneNumber,
+            username: user.username,
+          }),
+        );
+      }
       return result;
     } catch (e) {
       this.error.handleError(new InternalServerErrorException(e));
@@ -49,6 +63,17 @@ export class PostService {
         data: { content: input.content },
       });
       this.logger.info(`Post with id: ${input.id} updated successfully`);
+      if (input.mentionedUserId) {
+        const userWhoMentioned = await this.userService.findOne(input.userId);
+        const user = await this.userService.findOne(input.mentionedUserId);
+        await this.sqs.sendMessage(
+          JSON.stringify({
+            userWhoMentioned: userWhoMentioned.username,
+            phoneNumber: user.phoneNumber,
+            username: user.username,
+          }),
+        );
+      }
       return result;
     } catch (e) {
       this.error.handleError(new InternalServerErrorException(e));

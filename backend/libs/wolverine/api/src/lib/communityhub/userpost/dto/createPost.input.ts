@@ -18,4 +18,7 @@ export class CreatePostInput {
 
   @Field(() => Boolean, { nullable: true })
   isAnonymous?: boolean;
+
+  @Field(() => GraphQLUUID, { nullable: true })
+  mentionedUserId?: string;
 }

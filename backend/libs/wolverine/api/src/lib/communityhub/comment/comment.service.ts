@@ -3,7 +3,11 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCommentInput, UpdateCommentInput, UserService } from '../../index';
+import {
+  CreateCommentInput,
+  UpdateCommentInput,
+  UserService,
+} from '../../index';
 import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { ErrorService } from '../../shared/error/error.service';
@@ -32,11 +36,13 @@ export class CommentService {
       this.logger.info(`Comment created successfully with id: ${result.id}.`);
       if (input.mentionedUserId) {
         const user = await this.userService.findOne(input.mentionedUserId);
-        await this.sqs.sendMessage(JSON.stringify({
-          email: user.email,
-          username: user.username,
-          mentionedUserId: input.mentionedUserId,
-        }));
+        await this.sqs.sendMessage(
+          JSON.stringify({
+            userWhoMentioned: input.username,
+            phoneNumber: user.phoneNumber,
+            username: user.username,
+          }),
+        );
       }
       return result;
     } catch (e) {
@@ -53,6 +59,17 @@ export class CommentService {
         where: { id: input.id },
         data: { content: input.content },
       });
+      if (input.mentionedUserId) {
+        const userWhoMentioned = await this.userService.findOne(result.userId);
+        const user = await this.userService.findOne(input.mentionedUserId);
+        await this.sqs.sendMessage(
+          JSON.stringify({
+            userWhoMentioned: userWhoMentioned.username,
+            phoneNumber: user.phoneNumber,
+            username: user.username,
+          }),
+        );
+      }
       this.logger.info(`Comment with id: ${input.id} updated successfully`);
       return result;
     } catch (e) {
