@@ -32,7 +32,7 @@ export class PostService {
           content: input.content,
           userId: input.userId,
           isAnonymous: input.isAnonymous,
-          imageUrl: input.imageUrl || undefined,
+          imageUrl: input.imageUrl,
         },
       });
       this.logger.info(`Post created successfully with id: ${result.id}.`);
@@ -45,11 +45,12 @@ export class PostService {
   async updatePost(input: UpdatePostInput): Promise<Post> {
     try {
       this.logger.info(`Updating post with id: ${input.id}.`);
+      const imageUrl = input.deleteImage ? null : input.imageUrl;
       const result = await this.prisma.post.update({
         where: { id: input.id, userId: input.userId },
         data: {
           content: input.content,
-          imageUrl: input.imageUrl || undefined,
+          imageUrl,
         },
       });
       this.logger.info(`Post with id: ${input.id} updated successfully`);

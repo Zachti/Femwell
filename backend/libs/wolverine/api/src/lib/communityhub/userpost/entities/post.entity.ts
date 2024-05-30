@@ -37,8 +37,8 @@ export class Post {
   static buildFilter(filter: PostsFilter): Prisma.PostWhereInput {
     if (!filter) return {};
     return {
-      ...(filter.ids && { id: { in: filter.ids } }),
-      ...(filter.usernames && { username: { in: filter.usernames } }),
+      ...(filter.ids?.length && { id: { in: filter.ids } }),
+      ...(filter.usernames?.length && { username: { in: filter.usernames } }),
     };
   }
 }

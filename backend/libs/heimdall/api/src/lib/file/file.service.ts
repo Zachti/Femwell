@@ -43,7 +43,7 @@ export class FileService {
     } as UploadResult;
   }
 
-  async delete(prefix: string, userId: string): Promise<void> {
+  async delete(userId: string, prefix: string): Promise<void> {
     this.logger.info(
       `Initiating file deletion for the post associated with user ID: ${userId}.`,
     );

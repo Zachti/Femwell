@@ -15,4 +15,7 @@ export class UpdatePostInput {
 
   @Field(() => GraphQLString)
   imageUrl?: string;
+
+  @Field(() => Boolean)
+  deleteImage?: boolean;
 }

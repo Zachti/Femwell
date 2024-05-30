@@ -35,9 +35,7 @@ export class CommentService {
 
   async updateComment(input: UpdateCommentInput): Promise<Comment> {
     try {
-      this.logger.info(
-        `Updating comment with id: ${input.id}`,
-      );
+      this.logger.info(`Updating comment with id: ${input.id}`);
       const result = await this.prisma.comment.update({
         where: { id: input.id },
         data: { content: input.content },
