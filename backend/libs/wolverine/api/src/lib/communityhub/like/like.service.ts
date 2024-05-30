@@ -21,7 +21,6 @@ export class LikeService {
       this.logger.info(`Creating a new like on post: ${input.postId}.`);
       const result = await this.prisma.like.create({
         data: {
-          username: input.username,
           userId: input.userId,
           postId: input.postId,
         },

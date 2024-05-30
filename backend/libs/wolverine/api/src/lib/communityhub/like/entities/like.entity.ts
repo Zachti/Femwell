@@ -7,9 +7,6 @@ export class Like {
   @Field(() => GraphQLPositiveInt)
   id!: string;
 
-  @Field(() => GraphQLString)
-  username!: string;
-
   @Field(() => GraphQLUUID)
   userId!: string;
 

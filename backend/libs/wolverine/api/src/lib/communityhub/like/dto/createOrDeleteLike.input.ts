@@ -4,9 +4,6 @@ import { GraphQLUUID } from 'graphql-scalars';
 
 @InputType()
 export class CreateOrDeleteLikeInput {
-  @Field(() => GraphQLString)
-  username!: string;
-
   @Field(() => GraphQLUUID)
   userId!: string;
 
