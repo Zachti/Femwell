@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import {
-  UploadModule,
+  FileModule,
   ExporterModule,
   HeimdallHealthIndicatorsProvider,
   heimdallConfigObject,
@@ -21,7 +21,7 @@ import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
-    UploadModule,
+    FileModule,
     LoggerModule.forRoot({ serviceName: 'heimdall' }),
     ConfigCoreModule.forRoot({
       isGlobal: true,
