@@ -3,7 +3,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCommentInput, UpdateCommentInput } from '../../index';
+import { CreateCommentInput, UpdateCommentInput, UserService } from '../../index';
 import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { ErrorService } from '../../shared/error/error.service';
@@ -17,6 +17,7 @@ export class CommentService {
     private readonly prisma: PrismaService,
     private readonly error: ErrorService,
     private readonly sqs: SqsService,
+    private readonly userService: UserService,
   ) {}
   async createComment(input: CreateCommentInput): Promise<Comment> {
     try {
@@ -26,16 +27,16 @@ export class CommentService {
           content: input.content,
           userId: input.userId,
           postId: input.postId,
-          username: input.username,
         },
       });
       this.logger.info(`Comment created successfully with id: ${result.id}.`);
       if (input.mentionedUserId) {
+        const user = await this.userService.findOne(input.mentionedUserId);
         await this.sqs.sendMessage(JSON.stringify({
-          postId: input.postId,
-          commentId: result.id,
+          email: user.email,
+          username: user.username,
           mentionedUserId: input.mentionedUserId,
-        });
+        }));
       }
       return result;
     } catch (e) {
