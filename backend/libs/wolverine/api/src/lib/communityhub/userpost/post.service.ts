@@ -88,7 +88,7 @@ export class PostService {
                   username: true, // Only select the username field from the related user
                 },
               },
-            }
+            },
           },
           likes: true,
           user: {
