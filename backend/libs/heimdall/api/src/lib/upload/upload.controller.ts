@@ -1,5 +1,7 @@
 import {
+  Body,
   Controller,
+  Delete,
   MaxFileSizeValidator,
   ParseFilePipe,
   Post,
@@ -43,5 +45,14 @@ export class uploadController {
       },
       req.body.path,
     );
+  }
+
+  @Delete()
+  @Auth()
+  async deleteFile(
+    @Body('path') path: string,
+    @Req() req: RequestWithPayload,
+  ): Promise<void> {
+    await this.uploadService.delete(req.user.sub, path);
   }
 }

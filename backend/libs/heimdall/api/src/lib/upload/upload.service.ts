@@ -42,4 +42,30 @@ export class UploadService {
       error: 0,
     } as UploadResult;
   }
+
+  async delete(prefix: string, userId: string): Promise<void> {
+    this.logger.info(
+      `Initiating file deletion for the post associated with user ID: ${userId}.`,
+    );
+    try {
+      const { Contents } = await this.s3.listObjectsV2({
+        Bucket: this.heimdallCfg.awsBucket,
+        Prefix: prefix,
+      });
+      if (!Contents) {
+        this.logger.info('No files found for the given post.');
+        return;
+      }
+      await this.s3.deleteObjects({
+        Bucket: this.heimdallCfg.awsBucket,
+        Delete: {
+          Objects: Contents.map((obj) => ({ Key: obj.Key })),
+        },
+      });
+    } catch (e: any) {
+      this.logger.error(`Fail deleting file: ${e.message}`);
+      throw new InternalServerErrorException(e, 'Fail deleting file');
+    }
+    this.logger.info('file deleted successfully.');
+  }
 }
