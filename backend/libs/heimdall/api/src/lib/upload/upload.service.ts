@@ -38,7 +38,7 @@ export class UploadService {
     this.logger.info('file uploaded successfully.');
     return {
       type: file.mimeType,
-      id: `${filePath}/${file.key}`,
+      id: keyName,
       error: 0,
     } as UploadResult;
   }
