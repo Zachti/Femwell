@@ -9,7 +9,4 @@ export class UpdateCommentInput {
 
   @Field(() => GraphQLString)
   content!: string;
-
-  @Field(() => GraphQLUUID)
-  postId!: string;
 }

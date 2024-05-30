@@ -32,6 +32,7 @@ export class PostService {
           content: input.content,
           userId: input.userId,
           isAnonymous: input.isAnonymous,
+          imageUrl: input.imageUrl || undefined,
         },
       });
       this.logger.info(`Post created successfully with id: ${result.id}.`);
@@ -46,7 +47,10 @@ export class PostService {
       this.logger.info(`Updating post with id: ${input.id}.`);
       const result = await this.prisma.post.update({
         where: { id: input.id, userId: input.userId },
-        data: { content: input.content },
+        data: {
+          content: input.content,
+          imageUrl: input.imageUrl || undefined,
+        },
       });
       this.logger.info(`Post with id: ${input.id} updated successfully`);
       return result;
@@ -77,7 +81,15 @@ export class PostService {
         },
         take: this.Cfg.postLimit, // Limit the result to 50 posts
         include: {
-          comments: true,
+          comments: {
+            include: {
+              user: {
+                select: {
+                  username: true, // Only select the username field from the related user
+                },
+              },
+            }
+          },
           likes: true,
           user: {
             select: {

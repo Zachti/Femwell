@@ -24,7 +24,6 @@ export class CommentService {
           content: input.content,
           userId: input.userId,
           postId: input.postId,
-          username: input.username,
         },
       });
       this.logger.info(`Comment created successfully with id: ${result.id}.`);
@@ -37,7 +36,7 @@ export class CommentService {
   async updateComment(input: UpdateCommentInput): Promise<Comment> {
     try {
       this.logger.info(
-        `Updating comment with id: ${input.id}. on post ${input.postId}`,
+        `Updating comment with id: ${input.id}`,
       );
       const result = await this.prisma.comment.update({
         where: { id: input.id },
@@ -72,6 +71,7 @@ export class CommentService {
           user: {
             select: {
               profilePic: true,
+              username: true,
             },
           },
         },
