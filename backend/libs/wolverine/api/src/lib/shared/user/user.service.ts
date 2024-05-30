@@ -76,7 +76,12 @@ export class UserService {
       this.logger.info('Finding all users.');
       const result = await this.prisma.user.findMany({
         include: {
-          posts: true,
+          posts: {
+            include: {
+              comments: true,
+              likes: true,
+            },
+          },
           comments: true,
           likes: true,
           events: true,

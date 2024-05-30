@@ -38,7 +38,13 @@ export class Post {
     if (!filter) return {};
     return {
       ...(filter.ids?.length && { id: { in: filter.ids } }),
-      ...(filter.usernames?.length && { username: { in: filter.usernames } }),
+      ...(filter.usernames?.length && {
+        user: {
+          username: {
+            in: filter.usernames,
+          },
+        },
+      }),
     };
   }
 }
