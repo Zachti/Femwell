@@ -1,5 +1,7 @@
 import {
+  Body,
   Controller,
+  Delete,
   MaxFileSizeValidator,
   ParseFilePipe,
   Post,
@@ -9,16 +11,16 @@ import {
   UsePipes,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { UploadService } from './upload.service';
+import { FileService } from './file.service';
 import { mimeTypePipe } from '../pipes/mimeType.pipe';
 import 'multer';
 import { Auth, RequestWithPayload } from '@backend/auth';
 import { UploadResult } from '../inetrfaces/interfaces';
 
-@Controller('upload')
-export class uploadController {
-  constructor(private readonly uploadService: UploadService) {}
-  @Post()
+@Controller()
+export class fileController {
+  constructor(private readonly fileService: FileService) {}
+  @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   @UsePipes(new mimeTypePipe())
   @Auth()
@@ -35,7 +37,7 @@ export class uploadController {
     )
     file: Express.Multer.File,
   ): Promise<UploadResult> {
-    return await this.uploadService.upload(
+    return await this.fileService.upload(
       {
         key: file.originalname,
         data: file.buffer,
@@ -43,5 +45,14 @@ export class uploadController {
       },
       req.body.path,
     );
+  }
+
+  @Delete('delete')
+  @Auth()
+  async deleteFile(
+    @Body('path') path: string,
+    @Req() req: RequestWithPayload,
+  ): Promise<void> {
+    await this.fileService.delete(req.user.sub, path);
   }
 }
