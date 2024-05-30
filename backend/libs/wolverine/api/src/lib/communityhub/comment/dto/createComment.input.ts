@@ -15,4 +15,7 @@ export class CreateCommentInput {
 
   @Field(() => GraphQLUUID)
   postId!: string;
+
+  @Field(() => GraphQLUUID, { nullable: true })
+  mentionedUserId?: string;
 }

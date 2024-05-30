@@ -5,3 +5,5 @@ export * from './lib/questionnaire/questionnaire.module';
 export * from './lib/liveChat/liveChat.module';
 export * from './lib/shared/prisma/prisma.module';
 export * from './lib/shared/error/error.module';
+export * from './lib/sqs/sqs.module';
+export * from './lib/sns/sns.module';

@@ -12,6 +12,8 @@ import {
   LiveChatModule,
   wolverineConfigObject,
   PrismaModule,
+  SqsModule,
+  SnsModule,
 } from '@backend/wolverine';
 import { HealthModule, LoggerMiddleware } from '@backend/infrastructure';
 import { WolverineHealthIndicatorsProvider } from '@backend/wolverine';
@@ -21,6 +23,7 @@ import { CacheCoreModule } from '@backend/infrastructure';
 import { AWSSdkModule } from '@backend/awsModule';
 import { ConfigType } from '@nestjs/config';
 import { SNS } from '@aws-sdk/client-sns';
+import { SQS } from '@aws-sdk/client-sqs';
 
 @Module({
   imports: [
@@ -37,7 +40,7 @@ import { SNS } from '@aws-sdk/client-sns';
     }),
     HealthModule.forRoot(WolverineHealthIndicatorsProvider),
     AWSSdkModule.forRootWithAsyncOptions({
-      serviceObjects: [{ client: SNS }],
+      serviceObjects: [{ client: SNS }, { client: SQS }],
       useFactory: (
         commonCfg: ConfigType<typeof commonConfig>,
         awsCfg: ConfigType<typeof awsConfig>,
@@ -52,6 +55,8 @@ import { SNS } from '@aws-sdk/client-sns';
     ErrorModule,
     HttpModule,
     CacheCoreModule,
+    SqsModule,
+    SnsModule,
   ],
 })
 export class WolverineMainModule implements NestModule {

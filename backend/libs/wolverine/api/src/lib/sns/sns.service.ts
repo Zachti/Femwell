@@ -3,7 +3,7 @@ import { SNS } from '@aws-sdk/client-sns';
 import { InjectAwsService } from '@backend/awsModule';
 
 @Injectable()
-export class NotificationService {
+export class SnsService {
   constructor(@InjectAwsService(SNS) private sns: SNS) {}
 
   async sendNotification(topicArn: string, message: string): Promise<void> {

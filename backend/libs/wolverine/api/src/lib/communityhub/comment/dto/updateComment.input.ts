@@ -12,4 +12,7 @@ export class UpdateCommentInput {
 
   @Field(() => GraphQLUUID)
   postId!: string;
+
+  @Field(() => GraphQLUUID, { nullable: true })
+  mentionedUserId?: string;
 }

@@ -8,6 +8,7 @@ import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { ErrorService } from '../../shared/error/error.service';
 import { Comment } from '@prisma/client';
+import { SqsService } from '../../sqs/sqs.service';
 
 @Injectable()
 export class CommentService {
@@ -15,6 +16,7 @@ export class CommentService {
     private readonly logger: LoggerService,
     private readonly prisma: PrismaService,
     private readonly error: ErrorService,
+    private readonly sqs: SqsService,
   ) {}
   async createComment(input: CreateCommentInput): Promise<Comment> {
     try {
@@ -28,6 +30,13 @@ export class CommentService {
         },
       });
       this.logger.info(`Comment created successfully with id: ${result.id}.`);
+      if (input.mentionedUserId) {
+        await this.sqs.sendMessage(JSON.stringify({
+          postId: input.postId,
+          commentId: result.id,
+          mentionedUserId: input.mentionedUserId,
+        });
+      }
       return result;
     } catch (e) {
       this.error.handleError(new InternalServerErrorException(e));
