@@ -249,7 +249,6 @@ export const GET_COMMENTS_QUERY = gql`
 // comment dtos -
 
 interface CreateCommentInput {
-  username: string;
   content: string;
   userId: string;
   postId: string;
@@ -258,7 +257,6 @@ interface CreateCommentInput {
 interface UpdateCommentInput {
   id: number;
   content: string;
-  postId: string;
 }
 
 // POST RESOLVER REQUESTS -

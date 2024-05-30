@@ -4,7 +4,6 @@ import { GraphQLUUID } from 'graphql-scalars';
 
 @InputType()
 export class CreateCommentInput {
-
   @Field(() => GraphQLString)
   content!: string;
 
