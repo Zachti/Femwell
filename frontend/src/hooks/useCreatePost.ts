@@ -1,19 +1,16 @@
 import { useState } from "react";
 import useShowToast from "./useShowToast";
-import {
-  Timestamp,
-  addDoc,
-  arrayUnion,
-  collection,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
-import { firestore, storage } from "../firebase/firebase";
 import useAuthStore from "../store/authStore";
 import usePostStore from "../store/postStore";
 import { useLocation } from "react-router-dom";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
 import { PostInput } from "../models/postInput.model";
+import { v4 as uuidv4 } from "uuid";
+import {
+  CREATE_POST_MUTATION,
+  CreatePostInput,
+} from "../utils/wolverineRequests";
+import axios from "axios";
+import { print } from "graphql";
 
 const useCreatePost = () => {
   const [isLoadingPost, setIsLoadingPost] = useState(false);
@@ -27,36 +24,74 @@ const useCreatePost = () => {
     if (isLoadingPost) return;
     if (post && post.content.length > 0 && authUser) {
       setIsLoadingPost(true);
-      const newPost = {
-        imageURL: "",
-        content: post.content,
-        username: post.username,
-        createdAt: Timestamp.now(),
-        createdBy: authUser.id,
-        likes: 0,
-        comments: [],
-      };
 
       try {
-        const postDocRef = await addDoc(
-          collection(firestore, "posts"),
-          newPost,
-        );
-        const userDocRef = doc(firestore, "users", authUser.id);
+        let URL = "";
+        const postId = uuidv4();
         if (post.imageURL) {
-          const imageRef = ref(storage, `posts/${postDocRef.id}/image`);
-          await uploadString(imageRef, post.imageURL, "data_url");
-          const downloadURL = await getDownloadURL(imageRef);
-          await updateDoc(postDocRef, { imageURL: downloadURL });
-          newPost.imageURL = downloadURL;
-        }
-        await updateDoc(userDocRef, { posts: arrayUnion(postDocRef.id) });
+          const formData = new FormData();
+          formData.append("file", post.imageURL);
+          formData.append("path", `PostImages/${postId}`);
 
-        createPost({
-          ...newPost,
-          id: postDocRef.id,
-          profilePic: post.username === "Anonymous" ? "" : authUser.profilePic,
-        });
+          const uploadResponse = await axios.post(
+            `${import.meta.env.VITE_HEIMDALL_ENDPOINT}/upload`,
+            formData,
+            {
+              headers: {
+                authorization: authUser.jwt,
+              },
+            },
+          );
+
+          const uploadResult = await uploadResponse.data;
+          console.log("uploadResult", uploadResult.id);
+          console.log("--------------------");
+          if (uploadResult.id) {
+            URL = `${import.meta.env.VITE_S3_BUCKET_URL}/${uploadResult.id}`;
+          }
+        }
+
+        let createPostInput: CreatePostInput = {
+          id: postId,
+          userId: authUser.id,
+          content: post.content,
+          imageUrl: URL,
+          isAnonymous: post.isAnonymous,
+        };
+        console.log("createPostInput", createPostInput);
+        const createPostResponse = await axios.post(
+          `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+          {
+            query: print(CREATE_POST_MUTATION),
+            variables: { createPostInput },
+          },
+          {
+            headers: {
+              authorization: authUser.jwt,
+            },
+          },
+        );
+
+        const createPostResult = await createPostResponse.data.data.createPost;
+        console.log("createPostResult", createPostResult);
+        console.log("--------------------");
+
+        const newPost = {
+          id: createPostResult.id,
+          imageURL: URL || "",
+          content: post.content,
+          username: post.username,
+          createdBy: authUser.id,
+          profilePic: createPostResult.isAnonymous ? "" : authUser.profilePic,
+          createdAt: createPostResult.createdAt,
+          likes: 0,
+          comments: [],
+          isAnonymous: createPostResult.isAnonymous,
+        };
+
+        console.log("newPost", newPost);
+
+        createPost(newPost);
 
         setIsLoadingPost(false);
         showToast("Success", "Post created successfully", "success");

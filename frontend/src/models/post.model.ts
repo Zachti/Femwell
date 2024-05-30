@@ -1,5 +1,3 @@
-import { Timestamp } from "firebase/firestore";
-
 export interface Post {
   id: string;
   username: string;
@@ -8,6 +6,7 @@ export interface Post {
   imageURL?: string;
   likes: number;
   comments: string[];
-  createdAt: Timestamp;
+  createdAt: Date;
   createdBy: string;
+  isAnonymous: boolean;
 }

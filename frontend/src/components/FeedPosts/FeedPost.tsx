@@ -2,7 +2,6 @@ import { FC, useEffect, useRef, useState } from "react";
 import PostHeader from "./PostHeader";
 import { Box, Image, Text, Flex, useMediaQuery } from "@chakra-ui/react";
 import PostFooter from "./PostFooter";
-import { Timestamp } from "firebase/firestore";
 import { Comment } from "../../models/comment.model";
 
 interface PostProps {
@@ -11,7 +10,7 @@ interface PostProps {
   imageURL?: string;
   avatarURL?: string;
   content: string;
-  createdAt: Timestamp;
+  createdAt: Date;
   createdBy: string;
   likes: number;
   comments?: Comment[];
@@ -61,7 +60,7 @@ const FeedPost: FC<PostProps> = ({
         createdAt={createdAt}
         createdBy={createdBy}
         content={content}
-        imgURL={imageURL}
+        imageURL={imageURL}
       />
       <Box h={"fit-content"} minH={"80px"} bg={"white"} borderRadius={4}>
         {imageURL && (

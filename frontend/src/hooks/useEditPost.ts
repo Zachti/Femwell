@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
 import useShowToast from "./useShowToast";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { firestore, storage } from "../firebase/firebase";
 import useAuthStore from "../store/authStore";
 import usePostStore from "../store/postStore";
-
 import {
-  deleteObject,
-  getDownloadURL,
-  ref,
-  uploadString,
-} from "firebase/storage";
+  UPDATE_POST_MUTATION,
+  UpdatePostInput,
+} from "../utils/wolverineRequests";
+import axios from "axios";
+import { print } from "graphql";
 
 const useEditPost = () => {
   const [isLoadingEdit, setIsLoadingEdit] = useState(false);
@@ -23,50 +20,68 @@ const useEditPost = () => {
 
     if (
       updatedPost.content === originalPost.content &&
-      updatedPost.imgURL === originalPost.imgURL
+      updatedPost.imageURL === originalPost.imageURL
     )
       return;
 
     setIsLoadingEdit(true);
 
     try {
-      const postDocRef = doc(firestore, "posts", originalPost.postId);
-      const postSnapshot = await getDoc(postDocRef);
-      if (postSnapshot.exists()) {
-        const postData = postSnapshot.data();
-
-        if (postData?.createdBy !== authUser.id) {
-          throw new Error("You are not authorized to edit this post");
-        }
-
-        if (updatedPost.imgURL !== originalPost.imgURL) {
-          const imageRef = ref(storage, `posts/${originalPost.id}/image`);
-          if (postData?.imgURL) await deleteObject(imageRef);
-
-          if (updatedPost.imgURL) {
-            await uploadString(imageRef, updatedPost.imgURL, "data_url");
-            const downloadURL = await getDownloadURL(imageRef);
-            await updateDoc(postDocRef, {
-              imgURL: downloadURL,
-              content: updatedPost.content,
-            });
-
-            updatedPost.imgURL = downloadURL;
-          } else {
-            await updateDoc(postDocRef, {
-              imgURL: null,
-              content: updatedPost.content,
-            });
-          }
-        } else {
-          await updateDoc(postDocRef, {
-            content: updatedPost.content,
-          });
-        }
-
-        editPost(originalPost.postId, updatedPost.content, updatedPost.imgURL);
-        showToast("Success", "Post editted successfully", "success");
+      if (originalPost.createdBy !== authUser.id) {
+        showToast("Error", "You are not authorized to edit this post", "error");
+        return;
       }
+
+      let URL = "";
+      if (updatedPost.imageURL) {
+        const formData = new FormData();
+        formData.append("file", updatedPost.imageURL);
+        formData.append("path", `PostImages/${originalPost.postId}`);
+
+        const uploadResponse = await axios.post(
+          `${import.meta.env.VITE_HEIMDALL_ENDPOINT}/upload`,
+          formData,
+          {
+            headers: {
+              authorization: authUser.jwt,
+            },
+          },
+        );
+
+        const uploadResult = await uploadResponse.data;
+        console.log("uploadResult", uploadResult.id);
+        console.log("--------------------");
+        if (uploadResult.id) {
+          URL = `${import.meta.env.VITE_S3_BUCKET_URL}/${uploadResult.id}`;
+        }
+      }
+
+      let updatePostInput: UpdatePostInput = {
+        id: originalPost.postId,
+        userId: authUser.id,
+        content: updatedPost.content,
+        imageUrl: URL,
+      };
+      console.log("updatePostInput", updatePostInput);
+      const updatePostResponse = await axios.post(
+        `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+        {
+          query: print(UPDATE_POST_MUTATION),
+          variables: { updatePostInput },
+        },
+        {
+          headers: {
+            authorization: authUser.jwt,
+          },
+        },
+      );
+
+      const updatePostResult = await updatePostResponse.data;
+      console.log("updatePostResult", updatePostResult);
+      console.log("--------------------");
+
+      editPost(originalPost.postId, updatedPost.content, updatedPost.imgURL);
+      showToast("Success", "Post editted successfully", "success");
     } catch (error: any) {
       showToast("Error", error.message, "error");
     } finally {

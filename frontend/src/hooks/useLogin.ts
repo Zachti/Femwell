@@ -55,7 +55,14 @@ const useLogin = () => {
           const jwt = await authenticateResult.data.login.jwt;
           const refreshToken = await authenticateResult.data.login.refreshToken;
           console.log(jwt);
-          localStorage.setItem("user", JSON.stringify(userResult.data.oneUser));
+          localStorage.setItem(
+            "user",
+            JSON.stringify({
+              ...userResult.data.oneUser,
+              jwt: jwt,
+              refreshToken: refreshToken,
+            }),
+          );
           loginUser({
             ...userResult.data.oneUser,
             jwt: jwt,
