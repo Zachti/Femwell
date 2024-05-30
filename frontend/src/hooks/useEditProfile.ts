@@ -32,7 +32,7 @@ const useEditProfile = () => {
       if (preflightFile) {
         const formData = new FormData();
         formData.append("file", preflightFile);
-        formData.append("path", authUser.id);
+        formData.append("path", `UserProfilePics/${authUser.id}`);
 
         const uploadResponse = await axios.post(
           `${import.meta.env.VITE_HEIMDALL_ENDPOINT}/upload`,

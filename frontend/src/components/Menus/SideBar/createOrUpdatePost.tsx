@@ -31,8 +31,9 @@ interface createOrUpdatePostProps {
   onWinOpen: () => void;
   onWinClose: () => void;
   mode: "create" | "update";
+  createdBy?: string;
   content?: string;
-  imgURL?: string;
+  imageURL?: string;
   postId?: string;
 }
 
@@ -41,8 +42,9 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
   onWinOpen,
   onWinClose,
   mode,
+  createdBy,
   content,
-  imgURL,
+  imageURL,
   postId,
 }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -53,7 +55,13 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
   const authUser = useAuthStore((state) => state.user);
   const imageRef = useRef<HTMLInputElement>(null);
 
-  const { selectedFile, setSelectedFile, handleImageChange } = usePreviewImg();
+  const {
+    selectedFile,
+    setSelectedFile,
+    handleImageChange,
+    preflightFile,
+    setPreflightFile,
+  } = usePreviewImg();
   const { handleCreatePost, isLoadingPost } = useCreatePost();
   const { handleEditPost, isLoadingEdit } = useEditPost();
 
@@ -83,10 +91,12 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
       const postUsername = isAnon ? "Anonymous" : authUser?.username;
       await handleCreatePost({
         content: postText,
-        imgURL: selectedFile,
+        imageURL: preflightFile,
         username: postUsername,
+        isAnonymous: isAnon,
       });
       setSelectedFile(null);
+      setPreflightFile(null);
       setPostText("");
       onWinClose();
       setIsAnon(false);
@@ -98,12 +108,17 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
       await handleEditPost(
         {
           content: postText,
-          imgURL: selectedFile ? selectedFile : removedImage ? null : imgURL,
+          imageURL: preflightFile
+            ? preflightFile
+            : removedImage
+            ? null
+            : imageURL,
         },
         {
           content,
-          imgURL,
+          imageURL,
           postId,
+          createdBy: createdBy,
         },
       );
       onWinClose();
@@ -147,7 +162,7 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {(selectedFile || imgURL) && !removedImage && (
+            {(selectedFile || imageURL) && !removedImage && (
               <Box position="relative">
                 <Image
                   maxH={"450px"}
@@ -155,7 +170,7 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
                   borderTopLeftRadius={4}
                   borderTopRightRadius={4}
                   objectFit={"cover"}
-                  src={selectedFile ? selectedFile : imgURL}
+                  src={selectedFile ? selectedFile : imageURL}
                   alt="post image"
                 />
                 <IconButton

@@ -2,16 +2,15 @@ import { FC, useEffect, useRef, useState } from "react";
 import PostHeader from "./PostHeader";
 import { Box, Image, Text, Flex, useMediaQuery } from "@chakra-ui/react";
 import PostFooter from "./PostFooter";
-import { Timestamp } from "firebase/firestore";
 import { Comment } from "../../models/comment.model";
 
 interface PostProps {
   id: string;
   username: string;
-  imgURL?: string;
+  imageURL?: string;
   avatarURL?: string;
   content: string;
-  createdAt: Timestamp;
+  createdAt: Date;
   createdBy: string;
   likes: number;
   comments?: Comment[];
@@ -20,7 +19,7 @@ interface PostProps {
 const FeedPost: FC<PostProps> = ({
   id,
   username,
-  imgURL,
+  imageURL,
   avatarURL,
   content,
   createdAt,
@@ -39,7 +38,7 @@ const FeedPost: FC<PostProps> = ({
 
   useEffect(() => {
     const textHeight = textRef.current ? textRef.current.offsetHeight : 0;
-    const textSpaceHeight = imgURL ? 72 : 288;
+    const textSpaceHeight = imageURL ? 72 : 288;
     setShouldShowButton(textHeight >= textSpaceHeight);
   }, [textRef]);
 
@@ -61,17 +60,17 @@ const FeedPost: FC<PostProps> = ({
         createdAt={createdAt}
         createdBy={createdBy}
         content={content}
-        imgURL={imgURL}
+        imageURL={imageURL}
       />
       <Box h={"fit-content"} minH={"80px"} bg={"white"} borderRadius={4}>
-        {imgURL && (
+        {imageURL && (
           <Image
             maxH={"450px"}
             width={"full"}
             borderTopLeftRadius={4}
             borderTopRightRadius={4}
             objectFit={"cover"}
-            src={imgURL}
+            src={imageURL}
             alt="post image"
           />
         )}
@@ -79,7 +78,7 @@ const FeedPost: FC<PostProps> = ({
           <Box
             ref={textRef}
             css={{
-              WebkitLineClamp: isTextExpanded ? "none" : imgURL ? "3" : "12",
+              WebkitLineClamp: isTextExpanded ? "none" : imageURL ? "3" : "12",
               WebkitBoxOrient: "vertical",
             }}
             overflow="hidden"

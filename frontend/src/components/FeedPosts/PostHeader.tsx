@@ -25,10 +25,10 @@ interface PostHeaderProps {
   id: string;
   username: string;
   avatarURL?: string;
-  createdAt: Timestamp;
+  createdAt: Date;
   createdBy: string;
   content: string;
-  imgURL?: string;
+  imageURL?: string;
 }
 
 const PostHeader: FC<PostHeaderProps> = ({
@@ -38,7 +38,7 @@ const PostHeader: FC<PostHeaderProps> = ({
   createdAt,
   createdBy,
   content,
-  imgURL,
+  imageURL,
 }) => {
   const authUser = useAuthStore((state) => state.user);
   const { isLoading, handleDeletePost } = useDeletePost();
@@ -47,12 +47,12 @@ const PostHeader: FC<PostHeaderProps> = ({
   const postUpdateDisclosure = useDisclosure();
 
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const timeAgo = formatDistanceToNow(createdAt.toDate(), { addSuffix: true });
+  const timeAgo = formatDistanceToNow(createdAt, { addSuffix: true });
 
   const handleDeletePostClick = () => {
     console.log("Deleting Post...");
     closeMenu();
-    handleDeletePost(id);
+    handleDeletePost(id, createdBy, imageURL);
   };
 
   const closeMenu = () => {
@@ -135,8 +135,9 @@ const PostHeader: FC<PostHeaderProps> = ({
         onWinOpen={postUpdateDisclosure.onOpen}
         onWinClose={postUpdateDisclosure.onClose}
         mode="update"
+        createdBy={createdBy}
         content={content}
-        imgURL={imgURL}
+        imageURL={imageURL}
         postId={id}
       />
     </>

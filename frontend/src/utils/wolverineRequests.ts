@@ -269,19 +269,8 @@ export const CREATE_POST_MUTATION = gql`
       id
       content
       userId
-      username
-      imageUrl
-      isAnonymous
       createdAt
-      comments {
-        id
-        content
-        username
-      }
-      likes {
-        id
-        username
-      }
+      isAnonymous
     }
   }
 `;
@@ -313,21 +302,7 @@ export const DELETE_POST_MUTATION = gql`
   mutation DeletePost($id: UUID!) {
     deletePost(id: $id) {
       id
-      content
       userId
-      username
-      imageUrl
-      isAnonymous
-      createdAt
-      comments {
-        id
-        content
-        username
-      }
-      likes {
-        id
-        username
-      }
     }
   }
 `;
@@ -357,26 +332,25 @@ export const GET_POSTS_QUERY = gql`
 
 // post dtos -
 
-interface CreatePostInput {
-  username: string;
+export interface CreatePostInput {
+  id: string;
   content: string;
   userId: string;
   imageUrl?: string;
   isAnonymous?: boolean;
 }
 
-interface UpdatePostInput {
+export interface UpdatePostInput {
   id: string;
   content: string;
   userId: string;
   imageUrl?: string;
 }
 
-interface PostsFilter {
-    ids: string[];
-    usernames: string[];
+export interface PostsFilter {
+  ids: string[];
+  usernames: string[];
 }
-
 
 // LIKES RESOLVER REQUESTS -
 
@@ -411,9 +385,9 @@ export const GET_LIKES_QUERY = gql`
 // like dtos -
 
 interface CreateOrDeleteLikeInput {
-    postId: string;
-    userId: string;
-    username: string;
+  postId: string;
+  userId: string;
+  username: string;
 }
 
 // LIVE CHAT RESOLVER REQUESTS -

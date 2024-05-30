@@ -1,17 +1,10 @@
 import { useState } from "react";
 import useShowToast from "./useShowToast";
-import {
-  arrayRemove,
-  deleteDoc,
-  doc,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
-import { firestore, storage } from "../firebase/firebase";
 import useAuthStore from "../store/authStore";
 import usePostStore from "../store/postStore";
-
-import { deleteObject, ref } from "firebase/storage";
+import { DELETE_POST_MUTATION } from "../utils/wolverineRequests";
+import axios from "axios";
+import { print } from "graphql";
 
 const useDeletePost = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,33 +12,47 @@ const useDeletePost = () => {
   const deletePost = usePostStore((state) => state.deletePost);
   const showToast = useShowToast();
 
-  const handleDeletePost = async (postId: string) => {
+  const handleDeletePost = async (
+    postId: string,
+    createdBy: string,
+    imageURL: string | undefined,
+  ) => {
     if (isLoading) return;
     if (postId && authUser) {
       setIsLoading(true);
 
       try {
-        const postDocRef = doc(firestore, "posts", postId);
-        const postSnapshot = await getDoc(postDocRef);
-        if (postSnapshot.exists()) {
-          const postData = postSnapshot.data();
-
-          if (postData?.createdBy !== authUser.id) {
-            throw new Error("You are not authorized to delete this post");
-          }
-
-          if (postData?.imgURL) {
-            const imageRef = ref(storage, `posts/${postId}/image`);
-            await deleteObject(imageRef);
-          }
-          const userDocRef = doc(firestore, "users", authUser.id);
-          await updateDoc(userDocRef, {
-            posts: arrayRemove(postId),
-          });
-          await deleteDoc(postDocRef);
-          deletePost(postId);
-          showToast("Success", "Post deleted successfully", "success");
+        if (createdBy !== authUser.id) {
+          showToast(
+            "Error",
+            "You are not authorized to edit this post",
+            "error",
+          );
+          return;
         }
+
+        if (imageURL) {
+          //go delete formData.append("path", `PostImages/${postId}`);
+        }
+
+        const deletePostResponse = await axios.post(
+          `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+          {
+            query: print(DELETE_POST_MUTATION),
+            variables: { id: postId },
+          },
+          {
+            headers: {
+              authorization: authUser.jwt,
+            },
+          },
+        );
+        const deleteResult = await deletePostResponse.data;
+        console.log("uploadResult", deleteResult);
+        console.log("--------------------");
+
+        deletePost(postId);
+        showToast("Success", "Post deleted successfully", "success");
       } catch (error: any) {
         showToast("Error", error.message, "error");
       } finally {
@@ -53,7 +60,6 @@ const useDeletePost = () => {
       }
     }
   };
-
   return { isLoading, handleDeletePost };
 };
 
