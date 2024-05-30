@@ -4,8 +4,8 @@ import { GraphQLUUID } from 'graphql-scalars';
 
 @InputType()
 export class CreatePostInput {
-  @Field(() => GraphQLString)
-  username!: string;
+  @Field(() => GraphQLUUID)
+  id!: string;
 
   @Field(() => GraphQLString)
   content!: string;

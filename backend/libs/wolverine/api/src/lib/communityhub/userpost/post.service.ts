@@ -25,10 +25,10 @@ export class PostService {
   ) {}
   async createPost(input: CreatePostInput): Promise<Post> {
     try {
-      this.logger.info(`Creating a new post for user: ${input.username}.`);
+      this.logger.info(`Creating a new post for user id: ${input.id}.`);
       const result = await this.prisma.post.create({
         data: {
-          username: input.username,
+          id: input.id,
           content: input.content,
           userId: input.userId,
           isAnonymous: input.isAnonymous,
@@ -79,6 +79,11 @@ export class PostService {
         include: {
           comments: true,
           likes: true,
+          user: {
+            select: {
+              username: true, // Only select the username field from the related user
+            },
+          },
         },
       });
       this.logger.info('Posts fetched successfully.');

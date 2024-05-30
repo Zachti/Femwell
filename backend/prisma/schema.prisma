@@ -29,7 +29,6 @@ model User {
 
 model Post {
   id          String    @id @default(uuid())
-  username    String
   content     String
   likes       Like[]
   comments    Comment[]
