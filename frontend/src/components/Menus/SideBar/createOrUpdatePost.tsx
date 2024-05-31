@@ -31,9 +31,9 @@ interface createOrUpdatePostProps {
   onWinOpen: () => void;
   onWinClose: () => void;
   mode: "create" | "update";
-  createdBy?: string;
+  userId?: string;
   content?: string;
-  imageURL?: string;
+  imageUrl?: string;
   postId?: string;
 }
 
@@ -42,9 +42,9 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
   onWinOpen,
   onWinClose,
   mode,
-  createdBy,
+  userId,
   content,
-  imageURL,
+  imageUrl,
   postId,
 }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -91,7 +91,7 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
       const postUsername = isAnon ? "Anonymous" : authUser?.username;
       await handleCreatePost({
         content: postText,
-        imageURL: preflightFile,
+        imageUrl: preflightFile,
         username: postUsername,
         isAnonymous: isAnon,
       });
@@ -108,17 +108,18 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
       await handleEditPost(
         {
           content: postText,
-          imageURL: preflightFile
+          imageUrl: preflightFile
             ? preflightFile
             : removedImage
             ? null
-            : imageURL,
+            : imageUrl,
+          deleteImage: removedImage,
         },
         {
           content,
-          imageURL,
+          imageUrl,
           postId,
-          createdBy: createdBy,
+          userId,
         },
       );
       onWinClose();
@@ -162,7 +163,7 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {(selectedFile || imageURL) && !removedImage && (
+            {(selectedFile || imageUrl) && !removedImage && (
               <Box position="relative">
                 <Image
                   maxH={"450px"}
@@ -170,7 +171,7 @@ const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
                   borderTopLeftRadius={4}
                   borderTopRightRadius={4}
                   objectFit={"cover"}
-                  src={selectedFile ? selectedFile : imageURL}
+                  src={selectedFile ? selectedFile : imageUrl}
                   alt="post image"
                 />
                 <IconButton

@@ -21,29 +21,48 @@ import { FC, useState } from "react";
 import EmojiPicker from "../EmojiPicker";
 import { Comment } from "../../models/comment.model";
 import PostComment from "./PostComment";
+import useLike from "../../hooks/useLike";
+import useCreateComment from "../../hooks/useCreateComment";
 
 interface PostFooterProps {
-  likes: number; //will be array of userIDs who liked the post
+  likes: string[]; //will be array of userIDs who liked the post
   comments?: Comment[]; //will be array of comments
+  postId: string;
 }
 
-const PostFooter: FC<PostFooterProps> = ({ likes, comments }) => {
+const PostFooter: FC<PostFooterProps> = ({ likes, comments, postId }) => {
   const [liked, setLiked] = useState(false);
-  const [likeCount, setLikes] = useState(likes);
+  const [likeCount, setLikes] = useState(likes.length);
+  const { handleLikePost, isLoading } = useLike();
+  const { handleCreateComment, isLoading: isLoadingComment } =
+    useCreateComment();
   const [showComments, setShowComments] = useState(false);
   const [visibleCommentsCount, setVisibleCommentsCount] = useState(10);
   const [commentActive, setCommentActive] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
 
-  const handleLike = () => {
-    setLiked(!liked);
-    liked ? setLikes(likeCount - 1) : setLikes(likeCount + 1);
+  const handleLike = async () => {
+    const res = await handleLikePost(postId);
+    if (res) {
+      setLiked(!liked);
+      liked ? setLikes(likeCount - 1) : setLikes(likeCount + 1);
+    }
   };
   const handleComment = () => {
     setCommentActive(!commentActive);
     setShowEmojiPicker(false);
   };
+
+  const postComment = async () => {
+    if (inputValue.length > 0) {
+      const res = await handleCreateComment({ postId, content: inputValue });
+      if (res) {
+        setInputValue("");
+      }
+    }
+  };
+
   const addEmoji = (emoji: string) => {
     setInputValue(inputValue + emoji);
   };
@@ -55,7 +74,11 @@ const PostFooter: FC<PostFooterProps> = ({ likes, comments }) => {
   return (
     <>
       <Flex alignItems={"center"} gap={4} w={"full"} pt={0} mt={2}>
-        <Box onClick={handleLike} cursor={"pointer"} fontSize={20}>
+        <Box
+          onClick={isLoading ? undefined : handleLike}
+          cursor={"pointer"}
+          fontSize={20}
+        >
           {!liked ? (
             <FontAwesomeIcon icon={faHeart} />
           ) : (
@@ -89,7 +112,10 @@ const PostFooter: FC<PostFooterProps> = ({ likes, comments }) => {
         <Text
           _hover={{ color: "pink.200" }}
           cursor={"pointer"}
-          onClick={() => setShowComments(!showComments)}
+          onClick={() => {
+            if (comments && comments?.length > 0)
+              setShowComments(!showComments);
+          }}
         >
           {`View all comments (${comments?.length})`}
         </Text>
@@ -111,6 +137,8 @@ const PostFooter: FC<PostFooterProps> = ({ likes, comments }) => {
               cursor={"pointer"}
               _hover={{ bg: "transparent", color: "white" }}
               mr={-2}
+              onClick={postComment}
+              isLoading={isLoadingComment}
             >
               Post
             </Button>

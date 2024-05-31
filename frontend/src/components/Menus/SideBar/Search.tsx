@@ -16,6 +16,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import useSearchUser from "../../../hooks/useSearchUser";
 import { queryTypes } from "../../../utils/userPostQueries";
+import useGetUserPost from "../../../hooks/useGetUserPost";
 
 interface SideBarProps {
   btnText?: string;
@@ -30,11 +31,13 @@ const Search: FC<{}> = ({}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [searchVal, setSearchVal] = useState("");
 
-  const { isLoading, getUserProfile } = useSearchUser();
+  const { getPosts, isLoading } = useGetUserPost();
+  // const { isLoading, getUserProfile } = useSearchUser();
 
   const handleSearchUser = async () => {
     if (searchVal) {
-      await getUserProfile(searchVal, queryTypes.USER_POSTS);
+      await getPosts({ username: searchVal, queryType: queryTypes.USER_POSTS });
+      // await getUserProfile(searchVal, queryTypes.USER_POSTS);
       onClose();
       setSearchVal("");
     }

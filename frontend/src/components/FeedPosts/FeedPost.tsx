@@ -7,25 +7,27 @@ import { Comment } from "../../models/comment.model";
 interface PostProps {
   id: string;
   username: string;
-  imageURL?: string;
-  avatarURL?: string;
+  imageUrl?: string;
+  profilePic?: string;
   content: string;
   createdAt: Date;
-  createdBy: string;
-  likes: number;
+  userId: string;
+  likes: string[];
   comments?: Comment[];
+  isAnonymous: boolean;
 }
 
 const FeedPost: FC<PostProps> = ({
   id,
   username,
-  imageURL,
-  avatarURL,
+  imageUrl,
+  profilePic,
   content,
   createdAt,
-  createdBy,
+  userId,
   likes,
   comments,
+  isAnonymous,
 }) => {
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const textRef = useRef<HTMLDivElement>(null);
@@ -38,7 +40,7 @@ const FeedPost: FC<PostProps> = ({
 
   useEffect(() => {
     const textHeight = textRef.current ? textRef.current.offsetHeight : 0;
-    const textSpaceHeight = imageURL ? 72 : 288;
+    const textSpaceHeight = imageUrl ? 72 : 288;
     setShouldShowButton(textHeight >= textSpaceHeight);
   }, [textRef]);
 
@@ -56,21 +58,22 @@ const FeedPost: FC<PostProps> = ({
       <PostHeader
         id={id}
         username={username}
-        avatarURL={avatarURL}
+        profilePic={profilePic}
         createdAt={createdAt}
-        createdBy={createdBy}
+        userId={userId}
         content={content}
-        imageURL={imageURL}
+        imageUrl={imageUrl}
+        isAnonymous={isAnonymous}
       />
       <Box h={"fit-content"} minH={"80px"} bg={"white"} borderRadius={4}>
-        {imageURL && (
+        {imageUrl && (
           <Image
             maxH={"450px"}
             width={"full"}
             borderTopLeftRadius={4}
             borderTopRightRadius={4}
             objectFit={"cover"}
-            src={imageURL}
+            src={imageUrl}
             alt="post image"
           />
         )}
@@ -78,7 +81,7 @@ const FeedPost: FC<PostProps> = ({
           <Box
             ref={textRef}
             css={{
-              WebkitLineClamp: isTextExpanded ? "none" : imageURL ? "3" : "12",
+              WebkitLineClamp: isTextExpanded ? "none" : imageUrl ? "3" : "12",
               WebkitBoxOrient: "vertical",
             }}
             overflow="hidden"
@@ -101,7 +104,7 @@ const FeedPost: FC<PostProps> = ({
           )}
         </Flex>
       </Box>
-      <PostFooter likes={likes} comments={comments} />
+      <PostFooter likes={likes} comments={comments} postId={id} />
     </Box>
   );
 };

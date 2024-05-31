@@ -55,16 +55,24 @@ const useLogin = () => {
           const jwt = await authenticateResult.data.login.jwt;
           const refreshToken = await authenticateResult.data.login.refreshToken;
           console.log(jwt);
+          const postIds = userResult.data.oneUser.posts.map(
+            (post: any) => post.id,
+          );
+          const likedPostIds = userResult.data.oneUser.likes.map(
+            (like: any) => like.postId,
+          );
           localStorage.setItem(
             "user",
             JSON.stringify({
               ...userResult.data.oneUser,
-              jwt: jwt,
-              refreshToken: refreshToken,
+              posts: postIds,
+              likes: likedPostIds,
             }),
           );
           loginUser({
             ...userResult.data.oneUser,
+            posts: postIds,
+            likes: likedPostIds,
             jwt: jwt,
             refreshToken: refreshToken,
           });

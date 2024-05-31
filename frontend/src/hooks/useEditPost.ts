@@ -20,22 +20,22 @@ const useEditPost = () => {
 
     if (
       updatedPost.content === originalPost.content &&
-      updatedPost.imageURL === originalPost.imageURL
+      updatedPost.imageUrl === originalPost.imageUrl
     )
       return;
 
     setIsLoadingEdit(true);
 
     try {
-      if (originalPost.createdBy !== authUser.id) {
+      if (originalPost.userId !== authUser.id) {
         showToast("Error", "You are not authorized to edit this post", "error");
         return;
       }
 
       let URL = "";
-      if (updatedPost.imageURL) {
+      if (updatedPost.imageUrl) {
         const formData = new FormData();
-        formData.append("file", updatedPost.imageURL);
+        formData.append("file", updatedPost.imageUrl);
         formData.append("path", `PostImages/${originalPost.postId}`);
 
         const uploadResponse = await axios.post(
@@ -60,7 +60,8 @@ const useEditPost = () => {
         id: originalPost.postId,
         userId: authUser.id,
         content: updatedPost.content,
-        imageUrl: URL,
+        imageUrl: URL || originalPost.imageUrl,
+        deleteImage: updatedPost.deleteImage,
       };
       console.log("updatePostInput", updatePostInput);
       const updatePostResponse = await axios.post(
@@ -80,7 +81,8 @@ const useEditPost = () => {
       console.log("updatePostResult", updatePostResult);
       console.log("--------------------");
 
-      editPost(originalPost.postId, updatedPost.content, updatedPost.imgURL);
+      console.log("URL", URL);
+      editPost(originalPost.postId, updatedPost.content, URL);
       showToast("Success", "Post editted successfully", "success");
     } catch (error: any) {
       showToast("Error", error.message, "error");

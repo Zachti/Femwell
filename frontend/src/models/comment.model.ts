@@ -1,6 +1,11 @@
-export interface Comment {
-  id?: string;
+interface User {
+  profilePic?: string;
   username: string;
-  avatarURL?: string;
+}
+
+export interface Comment {
+  id: number;
+  userId: string;
+  user: User;
   content: string;
 }

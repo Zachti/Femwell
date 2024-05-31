@@ -24,21 +24,23 @@ import useEditPost from "../../hooks/useEditPost";
 interface PostHeaderProps {
   id: string;
   username: string;
-  avatarURL?: string;
+  profilePic?: string;
   createdAt: Date;
-  createdBy: string;
+  userId: string;
   content: string;
-  imageURL?: string;
+  imageUrl?: string;
+  isAnonymous: boolean;
 }
 
 const PostHeader: FC<PostHeaderProps> = ({
   id,
   username,
-  avatarURL,
+  profilePic,
   createdAt,
-  createdBy,
+  userId,
   content,
-  imageURL,
+  imageUrl,
+  isAnonymous,
 }) => {
   const authUser = useAuthStore((state) => state.user);
   const { isLoading, handleDeletePost } = useDeletePost();
@@ -52,7 +54,7 @@ const PostHeader: FC<PostHeaderProps> = ({
   const handleDeletePostClick = () => {
     console.log("Deleting Post...");
     closeMenu();
-    handleDeletePost(id, createdBy, imageURL);
+    handleDeletePost(id, userId, imageUrl);
   };
 
   const closeMenu = () => {
@@ -71,19 +73,19 @@ const PostHeader: FC<PostHeaderProps> = ({
         pb={2}
       >
         <Avatar
-          name={username}
-          src={avatarURL ? avatarURL : ""}
+          name={isAnonymous ? "Anonymous" : username}
+          src={isAnonymous ? "" : profilePic ? profilePic : ""}
           size={"sm"}
           bgColor={"pink.500"}
           color={"white"}
           mr={2}
         />
-        {username}
+        {isAnonymous ? "Anonymous" : username}
         <Flex w={"full"} justifyContent={"space-between"}>
           <Box px={2} color={"gray.400"}>
             ● {timeAgo}
           </Box>
-          {authUser?.id === createdBy && !isLoading && (
+          {authUser?.id === userId && !isLoading && (
             <Menu
               isOpen={menuDisclosure.isOpen}
               onClose={closeMenu}
@@ -135,9 +137,9 @@ const PostHeader: FC<PostHeaderProps> = ({
         onWinOpen={postUpdateDisclosure.onOpen}
         onWinClose={postUpdateDisclosure.onClose}
         mode="update"
-        createdBy={createdBy}
+        userId={userId}
         content={content}
-        imageURL={imageURL}
+        imageUrl={imageUrl}
         postId={id}
       />
     </>

@@ -1,12 +1,18 @@
+import { Comment } from "./comment.model";
+
+interface User {
+  profilePic?: string;
+  username: string;
+}
+
 export interface Post {
   id: string;
-  username: string;
-  profilePic?: string;
+  userId: string;
+  user: User;
   content: string;
-  imageURL?: string;
-  likes: number;
-  comments: string[];
+  imageUrl?: string;
+  likes: string[];
+  comments: Comment[];
   createdAt: Date;
-  createdBy: string;
   isAnonymous: boolean;
 }

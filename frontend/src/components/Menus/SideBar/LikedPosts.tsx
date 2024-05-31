@@ -8,6 +8,7 @@ import useAuthStore from "../../../store/authStore";
 import useProfileStore from "../../../store/profileStore";
 import { queryTypes } from "../../../utils/userPostQueries";
 import useSearchUser from "../../../hooks/useSearchUser";
+import useGetUserPost from "../../../hooks/useGetUserPost";
 
 interface SideBarProps {
   btnText?: string;
@@ -24,17 +25,19 @@ const LikedPosts: FC<SideBarProps> = ({}) => {
   const userProfile = useProfileStore((state) => state.userProfile);
   const setPostsQuery = usePostStore((state) => state.setPostsQuery);
   const queryType = usePostStore((state) => state.queryType);
-  const { getUserProfile } = useSearchUser();
+  // const { getUserProfile } = useSearchUser();
+  const { getPosts } = useGetUserPost();
   const showToast = useShowToast();
 
   const handleLikedPosts = async () => {
     if (authUser) {
-      if (!userProfile || queryType !== queryTypes.LIKED_POSTS) {
-        if (userProfile?.username === authUser.username) {
-          setPostsQuery(queryTypes.LIKED_POSTS);
-        } else {
-          await getUserProfile(authUser.username, queryTypes.LIKED_POSTS);
-        }
+      if (queryType !== queryTypes.LIKED_POSTS) {
+        // if (userProfile?.username === authUser.username) {
+        //   setPostsQuery(queryTypes.LIKED_POSTS);
+        // } else {
+        //   await getUserProfile(authUser.username, queryTypes.LIKED_POSTS);
+        // }
+        await getPosts({ queryType: queryTypes.LIKED_POSTS });
       }
     } else {
       showToast("Error", "Please Login to use this feature", "error");
