@@ -14,9 +14,9 @@ import { LoggerService } from '@backend/logger';
 import { Role, Roles } from '@backend/infrastructure';
 import { GraphQLError } from 'graphql/index';
 import { RequestContext } from '../graphQL/interfaces';
-import { User } from '../shared/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { InjectPubSubToken } from './providers/pubSub.provider';
-import { UserService } from '../shared/user/user.service';
+import { UserService } from '../user/user.service';
 
 @Resolver(() => LiveChat)
 export class LiveChatResolver {
