@@ -11,12 +11,19 @@ datasource db {
   url      = env("AWS_AURORA_URL")
 }
 
+enum Role {
+  USER
+  PADULLA
+  PREMIUM
+}
+
 model User {
   id            String         @id @default(uuid())
   username      String         @unique
   email         String
   phoneNumber   String?
   profilePic    String?
+  role          Role           @default(USER)
   posts         Post[]
   comments      Comment[]      @relation("UserComments")
   likes         Like[]         @relation("UserLikes")
