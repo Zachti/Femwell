@@ -13,7 +13,7 @@ import {
   Questionnaire,
   LiveChat,
   Message,
-} from '../../../index';
+} from '../../index';
 
 @ObjectType()
 export class User {

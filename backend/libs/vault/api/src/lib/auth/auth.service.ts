@@ -249,6 +249,22 @@ export class AuthService {
         },
       ],
     };
+    try {
+      await this.wolverineSdk.sendWolverineMutation(
+        mutationType.updateRole,
+        {
+          updateUserInput: {
+            id: changeRoleDto.id,
+            username: changeRoleDto.profileUsername,
+            role: changeRoleDto.newRole,
+          },
+        },
+        this.logger,
+      );
+    } catch (e: any) {
+      this.logger.error(e.message);
+      throw e;
+    }
     const command = new AdminUpdateUserAttributesCommand(input);
     await this.cognito.send(command);
     return 'Role changed successfully!';

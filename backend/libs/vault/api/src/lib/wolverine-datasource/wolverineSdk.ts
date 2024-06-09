@@ -18,6 +18,14 @@ const deleteUserMutation = gql`
   }
 `;
 
+const updateUserRoleMutation = gql`
+  mutation UpdateUser($updateUserInput: UpdateUserInput!) {
+    updateUser(updateUserInput: $updateUserInput) {
+      id
+    }
+  }
+`;
+
 export function getSdk(client: GraphQLClient) {
   const getWolverineMutation = (
     mutation: mutationType,
@@ -28,6 +36,8 @@ export function getSdk(client: GraphQLClient) {
         return createUserMutation;
       case mutationType.delete:
         return deleteUserMutation;
+      case mutationType.updateRole:
+        return updateUserRoleMutation;
       default:
         logger.error(`Not Allowed mutation: ${mutation}.`);
         throw new GraphQLError(`Not Allowed mutation: ${mutation}.`, {

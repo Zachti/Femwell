@@ -3,12 +3,12 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserInput, UpdateUserInput } from '../../index';
+import { CreateUserInput, UpdateUserInput } from '../index';
 import { LoggerService } from '@backend/logger';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../shared/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
 import { User } from '@prisma/client';
-import { ErrorService } from '../error/error.service';
+import { ErrorService } from '../shared/error/error.service';
 
 @Injectable()
 export class UserService {

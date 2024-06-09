@@ -1,5 +1,9 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { GraphQLPhoneNumber, GraphQLUUID } from 'graphql-scalars';
+import {
+  GraphQLEmailAddress,
+  GraphQLPhoneNumber,
+  GraphQLUUID,
+} from 'graphql-scalars';
 import { GraphQLString } from 'graphql/type';
 
 @InputType()
@@ -9,7 +13,7 @@ export class CreateUserInput {
   })
   cognitoUserId!: string;
 
-  @Field(() => GraphQLString)
+  @Field(() => GraphQLEmailAddress)
   email!: string;
 
   @Field(() => GraphQLString, {
