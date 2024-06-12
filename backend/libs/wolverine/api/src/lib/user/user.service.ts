@@ -6,7 +6,6 @@ import {
 import { CreateUserInput, UpdateUserInput } from '../index';
 import { LoggerService } from '@backend/logger';
 import { PrismaService } from '../shared/prisma/prisma.service';
-import { v4 as uuidv4 } from 'uuid';
 import { User } from '@prisma/client';
 import { ErrorService } from '../shared/error/error.service';
 
@@ -24,7 +23,7 @@ export class UserService {
       );
       const result = await this.prisma.user.create({
         data: {
-          id: input.cognitoUserId || uuidv4(), // the || is for dev phase todo remove this shit leibo
+          id: input.cognitoUserId,
           username: input.profileUsername,
           email: input.email,
           phoneNumber: input.phoneNumber || undefined,
