@@ -27,12 +27,16 @@ export class GqlConfigService
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
       autoSchemaFile: {
         path: join(process.cwd(), 'apps/wv/src/graphQL/schema.gql'),
-        federation: 2,
       },
       context: this.createContext.bind(this),
       playground: false,
       csrfPrevention: false,
       useGlobalPrefix: true,
+      installSubscriptionHandlers: true,
+      subscriptions: {
+        'graphql-ws': true,
+        'subscriptions-transport-ws': true,
+      },
     };
   }
 

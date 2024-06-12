@@ -12,26 +12,27 @@ datasource db {
 }
 
 enum Role {
-  USER
-  PADULLA
-  PREMIUM
+  User
+  Padulla
+  Premium
 }
 
 model User {
-  id            String         @id @default(uuid())
-  username      String         @unique
+  id            String          @id @default(uuid())
+  username      String          @unique
   email         String
   phoneNumber   String?
   profilePic    String?
-  role          Role           @default(USER)
+  role          Role            @default(User)
   posts         Post[]
-  comments      Comment[]      @relation("UserComments")
-  likes         Like[]         @relation("UserLikes")
+  comments      Comment[]       @relation("UserComments")
+  likes         Like[]          @relation("UserLikes")
   questionnaire Questionnaire?
-  liveChats     LiveChat[]
-  messages      Message[]      @relation("UserMessages")
-  readLater     String[]       @default([])
+  liveChats     LiveChat[]      @relation("LiveChatUsers")
+  messages      Message[]       @relation("UserMessages")
+  readLater     String[]        @default([])
   events        Event[]
+  liveChatUsers LiveChatUsers[]
 }
 
 model Post {
@@ -87,12 +88,13 @@ model Response {
 }
 
 model LiveChat {
-  id        Int       @id @default(autoincrement())
-  name      String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  users     User[]
-  messages  Message[]
+  id            Int             @id @default(autoincrement())
+  name          String
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  users         User[]          @relation("LiveChatUsers")
+  messages      Message[]
+  liveChatUsers LiveChatUsers[]
 }
 
 model Message {
@@ -118,4 +120,14 @@ model Event {
   is1HourNotificationSent  Boolean  @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LiveChatUsers {
+  liveChatId Int
+  userId     String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  liveChat   LiveChat @relation(fields: [liveChatId], references: [id], onDelete: Cascade)
+
+  @@id([liveChatId, userId])
 }

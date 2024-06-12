@@ -17,6 +17,7 @@ import { RequestContext } from '../graphQL/interfaces';
 import { User } from '../user/entities/user.entity';
 import { InjectPubSubToken } from './providers/pubSub.provider';
 import { UserService } from '../user/user.service';
+import {SendMessageInput} from "./dto/sendMessage.input";
 
 @Resolver(() => LiveChat)
 export class LiveChatResolver {
@@ -33,6 +34,14 @@ export class LiveChatResolver {
   newMessage(@Args('liveChatId') liveChatId: number) {
     return this.pubSub.asyncIterator(`newMessage.${liveChatId}`);
   }
+
+  @Subscription(() => User, {
+    nullable: true,
+    resolve: (value) => value.userId,
+  })
+    userExitLiveChat(@Args('liveChatId') liveChatId: number) {
+        return this.pubSub.asyncIterator(`userExitLiveChat.${liveChatId}`);
+    }
   @Subscription(() => User, {
     nullable: true,
     resolve: (value) => value.user,
@@ -97,17 +106,11 @@ export class LiveChatResolver {
   @Roles([Role.Padulla, Role.Premium, Role.User])
   @Mutation(() => Message)
   async sendMessage(
-    @Args('liveChatId') liveChatId: number,
-    @Args('content') content: string,
-    @Args('userId') userId: string,
+    @Args('sendMessageInput') SendMessageInput: SendMessageInput,
   ) {
-    const newMessage = await this.liveChatService.sendMessage(
-      liveChatId,
-      content,
-      userId,
-    );
+    const newMessage = await this.liveChatService.sendMessage(SendMessageInput);
     await this.pubSub
-      .publish(`newMessage.${liveChatId}`, { newMessage })
+      .publish(`newMessage.${SendMessageInput.liveChatId}`, { newMessage })
       .then((res) => {
         this.logger.info('published', res);
       })
@@ -206,4 +209,21 @@ export class LiveChatResolver {
   async setMessageAsUnread(@Args('liveChatId') liveChatId: number) {
     return await this.liveChatService.setMessageAsUnread(liveChatId);
   }
+
+    @Roles([Role.Padulla, Role.Premium, Role.User])
+    @Mutation(() => Boolean)
+    async exitLiveChat(@Args('liveChatId') liveChatId: number, @Args('userId') userId: string): Promise<boolean>{
+      const res = await this.liveChatService.exitLiveChat(liveChatId, userId);
+      await this.pubSub.publish(`userExitLiveChat.${liveChatId}`, {
+            userId,
+            liveChatId,
+      });
+      return res;
+    }
+
+    @Roles([Role.Padulla, Role.Premium, Role.User])
+    @Query(() => [LiveChat])
+    async getLiveChatsForPadulla(@Args('userId') userId: string) {
+      return this.liveChatService.getLiveChatsForPadulla(userId);
+    }
 }
