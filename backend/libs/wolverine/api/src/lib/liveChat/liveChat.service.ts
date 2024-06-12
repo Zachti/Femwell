@@ -48,6 +48,9 @@ export class LiveChatService {
             },
           },
         },
+        include: {
+            users: true, // show all users in the liveChat (padulla and client)
+        }
       });
       this.logger.info(`New LiveChat created: ${JSON.stringify(res)}`);
       await this.cacheService.set(`${res.id}`, res);

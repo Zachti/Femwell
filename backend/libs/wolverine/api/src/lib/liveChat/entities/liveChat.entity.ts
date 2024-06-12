@@ -19,7 +19,7 @@ export class LiveChat {
   updatedAt?: Date;
 
   @Field(() => [User]) // array of users that have joined the livechat
-  users: User[];
+  users!: User[];
 
   @Field(() => [Message], { nullable: true }) // array of messages
   messages?: Message[];

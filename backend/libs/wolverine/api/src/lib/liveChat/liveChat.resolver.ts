@@ -140,7 +140,7 @@ export class LiveChatResolver {
   }
 
   @Roles([Role.Padulla, Role.Premium, Role.User])
-  @Query(() => [LiveChat])
+  @Query(() => LiveChat)
   async getLiveChat(@Args('liveChatId') liveChatId: number) {
     return this.liveChatService.getLiveChat(liveChatId);
   }
