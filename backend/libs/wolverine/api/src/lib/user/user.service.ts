@@ -117,6 +117,7 @@ export class UserService {
           liveChats: {
             include: {
               messages: true,
+              users: true,
             },
           },
           questionnaire: {
