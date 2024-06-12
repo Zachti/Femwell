@@ -15,6 +15,7 @@ import { Role } from '@backend/infrastructure';
 import { InjectCognitoToken } from './providers/cognito.provider';
 import { signUpUser, userSession } from './interfaces/inrefaces';
 import {
+  AdminUpdateUserAttributesCommand,
   ChangePasswordCommand,
   CognitoIdentityProvider,
 } from '@aws-sdk/client-cognito-identity-provider';
@@ -25,6 +26,7 @@ import { randomUUID } from 'node:crypto';
 import { AuditService, InjectAuditService } from '@backend/auditService';
 import { ChangePasswordInput } from './dto/changePassword.input';
 import { InjectAwsService } from '@backend/awsModule';
+import { ChangeRoleInput } from './dto/changeRole.input';
 
 @Injectable()
 export class AuthService {
@@ -47,7 +49,7 @@ export class AuthService {
     const userAttributes = [
       new CognitoUserAttribute({ Name: 'name', Value: profileUsername }),
       new CognitoUserAttribute({ Name: 'email', Value: email }),
-      //new CognitoUserAttribute({ Name: 'role', Value: Role.User }), // todo try to solve the role issue
+      new CognitoUserAttribute({ Name: 'custom:role', Value: Role.User }),
     ];
     phoneNumber &&
       userAttributes.push(
@@ -236,17 +238,35 @@ export class AuthService {
     });
   }
 
-  // async changeEmail(changeEmailDto: ChangeEmailInput) {
-  //   const input = {
-  //     UserPoolId: this.awsCfg.userPoolId, // required
-  //     Username: changeEmailDto.email, // required
-  //     UserAttributes: [
-  //       {
-  //         Name: 'email',
-  //         Value: changeEmailDto.newEmail,
-  //       },
-  //     ],
-  //   };
-  //   const command = new AdminUpdateUserAttributesCommand(input);
-  //   return await this.cognito.send(command);
+  async changeRole(changeRoleDto: ChangeRoleInput) {
+    const input = {
+      UserPoolId: this.awsCfg.userPoolId, // required
+      Username: changeRoleDto.email, // required
+      UserAttributes: [
+        {
+          Name: 'custom:role',
+          Value: changeRoleDto.newRole,
+        },
+      ],
+    };
+    try {
+      await this.wolverineSdk.sendWolverineMutation(
+        mutationType.updateRole,
+        {
+          updateUserInput: {
+            id: changeRoleDto.id,
+            username: changeRoleDto.profileUsername,
+            role: changeRoleDto.newRole,
+          },
+        },
+        this.logger,
+      );
+    } catch (e: any) {
+      this.logger.error(e.message);
+      throw e;
+    }
+    const command = new AdminUpdateUserAttributesCommand(input);
+    await this.cognito.send(command);
+    return 'Role changed successfully!';
+  }
 }

@@ -10,6 +10,8 @@ import { DeleteUserRequest } from './dto/deleteUserRequest.input';
 import { SignedUpUser } from '../authUser/signedUpUser.entity';
 import { userSession } from './interfaces/inrefaces';
 import { ChangePasswordInput } from './dto/changePassword.input';
+import { ChangeRoleInput } from './dto/changeRole.input';
+import { Auth } from '@backend/auth';
 
 @Resolver(() => AuthUser)
 export class AuthResolver {
@@ -58,6 +60,7 @@ export class AuthResolver {
   }
 
   @Mutation(() => GraphQLString)
+  @Auth()
   async delete(
     @Args('deleteUserRequest') deleteUserRequest: DeleteUserRequest,
   ): Promise<string> {
@@ -65,9 +68,18 @@ export class AuthResolver {
   }
 
   @Mutation(() => GraphQLString)
+  @Auth()
   async changePassword(
     @Args('changePasswordInput') changePasswordInput: ChangePasswordInput,
   ) {
     return this.authService.changePassword(changePasswordInput);
+  }
+
+  @Mutation(() => GraphQLString)
+  @Auth()
+  async changeRole(
+    @Args('ChangeRoleInput') changeRoleInput: ChangeRoleInput,
+  ): Promise<string> {
+    return await this.authService.changeRole(changeRoleInput);
   }
 }

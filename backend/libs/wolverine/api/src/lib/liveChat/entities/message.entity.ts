@@ -2,7 +2,7 @@ import { Field, ObjectType, ID } from '@nestjs/graphql';
 import { GraphQLDate, GraphQLPositiveInt } from 'graphql-scalars';
 import { GraphQLString } from 'graphql/type';
 import { LiveChat } from './liveChat.entity';
-import { User } from '../../shared/user/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 @ObjectType()
 export class Message {
   @Field(() => GraphQLPositiveInt)
