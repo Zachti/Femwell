@@ -148,7 +148,9 @@ export class LiveChatResolver {
 
   @Roles([Role.Padulla, Role.Premium, Role.User])
   @Query(() => [LiveChat])
-  async getPreviousChatsForUser(@Args('userId', { type: () => GraphQLUUID }) userId: string) {
+  async getPreviousChatsForUser(
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
+  ) {
     return this.liveChatService.getPreviousChatsForUser(userId);
   }
 
@@ -227,7 +229,9 @@ export class LiveChatResolver {
 
   @Roles([Role.Padulla, Role.Premium, Role.User])
   @Query(() => [LiveChat])
-  async getLiveChatsForPadulla(@Args('userId', { type: () => GraphQLUUID }) userId: string) {
+  async getLiveChatsForPadulla(
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
+  ) {
     return this.liveChatService.getLiveChatsForPadulla(userId);
   }
 }
