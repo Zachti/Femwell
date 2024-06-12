@@ -1,7 +1,4 @@
-import {
-  ApolloFederationDriver,
-  ApolloFederationDriverConfig,
-} from '@nestjs/apollo';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { GqlConfigService } from './GqlConfigService';
@@ -23,7 +20,7 @@ import {
 } from '../index';
 @Module({
   imports: [
-    GraphQLModule.forRootAsync<ApolloFederationDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       imports: [
         UserModule,
         PostModule,
@@ -40,7 +37,7 @@ import {
         QuestionnaireService,
         LiveChatService,
       ],
-      driver: ApolloFederationDriver,
+      driver: ApolloDriver,
       useClass: GqlConfigService,
     }),
   ],

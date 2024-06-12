@@ -37,12 +37,11 @@ export class LiveChatService {
     }
   }
 
-  async createLiveChat(name: string, userId: string): Promise<LiveChat> {
+  async createLiveChat(userId: string): Promise<LiveChat> {
     try {
       this.logger.info(`Trying to create LiveChat for user with id: ${userId}`);
       const res = await this.prisma.liveChat.create({
         data: {
-          name,
           users: {
             connect: {
               id: userId, // this is the id of the client that request to open the live chat

@@ -1,4 +1,7 @@
-import { ApolloFederationDriverConfig } from '@nestjs/apollo';
+import {
+  ApolloDriverConfig,
+  ApolloFederationDriverConfig,
+} from '@nestjs/apollo';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { GqlOptionsFactory } from '@nestjs/graphql';
@@ -21,7 +24,7 @@ export class GqlConfigService
     private readonly awsCfg: ConfigType<typeof awsConfig>,
     private readonly loggerService: LoggerService,
   ) {}
-  createGqlOptions(): Omit<ApolloFederationDriverConfig, 'driver'> {
+  createGqlOptions(): Omit<ApolloDriverConfig, 'driver'> {
     return {
       introspection: !this.configService.isLiveEnv,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],

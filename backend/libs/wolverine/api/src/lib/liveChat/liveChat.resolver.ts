@@ -125,10 +125,9 @@ export class LiveChatResolver {
   @Roles([Role.Padulla, Role.Premium, Role.User])
   @Mutation(() => LiveChat)
   async createLiveChat(
-    @Args('name') name: string,
     @Args('userId', { type: () => GraphQLUUID }) userId: string,
   ) {
-    return this.liveChatService.createLiveChat(name, userId);
+    return this.liveChatService.createLiveChat(userId);
   }
 
   @Roles([Role.Padulla])
