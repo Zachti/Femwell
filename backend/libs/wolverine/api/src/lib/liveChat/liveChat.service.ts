@@ -8,7 +8,7 @@ import { ErrorService } from '../shared/error/error.service';
 import { LoggerService } from '@backend/logger';
 import { LiveChat, Message } from '@prisma/client';
 import { CacheService } from '@backend/infrastructure';
-import {SendMessageInput} from "./dto/sendMessage.input";
+import { SendMessageInput } from './dto/sendMessage.input';
 
 @Injectable()
 export class LiveChatService {
@@ -235,25 +235,26 @@ export class LiveChatService {
   }
 
   async getLiveChatsForPadulla(padullaId: string): Promise<LiveChat[]> {
-    const liveChatsWithUnreadMessages: LiveChat[] = await this.prisma.liveChat.findMany({
-      where: {
-        users: {
-          some: {
-            id: padullaId,
+    const liveChatsWithUnreadMessages: LiveChat[] =
+      await this.prisma.liveChat.findMany({
+        where: {
+          users: {
+            some: {
+              id: padullaId,
+            },
+          },
+          messages: {
+            some: {
+              seen: false,
+            },
           },
         },
-        messages: {
-          some: {
-            seen: false,
-          },
+        include: {
+          users: true,
+          messages: true,
         },
-      },
-      include: {
-        users: true,
-        messages: true,
-      },
-      take: 10,
-    });
+        take: 10,
+      });
 
     if (liveChatsWithUnreadMessages.length >= 10) {
       return liveChatsWithUnreadMessages;
@@ -292,7 +293,9 @@ export class LiveChatService {
           users: true,
         },
       });
-      this.logger.info(`User with id: ${userId} exited LiveChat with id: ${liveChatId}`);
+      this.logger.info(
+        `User with id: ${userId} exited LiveChat with id: ${liveChatId}`,
+      );
       return true;
     } catch (e) {
       this.error.handleError(new InternalServerErrorException(e));

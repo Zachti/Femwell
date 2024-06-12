@@ -17,7 +17,7 @@ import { RequestContext } from '../graphQL/interfaces';
 import { User } from '../user/entities/user.entity';
 import { InjectPubSubToken } from './providers/pubSub.provider';
 import { UserService } from '../user/user.service';
-import {SendMessageInput} from "./dto/sendMessage.input";
+import { SendMessageInput } from './dto/sendMessage.input';
 
 @Resolver(() => LiveChat)
 export class LiveChatResolver {
@@ -39,9 +39,9 @@ export class LiveChatResolver {
     nullable: true,
     resolve: (value) => value.userId,
   })
-    userExitLiveChat(@Args('liveChatId') liveChatId: number) {
-        return this.pubSub.asyncIterator(`userExitLiveChat.${liveChatId}`);
-    }
+  userExitLiveChat(@Args('liveChatId') liveChatId: number) {
+    return this.pubSub.asyncIterator(`userExitLiveChat.${liveChatId}`);
+  }
   @Subscription(() => User, {
     nullable: true,
     resolve: (value) => value.user,
@@ -210,20 +210,23 @@ export class LiveChatResolver {
     return await this.liveChatService.setMessageAsUnread(liveChatId);
   }
 
-    @Roles([Role.Padulla, Role.Premium, Role.User])
-    @Mutation(() => Boolean)
-    async exitLiveChat(@Args('liveChatId') liveChatId: number, @Args('userId') userId: string): Promise<boolean>{
-      const res = await this.liveChatService.exitLiveChat(liveChatId, userId);
-      await this.pubSub.publish(`userExitLiveChat.${liveChatId}`, {
-            userId,
-            liveChatId,
-      });
-      return res;
-    }
+  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Mutation(() => Boolean)
+  async exitLiveChat(
+    @Args('liveChatId') liveChatId: number,
+    @Args('userId') userId: string,
+  ): Promise<boolean> {
+    const res = await this.liveChatService.exitLiveChat(liveChatId, userId);
+    await this.pubSub.publish(`userExitLiveChat.${liveChatId}`, {
+      userId,
+      liveChatId,
+    });
+    return res;
+  }
 
-    @Roles([Role.Padulla, Role.Premium, Role.User])
-    @Query(() => [LiveChat])
-    async getLiveChatsForPadulla(@Args('userId') userId: string) {
-      return this.liveChatService.getLiveChatsForPadulla(userId);
-    }
+  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Query(() => [LiveChat])
+  async getLiveChatsForPadulla(@Args('userId') userId: string) {
+    return this.liveChatService.getLiveChatsForPadulla(userId);
+  }
 }
