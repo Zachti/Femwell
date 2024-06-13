@@ -5,7 +5,7 @@ export const NEW_MESSAGE_SUBSCRIPTION = gql`
         newMessage(liveChatId: $liveChatId) {
             id
             content
-            sender {
+            user {
                 id
                 username
             }
