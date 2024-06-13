@@ -23,6 +23,7 @@ import { Comment } from "../../models/comment.model";
 import PostComment from "./PostComment";
 import useLike from "../../hooks/useLike";
 import useCreateComment from "../../hooks/useCreateComment";
+import useAuthStore from "../../store/authStore";
 
 interface PostFooterProps {
   likes: string[]; //will be array of userIDs who liked the post
@@ -31,7 +32,10 @@ interface PostFooterProps {
 }
 
 const PostFooter: FC<PostFooterProps> = ({ likes, comments, postId }) => {
-  const [liked, setLiked] = useState(false);
+  const authUser = useAuthStore((state) => state.user);
+  const [liked, setLiked] = useState(
+    authUser?.likes?.includes(postId) || false,
+  );
   const [likeCount, setLikes] = useState(likes.length);
   const { handleLikePost, isLoading } = useLike();
   const { handleCreateComment, isLoading: isLoadingComment } =
@@ -59,6 +63,8 @@ const PostFooter: FC<PostFooterProps> = ({ likes, comments, postId }) => {
       const res = await handleCreateComment({ postId, content: inputValue });
       if (res) {
         setInputValue("");
+        setCommentActive(false);
+        setShowComments(true);
       }
     }
   };

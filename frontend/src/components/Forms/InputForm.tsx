@@ -72,7 +72,7 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                 password: "",
                 confirmPassword: isLogin ? undefined : "",
                 username: isLogin ? undefined : "",
-                phone: isLogin ? undefined : "",
+                phone: isLogin ? undefined : null,
                 login: isLogin,
               }}
               onSubmit={

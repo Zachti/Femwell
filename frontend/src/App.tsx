@@ -17,6 +17,7 @@ import useAuthStore from "./store/authStore";
 import AccountSettings from "./pages/AccountSettings";
 import ION from "./pages/ION";
 import Welcome from "./pages/Welcome";
+import LiveChatCenter from "./pages/LiveChatCenter";
 
 const config = {
   initialColorMode: "light",
@@ -74,7 +75,11 @@ const App: FC<{}> = () => {
   const FabWithLocation = () => {
     const location = useLocation();
 
-    return authUser && location.pathname !== "/account" ? <Fab /> : null;
+    return authUser &&
+      location.pathname !== "/account" &&
+      location.pathname !== "/livechats" ? (
+      <Fab />
+    ) : null;
   };
 
   return (
@@ -92,6 +97,10 @@ const App: FC<{}> = () => {
           <Route
             path="/account"
             element={authUser ? <AccountSettings /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/livechats"
+            element={authUser ? <LiveChatCenter /> : <Navigate to="/" />} //should only be padulla user
           />
           <Route path="/ION" element={<ION />} />
         </Routes>

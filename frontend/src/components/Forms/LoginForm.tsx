@@ -24,7 +24,7 @@ import {
 
 import "../../assets/Navbar.css";
 import { Formik, Field } from "formik";
-import { validateEmail, validatePassword } from "../../utils/formValidations";
+import { validateEmail } from "../../utils/formValidations";
 
 import useLogin from "../../hooks/useLogin";
 import useGoogleAuth from "../../hooks/useGoogleAuth";
@@ -66,7 +66,6 @@ const LoginForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                 const success = await login(values);
                 if (success) {
                   onClose();
-                  //reloadPage();
                 }
               }}
               enableReinitialize
@@ -137,7 +136,6 @@ const LoginForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                         const success = await handleGoogleAuth();
                         if (success) {
                           onClose();
-                          //reloadPage();
                         }
                       }}
                     >

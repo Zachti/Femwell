@@ -31,6 +31,10 @@ import { emojis } from "../utils/emojis";
 import { MimeType } from "../utils/mimeTypes";
 import { Colors } from "../utils/colorsConstants";
 import "../assets/App.css";
+import useCreateLiveChat from "../hooks/useCreateLiveChat";
+import useAuthStore from "../store/authStore";
+import useChatStore from "../store/chatStore";
+import useCreateChatMessage from "../hooks/useCreateChatMessage";
 
 interface LiveChatProps {
   isOpen: boolean;
@@ -39,15 +43,22 @@ interface LiveChatProps {
 
 const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
   const [isLargerThan650] = useMediaQuery("(min-width: 650px)");
-  const [messages, setMessages] = useState<ChatMsg[]>([]);
+
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const bgColor = useColorModeValue("white", Colors.color5);
   const msgBgColor1 = useColorModeValue("pink.200", "pink.700");
   const msgBgColor2 = useColorModeValue("gray.200", "gray.500");
+
+  const { isLoadingChat, handleCreateChat } = useCreateLiveChat();
+  const { isLoading, handleCreateChatMessage } = useCreateChatMessage();
+  const authUser = useAuthStore((state) => state.user);
+  const chats = useChatStore((state) => state.chats);
+  const [chatId, setChatId] = useState<number>(0);
+  const [messages, setMessages] = useState<ChatMsg[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -69,29 +80,29 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
-        setIsLoading(false);
-        setTimeout(() => {
-          handleSndRcvMessage({
-            sender: "them",
-            message: "Hello there Zachary!",
-          });
-        }, 1000);
-      }, 3000);
+      const createChatAndSetData = async () => {
+        await handleCreateChat();
+      };
+
+      createChatAndSetData();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (chats.length > 0) {
+      const newChat = chats[0];
+      setMessages(newChat.messages);
+      setChatId(newChat.id);
+    }
+  }, [chats]);
 
   const onExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const handleSndRcvMessage = (msg: ChatMsg) => {
-    setMessages([...messages, msg]);
-  };
-
-  const onSendMessage = (msg: ChatMsg) => {
+  const onSendMessage = async () => {
     if (!(inputValue.trim() === "" || inputValue.length > 200)) {
-      handleSndRcvMessage(msg);
+      await handleCreateChatMessage({ chatId, content: inputValue });
       setInputValue("");
     }
   };
@@ -149,7 +160,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
           pb="2"
           borderBottom="2px solid var(--secondary-color)"
         >
-          {isLoading ? (
+          {isLoadingChat ? (
             <Flex align="center">
               <Spinner
                 thickness="2px"
@@ -195,7 +206,6 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
               aria-label="Close"
               icon={<SmallCloseIcon />}
               onClick={() => {
-                setIsLoading(true);
                 onClose();
               }}
             />
@@ -212,14 +222,20 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
           {messages.map((msg, index) => (
             <Box
               key={index}
-              bg={msg.sender === "You" ? `${msgBgColor1}` : `${msgBgColor2}`}
-              alignSelf={msg.sender === "You" ? "flex-start" : "flex-end"}
+              bg={
+                msg.username === authUser?.username
+                  ? `${msgBgColor1}`
+                  : `${msgBgColor2}`
+              }
+              alignSelf={
+                msg.username === authUser?.username ? "flex-start" : "flex-end"
+              }
               borderRadius="lg"
               p="2"
               mt="2"
               maxW="80%"
             >
-              <Text>{msg.message}</Text>
+              <Text>{msg.content}</Text>
             </Box>
           ))}
         </Flex>
@@ -234,7 +250,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
           <VStack w="100%">
             <Textarea
               ref={textAreaRef}
-              isDisabled={isLoading}
+              isDisabled={isLoadingChat}
               placeholder="Type a message"
               variant="filled"
               flex="1"
@@ -254,7 +270,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
               <Flex>
                 <IconButton
                   aria-label="Emoji"
-                  isDisabled={isLoading}
+                  isDisabled={isLoadingChat}
                   variant="ghost"
                   icon={<FontAwesomeIcon icon={faSmile} />}
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -325,8 +341,10 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
                   variant="ghost"
                   leftIcon={<FontAwesomeIcon icon={faPaperPlane} />}
                   ml="2"
+                  isLoading={isLoading}
+                  isDisabled={isLoadingChat}
                   onClick={() => {
-                    onSendMessage({ sender: "You", message: inputValue });
+                    if (authUser) onSendMessage();
                   }}
                 >
                   Send

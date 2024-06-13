@@ -66,6 +66,19 @@ resource "aws_cognito_user_pool" "femwell_user_pool" {
     }
   }
 
+   schema {
+    attribute_data_type      = "String"
+    developer_only_attribute = false
+    mutable                  = true
+    name                     = "role"
+    required                 = false
+
+    string_attribute_constraints {
+      min_length = 0
+      max_length = 10
+    }
+  }
+
   auto_verified_attributes = ["email"]
    mfa_configuration = "OFF"
 }
@@ -344,7 +357,8 @@ resource "aws_ecs_task_definition" "wolverine_task" {
   operating_system_family = "LINUX"
   cpu_architecture        = "X86_64"
   }
-  execution_role_arn       = data.aws_iam_role.existing.arn
+  execution_role_arn = data.aws_iam_role.existing.arn
+  task_role_arn      = data.aws_iam_role.existing.arn
 }
 
 resource "aws_ecs_service" "femwell_wolverine_service" {
@@ -438,7 +452,8 @@ resource "aws_ecs_task_definition" "vault_task" {
   operating_system_family = "LINUX"
   cpu_architecture        = "X86_64"
   }
-  execution_role_arn       = data.aws_iam_role.existing.arn
+  execution_role_arn = data.aws_iam_role.existing.arn
+  task_role_arn      = data.aws_iam_role.existing.arn
 }
 
 
@@ -551,8 +566,8 @@ resource "aws_ecs_task_definition" "heimdall_task" {
   operating_system_family = "LINUX"
   cpu_architecture        = "X86_64"
   }
-  execution_role_arn       = data.aws_iam_role.existing.arn
-  task_role_arn            = data.aws_iam_role.existing.arn
+  execution_role_arn = data.aws_iam_role.existing.arn
+  task_role_arn      = data.aws_iam_role.existing.arn
 }
 
 

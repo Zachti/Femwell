@@ -20,6 +20,7 @@ import useLogout from "../../hooks/useLogout";
 import ColorModeSwitch from "../ColorModeSwitch";
 import { Colors } from "../../utils/colorsConstants";
 import LogoSvg from "./LogoSvg";
+import LoginForm from "../Forms/LoginForm";
 
 const Navbar: FC<{}> = () => {
   const {
@@ -133,7 +134,7 @@ const Navbar: FC<{}> = () => {
           </div>
         </div>
       </nav>
-      <InputForm
+      <LoginForm
         isOpen={isInputFormOpen}
         onClose={onInputFormClose}
         onOpen={onInputFormOpen}

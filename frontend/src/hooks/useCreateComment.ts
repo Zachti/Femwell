@@ -41,7 +41,8 @@ const useCreateComment = () => {
           },
         );
 
-        const createCommentResult = await createCommentResponse.data;
+        const createCommentResult = await createCommentResponse.data.data
+          .createComment;
         console.log("createCommentResult", createCommentResult);
         console.log("--------------------");
 
@@ -49,8 +50,8 @@ const useCreateComment = () => {
           id: createCommentResult.id,
           userId: authUser.id,
           user: {
-            username: createCommentResult.user.username,
-            profilePic: createCommentResult.user.username || "",
+            username: authUser.username,
+            profilePic: authUser.profilePic || "",
           },
           content: createCommentResult.content,
         };

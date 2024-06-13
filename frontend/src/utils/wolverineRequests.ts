@@ -7,6 +7,7 @@ export const CREATE_USER_MUTATION = gql`
       email
       username
       phoneNumber
+      role
     }
   }
 `;
@@ -27,6 +28,7 @@ export const GET_USER_PROFILE_QUERY = gql`
       phoneNumber
       readLater
       profilePic
+      role
     }
   }
 `;
@@ -196,10 +198,6 @@ export const CREATE_COMMENT_MUTATION = gql`
       content
       userId
       postId
-      user {
-        username
-        profilePic
-      }
     }
   }
 `;
@@ -221,10 +219,6 @@ export const DELETE_COMMENT_MUTATION = gql`
       id
       content
       userId
-      user {
-        username
-        profilePic
-      }
     }
   }
 `;
@@ -321,6 +315,10 @@ export const GET_POSTS_QUERY = gql`
       comments {
         id
         content
+        user {
+          username
+          profilePic
+        }
       }
       likes {
         id
@@ -330,7 +328,6 @@ export const GET_POSTS_QUERY = gql`
 `;
 
 // post dtos -
-
 export interface CreatePostInput {
   id: string;
   content: string;
@@ -355,8 +352,8 @@ export interface PostsFilter {
 // LIKES RESOLVER REQUESTS -
 
 export const CREATE_LIKE_MUTATION = gql`
-  mutation CreateLike($createLikeInput: CreateOrDeleteLikeInput!) {
-    createLike(createLikeInput: $createLikeInput) {
+  mutation CreateLike($CreateOrDeleteLikeInput: CreateOrDeleteLikeInput!) {
+    createLike(CreateOrDeleteLikeInput: $CreateOrDeleteLikeInput) {
       postId
       userId
     }
@@ -364,8 +361,8 @@ export const CREATE_LIKE_MUTATION = gql`
 `;
 
 export const DELETE_LIKE_MUTATION = gql`
-  mutation DeleteLike($deleteLikeInput: CreateOrDeleteLikeInput!) {
-    deleteLike(deleteLikeInput: $deleteLikeInput)
+  mutation DeleteLike($CreateOrDeleteLikeInput: CreateOrDeleteLikeInput!) {
+    deleteLike(CreateOrDeleteLikeInput: $CreateOrDeleteLikeInput)
   }
 `;
 
@@ -389,30 +386,15 @@ export interface CreateOrDeleteLikeInput {
 // LIVE CHAT RESOLVER REQUESTS -
 
 export const CREATE_LIVE_CHAT_MUTATION = gql`
-  mutation CreateLiveChat($name: String!, $userId: UUID!) {
-    createLiveChat(name: $name, userId: $userId) {
+  mutation CreateLiveChat($userId: UUID!) {
+    createLiveChat(userId: $userId) {
       id
-      name
       createdAt
       updatedAt
       users {
         id
-        email
         username
-        phoneNumber
-      }
-      messages {
-        id
-        content
-        userId
-        user {
-          email
-          username
-          phoneNumber
-        }
-        seen
-        createdAt
-        updatedAt
+        profilePic
       }
     }
   }
@@ -422,7 +404,6 @@ export const DELETE_LIVE_CHAT_MUTATION = gql`
   mutation DeleteLiveChat($id: UUID!) {
     deleteLiveChat(id: $id) {
       id
-      name
       createdAt
       updatedAt
       users {
@@ -449,26 +430,22 @@ export const DELETE_LIVE_CHAT_MUTATION = gql`
 `;
 
 export const GET_LIVE_CHAT_QUERY = gql`
-  query GetLiveChat($liveChatId: PositiveInt!) {
+  query GetLiveChat($liveChatId: Float!) {
     getLiveChat(liveChatId: $liveChatId) {
       id
-      name
       createdAt
       updatedAt
       users {
         id
         email
         username
-        phoneNumber
       }
       messages {
         id
         content
         userId
         user {
-          email
           username
-          phoneNumber
         }
         seen
         createdAt
@@ -509,19 +486,13 @@ export const GET_PREVIOUS_CHATS_FOR_USER_QUERY = gql`
 `;
 
 export const SEND_MESSAGE_MUTATION = gql`
-  mutation SendMessage(
-    $liveChatId: PositiveInt!
-    $content: String!
-    $userId: UUID!
-  ) {
-    sendMessage(liveChatId: $liveChatId, content: $content, userId: $userId) {
+  mutation SendMessage($sendMessageInput: SendMessageInput!) {
+    sendMessage(sendMessageInput: $sendMessageInput) {
       id
       content
       userId
       user {
-        email
         username
-        phoneNumber
       }
       seen
       createdAt
@@ -529,6 +500,12 @@ export const SEND_MESSAGE_MUTATION = gql`
     }
   }
 `;
+
+export interface SendMessageInput {
+  userId: string;
+  liveChatId: number;
+  content: string;
+}
 
 export const ADD_PADULLA_TO_LIVE_CHAT_MUTATION = gql`
   mutation AddPadullaToLiveChat($liveChatId: PositiveInt!, $userId: UUID!) {

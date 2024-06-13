@@ -25,19 +25,20 @@ const useLike = () => {
       setIsLoading(true);
 
       try {
+        let flag = true; //remove this later on
         let updatedLikesArray: string[];
-        let likeInput: CreateOrDeleteLikeInput = {
+        let CreateOrDeleteLikeInput: CreateOrDeleteLikeInput = {
           postId,
           userId: authUser.id,
         };
-        console.log("likeInput", likeInput);
+        console.log("likeInput", CreateOrDeleteLikeInput);
         console.log(!authUser.likes?.includes(postId));
         if (!authUser.likes?.includes(postId)) {
           const createLikeResponse = await axios.post(
             `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
             {
               query: print(CREATE_LIKE_MUTATION),
-              variables: { createLikeInput: likeInput },
+              variables: { CreateOrDeleteLikeInput },
             },
             {
               headers: {
@@ -46,16 +47,18 @@ const useLike = () => {
             },
           );
 
-          const createLikeResult = await createLikeResponse.data.data;
+          const createLikeResult = await createLikeResponse.data.data
+            .createLike;
           console.log("createLikeResult", createLikeResult);
           console.log("--------------------");
           updatedLikesArray = [postId, ...(authUser.likes || [])];
         } else {
+          flag = false;
           const deleteLikeResponse = await axios.post(
             `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
             {
               query: print(DELETE_LIKE_MUTATION),
-              variables: { deleteLikeInput: likeInput },
+              variables: { CreateOrDeleteLikeInput },
             },
             {
               headers: {
@@ -65,19 +68,22 @@ const useLike = () => {
           );
 
           const deleteLikeResult = await deleteLikeResponse.data.data;
-          console.log("createLikeResult", deleteLikeResult);
+
+          console.log("deleteLikeResult", deleteLikeResult);
           console.log("--------------------");
           updatedLikesArray =
             authUser.likes?.filter((likedPost) => likedPost !== postId) || [];
         }
         console.log("updatedLikesArray", updatedLikesArray);
 
-        // setUser({
-        //   ...authUser,
-        //   likes: updatedLikesArray,
-        // });
+        setUser({
+          ...authUser,
+          likes: updatedLikesArray,
+        });
 
-        showToast("Success", "Like created successfully", "success");
+        flag
+          ? showToast("Success", "Like created successfully", "success")
+          : showToast("Success", "Like deleted successfully", "success");
         return true;
       } catch (error: any) {
         showToast("Error", error.message, "error");

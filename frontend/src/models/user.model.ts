@@ -25,4 +25,5 @@ export interface AuthUser {
   questionnaire?: Questionnare;
   profilePic?: string;
   laterArticles?: string[];
+  role: string;
 }

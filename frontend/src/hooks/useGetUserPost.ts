@@ -139,11 +139,12 @@ const useGetUserPost = () => {
         setPosts(filteredPosts);
         postLen = filteredPosts.length;
       } else if (data.queryType === queryTypes.MY_POSTS) {
+        if (!authUser.posts || authUser.posts.length <= 0) return;
         const filter: PostsFilter = {
           ids: authUser.posts,
         };
         console.log("filter", filter);
-        const userPostsResponse = await axios.post(
+        const myPostsResponse = await axios.post(
           `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
           {
             query: print(GET_POSTS_QUERY),
@@ -155,17 +156,18 @@ const useGetUserPost = () => {
             },
           },
         );
-        const userPostsResult = await userPostsResponse.data;
-        console.log("userPostsResult", userPostsResult.data.getPosts);
+        const myPostsResult = await myPostsResponse.data;
+        console.log("myPostsResult", myPostsResult.data.getPosts);
         console.log("--------------------");
-        setPosts(userPostsResult.data.getPosts);
-        postLen = userPostsResult.data.getPosts.length;
+        setPosts(myPostsResult.data.getPosts);
+        postLen = myPostsResult.data.getPosts.length;
       } else if (data.queryType === queryTypes.LIKED_POSTS) {
+        if (!authUser.likes || authUser.likes.length <= 0) return;
         const filter: PostsFilter = {
           ids: authUser.likes,
         };
         console.log("filter", filter);
-        const userPostsResponse = await axios.post(
+        const likedPostsResponse = await axios.post(
           `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
           {
             query: print(GET_POSTS_QUERY),
@@ -177,13 +179,32 @@ const useGetUserPost = () => {
             },
           },
         );
-        const userPostsResult = await userPostsResponse.data;
-        console.log("userPostsResult", userPostsResult.data.getPosts);
+        const likedPostsResult = await likedPostsResponse.data;
+        console.log("likedPostsResult", likedPostsResult.data.getPosts);
         console.log("--------------------");
-        setPosts(userPostsResult.data.getPosts);
-        postLen = userPostsResult.data.getPosts.length;
+        setPosts(likedPostsResult.data.getPosts);
+        postLen = likedPostsResult.data.getPosts.length;
       } else if (data.queryType === queryTypes.RANDOM_POSTS) {
-        q = userPostQueries.getRandomPosts();
+        const filter: PostsFilter = {
+          ids: [],
+        };
+        console.log("filter", filter);
+        const randomPostsResponse = await axios.post(
+          `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+          {
+            query: print(GET_POSTS_QUERY),
+            variables: { filter },
+          },
+          {
+            headers: {
+              authorization: authUser.jwt,
+            },
+          },
+        );
+        const randomPostsResult = await randomPostsResponse.data;
+        console.log("randomPostsResult", randomPostsResult.data.getPosts);
+        console.log("--------------------");
+        setPosts(randomPostsResult.data.getPosts);
       }
 
       if (postLen <= 0) {

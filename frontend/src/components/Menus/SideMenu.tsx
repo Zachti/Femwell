@@ -72,7 +72,7 @@ const SideMenu: FC<SideMenuProps> = ({
             </>
           ) : (
             <>
-              <Box>Welcome to FemWell!</Box>
+              <Box>Welcome to Femwell!</Box>
             </>
           )}
         </DrawerHeader>
@@ -151,6 +151,18 @@ const SideMenu: FC<SideMenuProps> = ({
                 Account
               </Button>
             )}
+            {authUser?.role === "Padulla" && (
+              <Button
+                colorScheme="pink"
+                w="full"
+                onClick={() => {
+                  onClose();
+                  navigate("/livechats");
+                }}
+              >
+                Chat Center
+              </Button>
+            )}
           </VStack>
         </DrawerBody>
         {authUser && (
@@ -162,7 +174,6 @@ const SideMenu: FC<SideMenuProps> = ({
               onClick={() => {
                 logout();
                 onClose();
-                //reloadPage();
               }}
               isLoading={isLoggingOut}
             >

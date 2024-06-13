@@ -84,7 +84,7 @@ const useLogin = () => {
         return false;
       }
     } catch (error: any) {
-      showToast("Error", error.message, "error");
+      showToast("Error", "Failed to login", "error");
       return false;
     } finally {
       setisLoggingIn(false);
