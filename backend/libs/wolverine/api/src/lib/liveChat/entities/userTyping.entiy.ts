@@ -1,11 +1,12 @@
-import { Field, ObjectType, ID } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
+import { GraphQLPositiveInt, GraphQLUUID } from 'graphql-scalars';
 
 @ObjectType()
 export class UserTyping {
-  @Field(() => ID, { nullable: true })
+  @Field(() => GraphQLUUID, { nullable: true })
   userId?: string;
 
-  @Field(() => ID, { nullable: true })
+  @Field(() => GraphQLPositiveInt, { nullable: true })
   liveChatId?: number;
 }
 
