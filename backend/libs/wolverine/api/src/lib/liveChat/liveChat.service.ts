@@ -78,6 +78,7 @@ export class LiveChatService {
         },
         include: {
           users: true, // show all users in the liveChat (padulla and client)
+          messages: true,
         },
       });
       this.logger.info(`Padulla added to LiveChat. Padulla id: ${padullaId}`);
