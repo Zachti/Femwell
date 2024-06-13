@@ -73,7 +73,7 @@ export class LiveChatResolver {
 
   @Subscription(() => User, {
     nullable: true,
-    resolve: (value) => value.userId,
+    resolve: (value) => value.user,
   })
   padullaEnteredLiveChat(@Args('liveChatId', { type: () => GraphQLPositiveInt }) liveChatId: number) {
     return this.pubSub.asyncIterator(`padullaEnteredLiveChat.${liveChatId}`);
