@@ -14,6 +14,7 @@ import {
   LiveChat,
   Message,
 } from '../../index';
+import {Role} from "@backend/infrastructure";
 
 @ObjectType()
 export class User {
@@ -52,4 +53,7 @@ export class User {
 
   @Field(() => GraphQLURL, { nullable: true })
   profilePic?: URL;
+
+  @Field(() => Role)
+  role!: Role;
 }

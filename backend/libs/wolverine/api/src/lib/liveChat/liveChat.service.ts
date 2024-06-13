@@ -8,6 +8,7 @@ import { ErrorService } from '../shared/error/error.service';
 import { LoggerService } from '@backend/logger';
 import { LiveChat, Message } from '@prisma/client';
 import { CacheService } from '@backend/infrastructure';
+import { SendMessageInput } from './dto/sendMessage.input';
 
 @Injectable()
 export class LiveChatService {
@@ -36,18 +37,20 @@ export class LiveChatService {
     }
   }
 
-  async createLiveChat(name: string, userId: string): Promise<LiveChat> {
+  async createLiveChat(userId: string): Promise<LiveChat> {
     try {
       this.logger.info(`Trying to create LiveChat for user with id: ${userId}`);
       const res = await this.prisma.liveChat.create({
         data: {
-          name,
           users: {
             connect: {
               id: userId, // this is the id of the client that request to open the live chat
             },
           },
         },
+        include: {
+            users: true, // show all users in the liveChat (padulla and client)
+        }
       });
       this.logger.info(`New LiveChat created: ${JSON.stringify(res)}`);
       await this.cacheService.set(`${res.id}`, res);
@@ -112,11 +115,12 @@ export class LiveChatService {
     });
   }
 
-  async sendMessage(liveChatId: number, message: string, userId: string) {
+  async sendMessage(SendMessageInput: SendMessageInput) {
+    const { userId, liveChatId, content } = SendMessageInput;
     try {
       const res = await this.prisma.message.create({
         data: {
-          content: message,
+          content,
           liveChatId,
           userId,
         },
@@ -230,5 +234,73 @@ export class LiveChatService {
       },
     });
     return lastMessage;
+  }
+
+  async getLiveChatsForPadulla(padullaId: string): Promise<LiveChat[]> {
+    const liveChatsWithUnreadMessages: LiveChat[] =
+      await this.prisma.liveChat.findMany({
+        where: {
+          users: {
+            some: {
+              id: padullaId,
+            },
+          },
+          messages: {
+            some: {
+              seen: false,
+            },
+          },
+        },
+        include: {
+          users: true,
+          messages: true,
+        },
+        take: 10,
+      });
+
+    if (liveChatsWithUnreadMessages.length >= 10) {
+      return liveChatsWithUnreadMessages;
+    }
+
+    const liveChatsWithOneUser: LiveChat[] = await this.prisma.$queryRaw`
+      SELECT lc., u.
+      FROM "LiveChat" lc
+      JOIN (
+        SELECT "liveChatId", COUNT(*) AS "chatCount"
+        FROM "User"
+        GROUP BY "liveChatId"
+        HAVING COUNT(*) = 1
+      ) c ON lc."id" = c."liveChatId"
+      JOIN "User" u ON lc."id" = u."liveChatId"
+      LIMIT 10 - liveChatsWithUnreadMessages.length;
+    `;
+
+    return [...liveChatsWithUnreadMessages, ...liveChatsWithOneUser];
+  }
+
+  async exitLiveChat(liveChatId: number, userId: string): Promise<boolean> {
+    try {
+      await this.prisma.liveChat.update({
+        where: {
+          id: liveChatId,
+        },
+        data: {
+          users: {
+            disconnect: {
+              id: userId,
+            },
+          },
+        },
+        include: {
+          users: true,
+        },
+      });
+      this.logger.info(
+        `User with id: ${userId} exited LiveChat with id: ${liveChatId}`,
+      );
+      return true;
+    } catch (e) {
+      this.error.handleError(new InternalServerErrorException(e));
+    }
   }
 }

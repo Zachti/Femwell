@@ -17,6 +17,8 @@ import { RequestContext } from '../graphQL/interfaces';
 import { User } from '../user/entities/user.entity';
 import { InjectPubSubToken } from './providers/pubSub.provider';
 import { UserService } from '../user/user.service';
+import { SendMessageInput } from './dto/sendMessage.input';
+import { GraphQLUUID } from 'graphql-scalars';
 
 @Resolver(() => LiveChat)
 export class LiveChatResolver {
@@ -33,6 +35,14 @@ export class LiveChatResolver {
   newMessage(@Args('liveChatId') liveChatId: number) {
     return this.pubSub.asyncIterator(`newMessage.${liveChatId}`);
   }
+
+  @Subscription(() => User, {
+    nullable: true,
+    resolve: (value) => value.userId,
+  })
+  userExitLiveChat(@Args('liveChatId') liveChatId: number) {
+    return this.pubSub.asyncIterator(`userExitLiveChat.${liveChatId}`);
+  }
   @Subscription(() => User, {
     nullable: true,
     resolve: (value) => value.user,
@@ -42,7 +52,7 @@ export class LiveChatResolver {
   })
   userStartedTyping(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: string,
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
   ) {
     return this.pubSub.asyncIterator(`userStartedTyping.${liveChatId}`);
   }
@@ -56,7 +66,7 @@ export class LiveChatResolver {
   })
   userStoppedTyping(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: string,
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
   ) {
     return this.pubSub.asyncIterator(`userStoppedTyping.${liveChatId}`);
   }
@@ -65,7 +75,7 @@ export class LiveChatResolver {
   @Mutation(() => User)
   async userStartedTypingMutation(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: string,
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
     @Context() context: { req: RequestContext },
   ) {
     const user = await this.userService.findOne(userId);
@@ -81,7 +91,7 @@ export class LiveChatResolver {
   @Mutation(() => User)
   async userStoppedTypingMutation(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: string,
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
     @Context() context: { req: RequestContext },
   ) {
     const user = await this.userService.findOne(userId);
@@ -97,17 +107,11 @@ export class LiveChatResolver {
   @Roles([Role.Padulla, Role.Premium, Role.User])
   @Mutation(() => Message)
   async sendMessage(
-    @Args('liveChatId') liveChatId: number,
-    @Args('content') content: string,
-    @Args('userId') userId: string,
+    @Args('sendMessageInput') SendMessageInput: SendMessageInput,
   ) {
-    const newMessage = await this.liveChatService.sendMessage(
-      liveChatId,
-      content,
-      userId,
-    );
+    const newMessage = await this.liveChatService.sendMessage(SendMessageInput);
     await this.pubSub
-      .publish(`newMessage.${liveChatId}`, { newMessage })
+      .publish(`newMessage.${SendMessageInput.liveChatId}`, { newMessage })
       .then((res) => {
         this.logger.info('published', res);
       })
@@ -121,30 +125,31 @@ export class LiveChatResolver {
   @Roles([Role.Padulla, Role.Premium, Role.User])
   @Mutation(() => LiveChat)
   async createLiveChat(
-    @Args('name') name: string,
-    @Args('userId') userId: string,
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
   ) {
-    return this.liveChatService.createLiveChat(name, userId);
+    return this.liveChatService.createLiveChat(userId);
   }
 
   @Roles([Role.Padulla])
   @Mutation(() => LiveChat)
   async addPadullaToLiveChat(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: string,
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
   ) {
     return this.liveChatService.addPadullaToLiveChat(liveChatId, userId);
   }
 
   @Roles([Role.Padulla, Role.Premium, Role.User])
-  @Query(() => [LiveChat])
+  @Query(() => LiveChat)
   async getLiveChat(@Args('liveChatId') liveChatId: number) {
     return this.liveChatService.getLiveChat(liveChatId);
   }
 
   @Roles([Role.Padulla, Role.Premium, Role.User])
   @Query(() => [LiveChat])
-  async getPreviousChatsForUser(@Args('userId') userId: string) {
+  async getPreviousChatsForUser(
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
+  ) {
     return this.liveChatService.getPreviousChatsForUser(userId);
   }
 
@@ -164,7 +169,7 @@ export class LiveChatResolver {
   @Mutation(() => Boolean)
   async enterLiveChat(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: string,
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
   ): Promise<boolean> {
     await this.pubSub
       .publish(`userInLiveCha: ${liveChatId}`, {
@@ -186,7 +191,7 @@ export class LiveChatResolver {
   @Mutation(() => Boolean)
   async leaveChatroom(
     @Args('liveChatId') liveChatId: number,
-    @Args('userId') userId: string,
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
   ): Promise<boolean> {
     await this.pubSub.publish(`UserLeftLiveChat: ${liveChatId}`, {
       userId,
@@ -205,5 +210,27 @@ export class LiveChatResolver {
   @Mutation(() => Message)
   async setMessageAsUnread(@Args('liveChatId') liveChatId: number) {
     return await this.liveChatService.setMessageAsUnread(liveChatId);
+  }
+
+  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Mutation(() => Boolean)
+  async exitLiveChat(
+    @Args('liveChatId') liveChatId: number,
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
+  ): Promise<boolean> {
+    const res = await this.liveChatService.exitLiveChat(liveChatId, userId);
+    await this.pubSub.publish(`userExitLiveChat.${liveChatId}`, {
+      userId,
+      liveChatId,
+    });
+    return res;
+  }
+
+  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Query(() => [LiveChat])
+  async getLiveChatsForPadulla(
+    @Args('userId', { type: () => GraphQLUUID }) userId: string,
+  ) {
+    return this.liveChatService.getLiveChatsForPadulla(userId);
   }
 }

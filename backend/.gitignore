@@ -57,3 +57,4 @@ apps/vt
 
 .nx/cache
 development/deployEcrImages.sh
+dockerfile

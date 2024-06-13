@@ -1,4 +1,7 @@
-import { ApolloFederationDriverConfig } from '@nestjs/apollo';
+import {
+  ApolloDriverConfig,
+  ApolloFederationDriverConfig,
+} from '@nestjs/apollo';
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { GqlOptionsFactory } from '@nestjs/graphql';
@@ -21,18 +24,22 @@ export class GqlConfigService
     private readonly awsCfg: ConfigType<typeof awsConfig>,
     private readonly loggerService: LoggerService,
   ) {}
-  createGqlOptions(): Omit<ApolloFederationDriverConfig, 'driver'> {
+  createGqlOptions(): Omit<ApolloDriverConfig, 'driver'> {
     return {
       introspection: !this.configService.isLiveEnv,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
       autoSchemaFile: {
         path: join(process.cwd(), 'apps/wv/src/graphQL/schema.gql'),
-        federation: 2,
       },
       context: this.createContext.bind(this),
       playground: false,
       csrfPrevention: false,
       useGlobalPrefix: true,
+      installSubscriptionHandlers: true,
+      subscriptions: {
+        'graphql-ws': true,
+        'subscriptions-transport-ws': true,
+      },
     };
   }
 
