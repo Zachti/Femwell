@@ -49,8 +49,8 @@ export class LiveChatService {
           },
         },
         include: {
-            users: true, // show all users in the liveChat (padulla and client)
-        }
+          users: true, // show all users in the liveChat (padulla and client)
+        },
       });
       this.logger.info(`New LiveChat created: ${JSON.stringify(res)}`);
       await this.cacheService.set(`${res.id}`, res);
@@ -78,6 +78,7 @@ export class LiveChatService {
         },
         include: {
           users: true, // show all users in the liveChat (padulla and client)
+          messages: true,
         },
       });
       this.logger.info(`Padulla added to LiveChat. Padulla id: ${padullaId}`);
@@ -272,7 +273,7 @@ export class LiveChatService {
         HAVING COUNT(*) = 1
       ) c ON lc."id" = c."liveChatId"
       JOIN "User" u ON lc."id" = u."liveChatId"
-      LIMIT 10 - liveChatsWithUnreadMessages.length;
+      LIMIT ${10 - liveChatsWithUnreadMessages.length}
     `;
 
     return [...liveChatsWithUnreadMessages, ...liveChatsWithOneUser];
