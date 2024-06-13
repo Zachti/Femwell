@@ -71,6 +71,14 @@ export class LiveChatResolver {
     return this.pubSub.asyncIterator(`userStoppedTyping.${liveChatId}`);
   }
 
+  @Subscription(() => User, {
+    nullable: true,
+    resolve: (value) => value.userId,
+  })
+  padullaEnteredLiveChat(@Args('liveChatId') liveChatId: number) {
+    return this.pubSub.asyncIterator(`padullaEnteredLiveChat.${liveChatId}`);
+  }
+
   @Roles([Role.Padulla, Role.Premium, Role.User])
   @Mutation(() => User)
   async userStartedTypingMutation(
@@ -136,7 +144,11 @@ export class LiveChatResolver {
     @Args('liveChatId') liveChatId: number,
     @Args('userId', { type: () => GraphQLUUID }) userId: string,
   ) {
-    return this.liveChatService.addPadullaToLiveChat(liveChatId, userId);
+    const res = this.liveChatService.addPadullaToLiveChat(liveChatId, userId);
+    await this.pubSub.publish(`padullaEnteredLiveChat.${liveChatId}`, {
+      liveChatId,
+    });
+    return res;
   }
 
   @Roles([Role.Padulla, Role.Premium, Role.User])
