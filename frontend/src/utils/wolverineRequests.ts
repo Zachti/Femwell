@@ -444,9 +444,6 @@ export const GET_LIVE_CHAT_QUERY = gql`
         id
         content
         userId
-        user {
-          username
-        }
         seen
         createdAt
         updatedAt
@@ -508,32 +505,31 @@ export interface SendMessageInput {
 }
 
 export const ADD_PADULLA_TO_LIVE_CHAT_MUTATION = gql`
-  mutation AddPadullaToLiveChat($liveChatId: PositiveInt!, $userId: UUID!) {
+  mutation AddPadullaToLiveChat($liveChatId: Float!, $userId: UUID!) {
     addPadullaToLiveChat(liveChatId: $liveChatId, userId: $userId) {
       id
-      name
       createdAt
       updatedAt
       users {
         id
-        email
         username
-        phoneNumber
+        profilePic
       }
       messages {
         id
         content
         userId
-        user {
-          email
-          username
-          phoneNumber
-        }
         seen
         createdAt
         updatedAt
       }
     }
+  }
+`;
+
+export const USER_LEAVE_CHAT_MUTATION = gql`
+  mutation ExitLiveChat($liveChatId: Int!, $userId: UUID!) {
+    exitLiveChat(liveChatId: $liveChatId, userId: $userId)
   }
 `;
 
@@ -564,5 +560,41 @@ export const SET_MESSAGE_SEEN_MUTATION = gql`
 export const SET_MESSAGES_UNSEEN_MUTATION = gql`
   mutation setMessageAsUnread($liveChatId: PositiveInt!) {
     setMessagesUnseen(liveChatId: $liveChatId)
+  }
+`;
+
+export const GET_CHATS_FOR_PADULLA = gql`
+  query getLiveChatsForPadulla($userId: UUID!) {
+    getLiveChatsForPadulla(userId: $userId) {
+      id
+      createdAt
+      users {
+        id
+        username
+        profilePic
+      }
+      messages {
+        id
+        userId
+        content
+        seen
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+
+export const NEW_MESSAGE_SUBSCRIPTION = gql`
+  subscription OnNewMessage($liveChatId: Int!) {
+    newMessage(liveChatId: $liveChatId) {
+      id
+      content
+      user {
+        id
+        username
+      }
+      createdAt
+    }
   }
 `;

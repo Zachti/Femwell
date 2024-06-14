@@ -10,6 +10,6 @@ export interface Chat {
   id: number;
   users: User[];
   messages: ChatMsg[];
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }

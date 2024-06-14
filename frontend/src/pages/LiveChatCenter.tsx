@@ -22,90 +22,83 @@ import { faMessage } from "@fortawesome/free-solid-svg-icons";
 import ChatInterface from "../components/ChatInterface";
 import { AvatarProps } from "../models/avatarProps.model";
 import useChatStore from "../store/chatStore";
-
-const messages1: ChatMsg[] = [
-  {
-    username: "User1",
-    userId: "1",
-    content: "Hello, this is a message from User1",
-    seen: false,
-  },
-  {
-    username: "You",
-    userId: "1",
-    content: "Hello, this is a message to User1",
-    seen: false,
-  },
-];
-
-const messages2: ChatMsg[] = [
-  {
-    username: "User2",
-    userId: "1",
-    content: "Hello, this is a message from User2",
-    seen: false,
-  },
-  {
-    username: "You",
-    userId: "1",
-    content: "Hello, this is a message to User2",
-    seen: false,
-  },
-];
+import useGetLiveChats from "../hooks/useGetLiveChats";
+import useCreateChatMessage from "../hooks/useCreateChatMessage";
+import usePadullaJoinChat from "../hooks/usePadullaJoinChat";
 
 const LiveChatCenter: FC<{}> = () => {
   const [isLargerThan650] = useMediaQuery("(min-width: 650px)");
   const [isLargerThan930] = useMediaQuery("(min-width: 930px)");
-  const [chats, setChats] = useState([]);
+
   const [tabIndex, setTabIndex] = useState(0);
   const [selectedUser, setSelectedUser] = useState<string>("");
   const [avatars, setAvatars] = useState<AvatarProps[]>([
-    { name: "a" },
-    { name: "b" },
-    { name: "c" },
-    { name: "d" },
-    { name: "e" },
-    { name: "f" },
-    { name: "g" },
-    { name: "h" },
-    { name: "i" },
-    { name: "j" },
+    { username: "a" },
+    { username: "b" },
+    { username: "c" },
+    { username: "d" },
+    { username: "e" },
+    { username: "f" },
+    { username: "g" },
+    { username: "h" },
+    { username: "i" },
+    { username: "j" },
   ]);
 
   const authUser = useAuthStore((state) => state.user);
-  // const chats = useChatStore((state) => state.chats);
+  const { handleGetChats, isLoadingChats } = useGetLiveChats();
+  const { handleJoinChat } = usePadullaJoinChat();
+  const { handleCreateChatMessage } = useCreateChatMessage();
+  const chats = useChatStore((state) => state.chats);
+
   const panelBackgoundColor = useColorModeValue("white", "#533142");
 
   const [isLoading, setIsLoading] = useState(true);
 
-  const handleSelectUser = (username: string) => {
+  const handleSelectUser = async (username: string, chatId: number) => {
+    addPadullaToChat(chatId);
     setSelectedUser(username);
-    const newTabIndex = avatars.findIndex((avatar) => avatar.name === username);
+    const newTabIndex = avatars.findIndex(
+      (avatar) => avatar.username === username,
+    );
     setTabIndex(newTabIndex);
   };
 
+  const addPadullaToChat = async (chatId: number) => {
+    const chat = chats.find((chat) => chat.id === chatId);
+    if (chat && !chat.users.some((user) => user.id === authUser?.id)) {
+      console.log(!chat.users.some((user) => user.id === authUser?.id));
+      await handleJoinChat(chatId);
+    }
+  };
   const handleTabChange = (index: number) => {
     setTabIndex(index);
   };
 
-  useEffect(() => {
-    console.log("fetching chats...");
-    let isCancelled = false;
+  const addMessage = async (data: any) => {
+    await handleCreateChatMessage(data);
+  };
 
+  useEffect(() => {
     const fetchChats = async () => {
-      // const chatData = await handleCreateChat();
-      // if (!isCancelled && chatData) {
-      //   setChatId(chatData.id);
-      //   setMessages(chatData.messages);
-      // }
+      await handleGetChats();
     };
 
     fetchChats();
     setIsLoading(false);
-    return () => {
-      isCancelled = true;
-    };
   }, []);
+
+  useEffect(() => {
+    if (chats.length > 0) {
+      const newAvatars: AvatarProps[] = chats.map((chat) => ({
+        username: chat.users[chat.users.length - 1].username,
+        profilePic: chat.users[chat.users.length - 1].profilePic,
+      }));
+      setAvatars(newAvatars);
+      setSelectedUser(chats[0].users[chats[0].users.length - 1].username);
+      addPadullaToChat(chats[0].id);
+    }
+  }, [chats]);
 
   return (
     <div className="page">
@@ -132,11 +125,17 @@ const LiveChatCenter: FC<{}> = () => {
               whiteSpace={isLargerThan650 ? "nowrap" : "normal"}
               minWidth={"200px"}
             >
-              {/* {chats.map((chat) => (
-                <Tab py={4} key={chat.id}>chat with someone</Tab>
-              ))} */}
+              {chats.map((chat, index) => (
+                <Tab py={4} key={chat.id}>
+                  {" "}
+                  <Avatar size={"sm"} mr={3} src={avatars[index].profilePic}>
+                    <AvatarBadge boxSize="1.25em" bg="green.500" />
+                  </Avatar>
+                  <Text>{`Chat with ${avatars[index].username}`}</Text>
+                </Tab>
+              ))}
 
-              <Tab py={4}>
+              {/* <Tab py={4}>
                 <Box position="relative" display="inline-block">
                   <Avatar size={"sm"} mr={3}>
                     <AvatarBadge boxSize="1.25em" bg="green.500" />
@@ -146,21 +145,7 @@ const LiveChatCenter: FC<{}> = () => {
                   </Box>
                 </Box>
                 Chat with A
-              </Tab>
-              <Tab py={4}>
-                {" "}
-                <Avatar size={"sm"} mr={3}>
-                  <AvatarBadge boxSize="1.25em" bg="green.500" />
-                </Avatar>
-                <Text>Chat with B</Text>
-              </Tab>
-              <Tab py={4}>
-                {" "}
-                <Avatar size={"sm"} mr={3}>
-                  <AvatarBadge boxSize="1.25em" bg="green.500" />
-                </Avatar>
-                Chat with C
-              </Tab>
+              </Tab> */}
             </TabList>
 
             <TabPanels
@@ -169,29 +154,23 @@ const LiveChatCenter: FC<{}> = () => {
               borderRadius={5}
               minHeight={isLargerThan650 ? "85vh" : "100vh"}
             >
-              <TabPanel display={"flex"} h={"100%"} position={"relative"}>
-                <ChatInterface
-                  chatId={1}
-                  user={"a"}
-                  msgs={messages1}
-                  avatars={avatars}
-                  selectedUser={selectedUser}
-                  handleSelectUser={handleSelectUser}
-                />
-              </TabPanel>
-
-              <TabPanel display={"flex"} h={"100%"} position={"relative"}>
-                <ChatInterface
-                  chatId={2}
-                  user={"b"}
-                  msgs={messages2}
-                  avatars={avatars}
-                  selectedUser={selectedUser}
-                  handleSelectUser={handleSelectUser}
-                />
-              </TabPanel>
-
-              <TabPanel></TabPanel>
+              {chats.map((chat, index) => (
+                <TabPanel
+                  key={chat.id}
+                  display={"flex"}
+                  h={"100%"}
+                  position={"relative"}
+                >
+                  <ChatInterface
+                    chat={chat}
+                    user={avatars[index].username}
+                    avatars={avatars}
+                    selectedUser={selectedUser}
+                    handleSelectUser={handleSelectUser}
+                    addMessage={addMessage}
+                  />
+                </TabPanel>
+              ))}
             </TabPanels>
           </Tabs>
         </Skeleton>

@@ -33,46 +33,76 @@ import {
   faPaperPlane,
   faSmile,
 } from "@fortawesome/free-solid-svg-icons";
-import { FC, useRef, useState } from "react";
-import { ChatMsg } from "../models";
+import { FC, useEffect, useRef, useState } from "react";
+import { Chat, ChatMsg } from "../models";
 import { emojis } from "../utils/emojis";
 import { Colors } from "../utils/colorsConstants";
 import "../assets/App.css";
 import { AvatarProps } from "../models/avatarProps.model";
 import useCreateChatMessage from "../hooks/useCreateChatMessage";
 import useAuthStore from "../store/authStore";
+import useChatStore from "../store/chatStore";
+import {
+  NEW_MESSAGE_SUBSCRIPTION,
+  USER_EXIT_LIVE_CHAT_SUBSCRIPTION,
+} from "../utils/wolverineSubscriptions";
+import { useSubscription } from "@apollo/client";
 
 interface ChatProps {
-  chatId: number;
+  chat: Chat;
+  chatId?: number;
   showEmojiPicker?: boolean;
   user: string;
-  msgs: ChatMsg[];
+  msgs?: ChatMsg[];
   avatars?: AvatarProps[];
   selectedUser?: string;
-  handleSelectUser: (user: string) => void;
+  handleSelectUser: (username: string, chatId: number) => void;
+  addMessage: (data: any) => void;
 }
 
 const ChatInterface: FC<ChatProps> = ({
-  chatId,
+  chat,
   user,
-  msgs,
   avatars,
   selectedUser,
   handleSelectUser,
+  addMessage,
 }) => {
   const [isLargerThan650] = useMediaQuery("(min-width: 650px)");
-  const [messages, setMessages] = useState<ChatMsg[]>(msgs);
+  const [messages, setMessages] = useState<ChatMsg[]>(chat.messages);
+
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
   const bgColor = useColorModeValue("white", Colors.color5);
   const msgBgColor1 = useColorModeValue("pink.200", "pink.700");
   const msgBgColor2 = useColorModeValue("gray.200", "gray.500");
 
+  const chats = useChatStore((state) => state.chats);
+  const createMessage = useChatStore((state) => state.createMessage);
+
+  const {
+    data: messageData,
+    loading: messageLoading,
+    error: messageError,
+  } = useSubscription(NEW_MESSAGE_SUBSCRIPTION, {
+    variables: { liveChatId: chat.id },
+    skip: !chat.id,
+  });
+
+  const {
+    data: exitData,
+    loading: exitLoading,
+    error: exitError,
+  } = useSubscription(USER_EXIT_LIVE_CHAT_SUBSCRIPTION, {
+    variables: { liveChatId: chat.id },
+    skip: !chat.id,
+  });
+
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [cursorPosition, setCursorPosition] = useState(0);
 
   const authUser = useAuthStore((state) => state.user);
-  const { isLoading, handleCreateChatMessage } = useCreateChatMessage();
+  const { isLoading } = useCreateChatMessage();
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.currentTarget.value);
@@ -94,10 +124,39 @@ const ChatInterface: FC<ChatProps> = ({
   //this will later on be a hook ofc
   const onSendMessage = async () => {
     if (!(inputValue.trim() === "" || inputValue.length > 200)) {
-      handleCreateChatMessage({ chatId, content: inputValue });
+      addMessage({ chatId: chat.id, content: inputValue });
       setInputValue("");
     }
   };
+
+  useEffect(() => {
+    console.log("something was received");
+    if (messageData?.newMessage) {
+      console.log("received message", messageData, messageError);
+      const newMessage = {
+        id: messageData?.newMessage.id,
+        userId: messageData?.newMessage.user.id,
+        username: messageData?.newMessage.user.username,
+        content: messageData?.newMessage.content,
+        seen: messageData?.newMessage.seen,
+        createdAt: messageData?.newMessage.createdAt,
+      };
+
+      createMessage(newMessage, chat.id);
+    }
+  }, [messageData, messageError]);
+
+  useEffect(() => {
+    console.log("user has left");
+    if (exitData?.newMessage) {
+      console.log("user", exitData, messageError);
+      //set the color of the user that left to gray
+    }
+  }, [exitData, exitError]);
+
+  useEffect(() => {
+    setMessages(chat.messages);
+  }, [chat]);
 
   return (
     <Box
@@ -126,16 +185,15 @@ const ChatInterface: FC<ChatProps> = ({
             {avatars.map((avatar) => (
               <Avatar
                 bg="gray"
-                key={avatar.name}
-                name={avatar.name}
+                key={avatar.username}
+                name={avatar.username}
                 src={avatar.profilePic}
                 cursor={"pointer"}
                 onClick={() => {
-                  console.log("hello", avatar.name);
-                  handleSelectUser(avatar.name);
+                  handleSelectUser(avatar.username, chat.id);
                 }}
                 style={
-                  avatar.name === selectedUser
+                  avatar.username === selectedUser
                     ? { transform: "translateY(-10px)" }
                     : {}
                 }
@@ -157,13 +215,9 @@ const ChatInterface: FC<ChatProps> = ({
           <Box
             key={index}
             bg={
-              msg.username === authUser?.id
-                ? `${msgBgColor1}`
-                : `${msgBgColor2}`
+              msg.userId === authUser?.id ? `${msgBgColor1}` : `${msgBgColor2}`
             }
-            alignSelf={
-              msg.username === authUser?.id ? "flex-start" : "flex-end"
-            }
+            alignSelf={msg.userId === authUser?.id ? "flex-start" : "flex-end"}
             borderRadius="lg"
             p="2"
             mt="2"

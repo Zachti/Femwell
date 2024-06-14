@@ -18,6 +18,7 @@ const useCreateChatMessage = () => {
 
   const handleCreateChatMessage = async (data: any) => {
     if (isLoading) return;
+    console.log(data);
     if (data.chatId && data.content.length > 0 && authUser) {
       setIsLoading(true);
 
@@ -40,28 +41,16 @@ const useCreateChatMessage = () => {
             },
           },
         );
-
         const createMessageResult = await createMessageResponse.data.data
           .sendMessage;
         console.log("createMessageResult", createMessageResult);
         console.log("--------------------");
         if (createMessageResult) {
-          const newMessage = {
-            id: createMessageResult.id,
-            userId: authUser.id,
-            username: authUser.username,
-            content: createMessageResult.content,
-            seen: createMessageResult.seen,
-            createdAt: createMessageResult.createdAt,
-          };
-
-          createMessage(newMessage, data.chatId);
-
           setIsLoading(false);
           showToast("Success", "Post created successfully", "success");
           return true;
         }
-        console.log("what");
+
         return false;
       } catch (error: any) {
         showToast("Error", error.message, "error");

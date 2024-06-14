@@ -35,6 +35,12 @@ import useCreateLiveChat from "../hooks/useCreateLiveChat";
 import useAuthStore from "../store/authStore";
 import useChatStore from "../store/chatStore";
 import useCreateChatMessage from "../hooks/useCreateChatMessage";
+import { useSubscription } from "@apollo/client";
+import {
+  NEW_MESSAGE_SUBSCRIPTION,
+  PADULLA_ENTERED_LIVE_CHAT_SUBSCRIPTION,
+} from "../utils/wolverineSubscriptions";
+import useUserLeaveChat from "../hooks/useUserLeaveChat";
 
 interface LiveChatProps {
   isOpen: boolean;
@@ -47,7 +53,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState(false);
-
+  const [isLoadingPadulla, setIsLoadingPadulla] = useState(true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const bgColor = useColorModeValue("white", Colors.color5);
   const msgBgColor1 = useColorModeValue("pink.200", "pink.700");
@@ -55,8 +61,10 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
 
   const { isLoadingChat, handleCreateChat } = useCreateLiveChat();
   const { isLoading, handleCreateChatMessage } = useCreateChatMessage();
+  const { handleLeaveChat } = useUserLeaveChat();
   const authUser = useAuthStore((state) => state.user);
   const chats = useChatStore((state) => state.chats);
+  const createMessage = useChatStore((state) => state.createMessage);
   const [chatId, setChatId] = useState<number>(0);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
 
@@ -78,6 +86,24 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
     setCursorPosition(cursorPosition + emoji.length);
   };
 
+  const {
+    data: messageData,
+    loading: messageLoading,
+    error: messageError,
+  } = useSubscription(NEW_MESSAGE_SUBSCRIPTION, {
+    variables: { liveChatId: chatId },
+    skip: !chatId,
+  });
+
+  const {
+    data: padullaData,
+    loading: padullaLoading,
+    error: padullaError,
+  } = useSubscription(PADULLA_ENTERED_LIVE_CHAT_SUBSCRIPTION, {
+    variables: { liveChatId: chatId },
+    skip: !chatId,
+  });
+
   useEffect(() => {
     if (isOpen) {
       const createChatAndSetData = async () => {
@@ -95,6 +121,21 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
       setChatId(newChat.id);
     }
   }, [chats]);
+
+  useEffect(() => {
+    console.log("received message", messageData, messageError);
+    if (messageData?.newMessage) {
+      createMessage(messageData.newMessage, chatId);
+    }
+  }, [messageData]);
+
+  //HERE HERE HERE ITS NOT .NEWMESSAGE ALSO NEED TO CHECK WHAT IS THE PROFILE PIC AND USERNAME OF THE PADULLA
+  useEffect(() => {
+    console.log("padulla joined", padullaData, padullaError);
+    if (padullaData?.newMessage) {
+      setIsLoadingPadulla(false);
+    }
+  }, [padullaData]);
 
   const onExpand = () => {
     setIsExpanded(!isExpanded);
@@ -118,6 +159,12 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
     if (file && Object.values(MimeType).includes(file.type)) {
       setSelectedFile(file);
     }
+  };
+
+  const onLeaveChat = async () => {
+    console.log("leaving chat");
+    await handleLeaveChat(chatId);
+    onClose();
   };
 
   const chat = (
@@ -160,7 +207,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
           pb="2"
           borderBottom="2px solid var(--secondary-color)"
         >
-          {isLoadingChat ? (
+          {isLoadingChat || isLoadingPadulla ? (
             <Flex align="center">
               <Spinner
                 thickness="2px"
@@ -206,7 +253,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
               aria-label="Close"
               icon={<SmallCloseIcon />}
               onClick={() => {
-                onClose();
+                onLeaveChat();
               }}
             />
           </Flex>

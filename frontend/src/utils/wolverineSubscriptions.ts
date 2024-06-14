@@ -1,53 +1,60 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const NEW_MESSAGE_SUBSCRIPTION = gql`
-    subscription OnNewMessage($liveChatId: Int!) {
-        newMessage(liveChatId: $liveChatId) {
-            id
-            content
-            sender {
-                id
-                username
-            }
-            createdAt
-        }
+  subscription OnNewMessage($liveChatId: PositiveInt!) {
+    newMessage(liveChatId: $liveChatId) {
+      id
+      content
+      user {
+        id
+        username
+      }
+      createdAt
+      seen
     }
+  }
 `;
 
 export const USER_EXIT_LIVE_CHAT_SUBSCRIPTION = gql`
-    subscription OnUserExitLiveChat($liveChatId: Int!) {
-        userExitLiveChat(liveChatId: $liveChatId) {
-            userId
-        }
+  subscription OnUserExitLiveChat($liveChatId: PositiveInt!) {
+    userExitLiveChat(liveChatId: $liveChatId) {
+      userId
     }
+  }
 `;
 
 export const USER_STARTED_TYPING_SUBSCRIPTION = gql`
-    subscription OnUserStartedTyping($liveChatId: Int!, $userId: String!) {
-        userStartedTyping(liveChatId: $liveChatId, userId: $userId) {
-            user {
-                id
-                username
-            }
-        }
+  subscription OnUserStartedTyping(
+    $liveChatId: PositiveInt!
+    $userId: String!
+  ) {
+    userStartedTyping(liveChatId: $liveChatId, userId: $userId) {
+      user {
+        id
+        username
+      }
     }
+  }
 `;
 
 export const USER_STOPPED_TYPING_SUBSCRIPTION = gql`
-    subscription OnUserStoppedTyping($liveChatId: Int!, $userId: String!) {
-        userStoppedTyping(liveChatId: $liveChatId, userId: $userId) {
-            user {
-                id
-                username
-            }
-        }
+  subscription OnUserStoppedTyping(
+    $liveChatId: PositiveInt!
+    $userId: String!
+  ) {
+    userStoppedTyping(liveChatId: $liveChatId, userId: $userId) {
+      user {
+        id
+        username
+      }
     }
+  }
 `;
 
 export const PADULLA_ENTERED_LIVE_CHAT_SUBSCRIPTION = gql`
-    subscription OnPadullaEnteredLiveChat($liveChatId: Int!) {
-        padullaEnteredLiveChat(liveChatId: $liveChatId) {
-            liveChatId
-        }
+  subscription OnPadullaEnteredLiveChat($liveChatId: PositiveInt!) {
+    padullaEnteredLiveChat(liveChatId: $liveChatId) {
+      liveChatId
     }
+  }
 `;
