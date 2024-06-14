@@ -264,10 +264,10 @@ export class LiveChatService {
     }
 
     const liveChatsWithOneUser: LiveChat[] = await this.prisma.$queryRaw`
-      SELECT lc., u.
+      SELECT lc.* , u.*
       FROM "LiveChat" lc
       JOIN (
-        SELECT "liveChatId", COUNT(*) AS "chatCount"
+        SELECT "liveChatId"
         FROM "User"
         GROUP BY "liveChatId"
         HAVING COUNT(*) = 1

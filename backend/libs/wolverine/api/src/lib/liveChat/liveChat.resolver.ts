@@ -18,7 +18,7 @@ import { User } from '../user/entities/user.entity';
 import { InjectPubSubToken } from './providers/pubSub.provider';
 import { UserService } from '../user/user.service';
 import { SendMessageInput } from './dto/sendMessage.input';
-import { GraphQLUUID } from 'graphql-scalars';
+import { GraphQLPositiveInt, GraphQLUUID} from 'graphql-scalars';
 
 @Resolver(() => LiveChat)
 export class LiveChatResolver {
@@ -32,7 +32,7 @@ export class LiveChatResolver {
     nullable: true,
     resolve: (value) => value.newMessage,
   })
-  newMessage(@Args('liveChatId') liveChatId: number) {
+  newMessage(@Args('liveChatId', { type: () => GraphQLPositiveInt }) liveChatId: number) {
     return this.pubSub.asyncIterator(`newMessage.${liveChatId}`);
   }
 
@@ -40,7 +40,7 @@ export class LiveChatResolver {
     nullable: true,
     resolve: (value) => value.userId,
   })
-  userExitLiveChat(@Args('liveChatId') liveChatId: number) {
+  userExitLiveChat(@Args('liveChatId', { type: () => GraphQLPositiveInt }) liveChatId: number) {
     return this.pubSub.asyncIterator(`userExitLiveChat.${liveChatId}`);
   }
   @Subscription(() => User, {
@@ -51,7 +51,7 @@ export class LiveChatResolver {
     },
   })
   userStartedTyping(
-    @Args('liveChatId') liveChatId: number,
+    @Args('liveChatId', { type: () => GraphQLPositiveInt }) liveChatId: number,
     @Args('userId', { type: () => GraphQLUUID }) userId: string,
   ) {
     return this.pubSub.asyncIterator(`userStartedTyping.${liveChatId}`);
@@ -65,7 +65,7 @@ export class LiveChatResolver {
     },
   })
   userStoppedTyping(
-    @Args('liveChatId') liveChatId: number,
+    @Args('liveChatId', { type: () => GraphQLPositiveInt }) liveChatId: number,
     @Args('userId', { type: () => GraphQLUUID }) userId: string,
   ) {
     return this.pubSub.asyncIterator(`userStoppedTyping.${liveChatId}`);
@@ -73,9 +73,9 @@ export class LiveChatResolver {
 
   @Subscription(() => User, {
     nullable: true,
-    resolve: (value) => value.userId,
+    resolve: (value) => value.user,
   })
-  padullaEnteredLiveChat(@Args('liveChatId') liveChatId: number) {
+  padullaEnteredLiveChat(@Args('liveChatId', { type: () => GraphQLPositiveInt }) liveChatId: number) {
     return this.pubSub.asyncIterator(`padullaEnteredLiveChat.${liveChatId}`);
   }
 
