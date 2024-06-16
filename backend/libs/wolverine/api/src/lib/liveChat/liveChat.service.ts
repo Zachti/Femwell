@@ -264,15 +264,16 @@ export class LiveChatService {
     }
 
     const liveChatsWithOneUser: LiveChat[] = await this.prisma.$queryRaw`
-      SELECT lc.* , u.*
+      SELECT lc.*, u.*
       FROM "LiveChat" lc
       JOIN (
         SELECT "liveChatId"
-        FROM "User"
+        FROM "LiveChatUsers"
         GROUP BY "liveChatId"
         HAVING COUNT(*) = 1
       ) c ON lc."id" = c."liveChatId"
-      JOIN "User" u ON lc."id" = u."liveChatId"
+      JOIN "LiveChatUsers" lcu ON lc."id" = lcu."liveChatId"
+      JOIN "User" u ON lcu."userId" = u."id"
       LIMIT ${10 - liveChatsWithUnreadMessages.length}
     `;
 
