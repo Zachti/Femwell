@@ -11,7 +11,6 @@ const useCreateLiveChat = () => {
   const authUser = useAuthStore((state) => state.user);
   const createChat = useChatStore((state) => state.createChat);
   const chats = useChatStore((state) => state.chats);
-  const setUser = useAuthStore((state) => state.setUser);
   const showToast = useShowToast();
 
   const handleCreateChat = async () => {

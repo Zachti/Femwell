@@ -5,9 +5,8 @@ import { faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 import useShowToast from "../../../hooks/useShowToast";
 import usePostStore from "../../../store/postStore";
 import useAuthStore from "../../../store/authStore";
-import useProfileStore from "../../../store/profileStore";
+// import useProfileStore from "../../../store/profileStore";
 import { queryTypes } from "../../../utils/userPostQueries";
-import useSearchUser from "../../../hooks/useSearchUser";
 import useGetUserPost from "../../../hooks/useGetUserPost";
 
 interface SideBarProps {
@@ -22,8 +21,8 @@ const LikedPosts: FC<SideBarProps> = ({}) => {
   const [isLargerThan760] = useMediaQuery("(min-width: 760px)");
 
   const authUser = useAuthStore((state) => state.user);
-  const userProfile = useProfileStore((state) => state.userProfile);
-  const setPostsQuery = usePostStore((state) => state.setPostsQuery);
+  // const userProfile = useProfileStore((state) => state.userProfile);
+  // const setPostsQuery = usePostStore((state) => state.setPostsQuery);
   const queryType = usePostStore((state) => state.queryType);
   // const { getUserProfile } = useSearchUser();
   const { getPosts } = useGetUserPost();

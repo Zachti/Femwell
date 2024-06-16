@@ -4,13 +4,13 @@ import useAuthStore from "../store/authStore";
 import { GET_CHATS_FOR_PADULLA } from "../utils/wolverineRequests";
 import axios from "axios";
 import { print } from "graphql";
-import useChatStore from "../store/chatStore";
+// import useChatStore from "../store/chatStore";
 
 const useGetLiveChats = () => {
   const [isLoadingChats, setIsLoadingChats] = useState(false);
   const authUser = useAuthStore((state) => state.user);
-  const setChats = useChatStore((state) => state.setChats);
-  const chats = useChatStore((state) => state.chats);
+  // const setChats = useChatStore((state) => state.setChats);
+  // const chats = useChatStore((state) => state.chats);
   const showToast = useShowToast();
 
   const handleGetChats = async () => {

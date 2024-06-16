@@ -165,29 +165,29 @@ export const FIND_QUESTIONNAIRE_BY_USER_QUERY = gql`
 
 // questionnaire dtos -
 
-interface Response {
-  id: string;
+// interface Response {
+//   id: string;
 
-  question: string;
+//   question: string;
 
-  answer?: string;
+//   answer?: string;
 
-  questionnaireId: string;
-}
+//   questionnaireId: string;
+// }
 
-interface CreateQuestionnaireInput {
-  userId: string;
+// interface CreateQuestionnaireInput {
+//   userId: string;
 
-  responses: Response[];
+//   responses: Response[];
 
-  username: string;
-}
+//   username: string;
+// }
 
-interface createResponseInput {
-  question: string;
+// interface createResponseInput {
+//   question: string;
 
-  answer?: string;
-}
+//   answer?: string;
+// }
 
 // COMMENT RESOLVER REQUESTS -
 
@@ -528,7 +528,7 @@ export const ADD_PADULLA_TO_LIVE_CHAT_MUTATION = gql`
 `;
 
 export const USER_LEAVE_CHAT_MUTATION = gql`
-  mutation ExitLiveChat($liveChatId: Int!, $userId: UUID!) {
+  mutation ExitLiveChat($liveChatId: PositiveInt!, $userId: UUID!) {
     exitLiveChat(liveChatId: $liveChatId, userId: $userId)
   }
 `;

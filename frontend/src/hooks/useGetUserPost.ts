@@ -81,12 +81,11 @@
 
 // export default useGetUserPost;
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import usePostStore from "../store/postStore";
 import useShowToast from "./useShowToast";
-import { Post } from "../models";
-import useProfileStore from "../store/profileStore";
-import { queryTypes, userPostQueries } from "../utils/userPostQueries";
+// import useProfileStore from "../store/profileStore";
+import { queryTypes } from "../utils/userPostQueries";
 import { GET_POSTS_QUERY, PostsFilter } from "../utils/wolverineRequests";
 import axios from "axios";
 import { print } from "graphql";
@@ -95,13 +94,12 @@ import useAuthStore from "../store/authStore";
 const useGetUserPost = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const userProfile = useProfileStore((state) => state.userProfile);
+  // const userProfile = useProfileStore((state) => state.userProfile);
   const authUser = useAuthStore((state) => state.user);
-  const prevQueryType = usePostStore((state) => state.prevQueryType);
   const setPrevPostsQuery = usePostStore((state) => state.setPrevPostsQuery);
   const queryType = usePostStore((state) => state.queryType);
   const setPosts = usePostStore((state) => state.setPosts);
-  const posts = usePostStore((state) => state.posts);
+  // const posts = usePostStore((state) => state.posts);
   const showToast = useShowToast();
 
   const getPosts = async (data: any) => {
@@ -111,7 +109,6 @@ const useGetUserPost = () => {
     setPosts([]);
     try {
       let postLen;
-      let q;
       if (data.queryType === queryTypes.USER_POSTS) {
         const filter: PostsFilter = {
           usernames: [data.username],

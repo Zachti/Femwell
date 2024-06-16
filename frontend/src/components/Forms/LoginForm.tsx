@@ -27,7 +27,7 @@ import { Formik, Field } from "formik";
 import { validateEmail } from "../../utils/formValidations";
 
 import useLogin from "../../hooks/useLogin";
-import useGoogleAuth from "../../hooks/useGoogleAuth";
+// import useGoogleAuth from "../../hooks/useGoogleAuth";
 
 interface InputFormProps {
   isOpen: boolean;
@@ -35,11 +35,11 @@ interface InputFormProps {
   onOpen: () => void;
 }
 
-const LoginForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
+const LoginForm: FC<InputFormProps> = ({ isOpen, onClose }) => {
   const [show, setShow] = useState(false);
   const handleShowClick = () => setShow(!show);
   const { login, isLoggingIn } = useLogin();
-  const { handleGoogleAuth } = useGoogleAuth();
+  // const { handleGoogleAuth } = useGoogleAuth();
   const [isLargerThan650] = useMediaQuery("(min-width: 650px)");
 
   return (
@@ -132,12 +132,12 @@ const LoginForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                       justifyContent="center"
                       cursor="pointer"
                       w="full"
-                      onClick={async () => {
-                        const success = await handleGoogleAuth();
-                        if (success) {
-                          onClose();
-                        }
-                      }}
+                      // onClick={async () => {
+                      //   const success = await handleGoogleAuth();
+                      //   if (success) {
+                      //     onClose();
+                      //   }
+                      // }}
                     >
                       <Image src="/google.png" alt="Google logo" w={5} />
                       <Text mx={2} color="blue.500">

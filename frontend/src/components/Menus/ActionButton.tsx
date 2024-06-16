@@ -15,7 +15,7 @@ const Fab = () => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const toggleIsOpen = () => setIsOpen(!isOpen);
   const authUser = useAuthStore((state) => state.user);
-  const [isPadulla, setIsPadulla] = useState<boolean>(
+  const [isPadulla, _setIsPadulla] = useState<boolean>(
     authUser?.role === "Padulla",
   );
 
@@ -27,10 +27,10 @@ const Fab = () => {
     handler: () => setIsOpen(false),
   });
 
-  const onLiveChatClose = () => {
-    setIsChatOpen(false);
-    setIsOpen(false);
-  };
+  // const onLiveChatClose = () => {
+  //   setIsChatOpen(false);
+  //   setIsOpen(false);
+  // };
 
   return (
     <Box

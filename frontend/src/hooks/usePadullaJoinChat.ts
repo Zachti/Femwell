@@ -10,7 +10,6 @@ const usePadullaJoinChat = () => {
   const [isLoadingJoinChat, setIsLoadingJoinChat] = useState(false);
   const authUser = useAuthStore((state) => state.user);
   const setChats = useChatStore((state) => state.setChats);
-  const chats = useChatStore((state) => state.chats);
   const showToast = useShowToast();
 
   const handleJoinChat = async (liveChatId: number) => {

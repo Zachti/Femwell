@@ -1,26 +1,11 @@
 import {
   Box,
   Button,
-  FormControl,
-  FormLabel,
-  InputGroup,
-  Input,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
   VStack,
-  Image,
   Text,
-  Tabs,
   useMediaQuery,
-  InputRightElement,
   Flex,
-  UnorderedList,
-  ListItem,
-  ListIcon,
   Avatar,
-  Skeleton,
   useColorModeValue,
   AvatarBadge,
   IconButton,
@@ -77,12 +62,12 @@ const ChatInterface: FC<ChatProps> = ({
   const msgBgColor1 = useColorModeValue("pink.200", "pink.700");
   const msgBgColor2 = useColorModeValue("gray.200", "gray.500");
 
-  const chats = useChatStore((state) => state.chats);
+  // const chats = useChatStore((state) => state.chats);
   const createMessage = useChatStore((state) => state.createMessage);
 
   const {
     data: messageData,
-    loading: messageLoading,
+    // loading: messageLoading,
     error: messageError,
   } = useSubscription(NEW_MESSAGE_SUBSCRIPTION, {
     variables: { liveChatId: chat.id },
@@ -91,7 +76,7 @@ const ChatInterface: FC<ChatProps> = ({
 
   const {
     data: exitData,
-    loading: exitLoading,
+    // loading: exitLoading,
     error: exitError,
   } = useSubscription(USER_EXIT_LIVE_CHAT_SUBSCRIPTION, {
     variables: { liveChatId: chat.id },

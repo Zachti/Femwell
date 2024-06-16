@@ -10,7 +10,7 @@ const useDeletePost = () => {
   const [isLoading, setIsLoading] = useState(false);
   const authUser = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
-  const posts = usePostStore((state) => state.posts);
+  // const posts = usePostStore((state) => state.posts);
   const deletePost = usePostStore((state) => state.deletePost);
   const showToast = useShowToast();
 

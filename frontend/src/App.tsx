@@ -1,4 +1,4 @@
-import { useState, FC, useEffect } from "react";
+import { FC } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -6,7 +6,7 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { ChakraProvider, extendTheme, list } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import Navbar from "./components/Menus/Navbar";
 import "./index.css";
 import "./assets/App.css";

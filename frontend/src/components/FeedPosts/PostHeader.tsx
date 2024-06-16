@@ -1,9 +1,8 @@
-import { formatDistanceToNow, set } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import {
   Avatar,
   Box,
   Flex,
-  IconButton,
   Menu,
   MenuButton,
   MenuItem,
@@ -11,7 +10,6 @@ import {
   Portal,
   useDisclosure,
 } from "@chakra-ui/react";
-import { Timestamp } from "firebase/firestore";
 import { FC, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
@@ -19,7 +17,6 @@ import useAuthStore from "../../store/authStore";
 import useDeletePost from "../../hooks/useDeletePost";
 import CreateOrUpdatePost from "../Menus/SideBar/createOrUpdatePost";
 import { DeleteIcon } from "@chakra-ui/icons";
-import useEditPost from "../../hooks/useEditPost";
 
 interface PostHeaderProps {
   id: string;

@@ -10,7 +10,6 @@ import {
   TabPanel,
   TabPanels,
   VStack,
-  Image,
   Text,
   Tabs,
   useMediaQuery,
@@ -122,7 +121,7 @@ const AccountSettings: FC<{}> = () => {
                   }}
                   enableReinitialize
                 >
-                  {({ values, errors, touched }) => (
+                  {({ errors, touched }) => (
                     <Form>
                       <Flex
                         direction={"column"}

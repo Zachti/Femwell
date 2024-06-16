@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useShowToast from "./useShowToast";
 import useAuthStore from "../store/authStore";
-import useChatStore from "../store/chatStore";
+// import useChatStore from "../store/chatStore";
 import {
   SEND_MESSAGE_MUTATION,
   SendMessageInput,
@@ -12,8 +12,8 @@ import { print } from "graphql";
 const useCreateChatMessage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const authUser = useAuthStore((state) => state.user);
-  const createMessage = useChatStore((state) => state.createMessage);
-  const chats = useChatStore((state) => state.chats);
+  // const createMessage = useChatStore((state) => state.createMessage);
+  // const chats = useChatStore((state) => state.chats);
   const showToast = useShowToast();
 
   const handleCreateChatMessage = async (data: any) => {

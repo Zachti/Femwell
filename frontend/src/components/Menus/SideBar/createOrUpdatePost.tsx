@@ -39,7 +39,6 @@ interface createOrUpdatePostProps {
 
 const createOrUpdatePost: FC<createOrUpdatePostProps> = ({
   isWinOpen,
-  onWinOpen,
   onWinClose,
   mode,
   userId,

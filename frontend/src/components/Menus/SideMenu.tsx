@@ -17,7 +17,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import useAuthStore from "../../store/authStore";
 import useLogout from "../../hooks/useLogout";
-import { reloadPage } from "../../utils/genericFunctions";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -26,12 +25,7 @@ interface SideMenuProps {
   onInputFormOpen: () => void;
 }
 
-const SideMenu: FC<SideMenuProps> = ({
-  isOpen,
-  onClose,
-  onOpen,
-  onInputFormOpen,
-}) => {
+const SideMenu: FC<SideMenuProps> = ({ isOpen, onClose, onInputFormOpen }) => {
   const navigate = useNavigate();
   const { logout, isLoggingOut } = useLogout();
   const authUser = useAuthStore((state) => state.user);

@@ -2,7 +2,7 @@ import { useState } from "react";
 import useShowToast from "./useShowToast";
 import useAuthStore from "../store/authStore";
 import usePostStore from "../store/postStore";
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 import {
   CREATE_COMMENT_MUTATION,
   CreateCommentInput,

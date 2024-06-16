@@ -1,9 +1,7 @@
 import { useState } from "react";
 import useShowToast from "./useShowToast";
 import useAuthStore from "../store/authStore";
-import usePostStore from "../store/postStore";
-
-import { PostInput } from "../models/postInput.model";
+// import usePostStore from "../store/postStore";
 import {
   CREATE_LIKE_MUTATION,
   DELETE_LIKE_MUTATION,
@@ -15,7 +13,7 @@ import { print } from "graphql";
 const useLike = () => {
   const [isLoading, setIsLoading] = useState(false);
   const authUser = useAuthStore((state) => state.user);
-  const posts = usePostStore((state) => state.posts);
+  // const posts = usePostStore((state) => state.posts);
   const setUser = useAuthStore((state) => state.setUser);
   const showToast = useShowToast();
 

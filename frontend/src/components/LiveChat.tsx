@@ -88,7 +88,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
 
   const {
     data: messageData,
-    loading: messageLoading,
+    // loading: messageLoading,
     error: messageError,
   } = useSubscription(NEW_MESSAGE_SUBSCRIPTION, {
     variables: { liveChatId: chatId },
@@ -97,7 +97,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
 
   const {
     data: padullaData,
-    loading: padullaLoading,
+    // loading: padullaLoading,
     error: padullaError,
   } = useSubscription(PADULLA_ENTERED_LIVE_CHAT_SUBSCRIPTION, {
     variables: { liveChatId: chatId },

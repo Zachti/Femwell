@@ -33,7 +33,7 @@ import {
 } from "../../utils/formValidations";
 import useSignupEmailPassword from "../../hooks/useSignupEmailPassword";
 import useLogin from "../../hooks/useLogin";
-import useGoogleAuth from "../../hooks/useGoogleAuth";
+// import useGoogleAuth from "../../hooks/useGoogleAuth";
 
 interface InputFormProps {
   isOpen: boolean;
@@ -41,14 +41,14 @@ interface InputFormProps {
   onOpen: () => void;
 }
 
-const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
+const InputForm: FC<InputFormProps> = ({ isOpen, onClose }) => {
   const [passValue, setPassValue] = useState("");
   const [show, setShow] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
   const handleShowClick = () => setShow(!show);
   const { signup, isSigningUp } = useSignupEmailPassword();
   const { login, isLoggingIn } = useLogin();
-  const { handleGoogleAuth } = useGoogleAuth();
+  // const { handleGoogleAuth } = useGoogleAuth();
   const [isLargerThan650] = useMediaQuery("(min-width: 650px)");
 
   return (
@@ -232,11 +232,11 @@ const InputForm: FC<InputFormProps> = ({ isOpen, onClose, onOpen }) => {
                           cursor="pointer"
                           w="full"
                           onClick={async () => {
-                            const success = await handleGoogleAuth();
-                            if (success) {
-                              onClose();
-                              //reloadPage();
-                            }
+                            // const success = await handleGoogleAuth();
+                            // if (success) {
+                            //   onClose();
+                            //   //reloadPage();
+                            // }
                           }}
                         >
                           <Image src="/google.png" alt="Google logo" w={5} />

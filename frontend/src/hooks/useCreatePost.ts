@@ -2,7 +2,6 @@ import { useState } from "react";
 import useShowToast from "./useShowToast";
 import useAuthStore from "../store/authStore";
 import usePostStore from "../store/postStore";
-import { useLocation } from "react-router-dom";
 import { PostInput } from "../models/postInput.model";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -16,11 +15,9 @@ const useCreatePost = () => {
   const [isLoadingPost, setIsLoadingPost] = useState(false);
   const authUser = useAuthStore((state) => state.user);
   const createPost = usePostStore((state) => state.createPost);
-  const posts = usePostStore((state) => state.posts);
+  // const posts = usePostStore((state) => state.posts);
   const setUser = useAuthStore((state) => state.setUser);
   const showToast = useShowToast();
-
-  const { pathname } = useLocation();
 
   const handleCreatePost = async (post: PostInput) => {
     if (isLoadingPost) return;

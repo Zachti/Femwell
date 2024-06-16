@@ -43,30 +43,30 @@ export const DELETE_USER_MUTATION = gql`
 
 // dtos -
 
-interface AuthenticateRequest {
-  username: string;
+// interface AuthenticateRequest {
+//   username: string;
 
-  password: string;
-}
+//   password: string;
+// }
 
-interface RegisterRequest {
-  profileUsername: string;
+// interface RegisterRequest {
+//   profileUsername: string;
 
-  email: string;
+//   email: string;
 
-  password: string;
+//   password: string;
 
-  phoneNumber?: string;
-}
+//   phoneNumber?: string;
+// }
 
-interface ConfirmUserRequest {
-  code: string;
+// interface ConfirmUserRequest {
+//   code: string;
 
-  email: string;
+//   email: string;
 
-  password: string;
-}
+//   password: string;
+// }
 
-interface DeleteUserRequest {
-  email: string;
-}
+// interface DeleteUserRequest {
+//   email: string;
+// }
