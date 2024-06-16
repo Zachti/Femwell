@@ -113,7 +113,7 @@ const AccountSettings: FC<{}> = () => {
                   initialValues={{
                     username: authUser?.username,
                     email: authUser?.email,
-                    phone: authUser?.phoneNumber || null,
+                    phone: authUser?.phoneNumber || "",
                   }}
                   onSubmit={async (values) => {
                     await editProfile(values, preflightFile);

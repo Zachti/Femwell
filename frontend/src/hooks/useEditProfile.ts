@@ -24,6 +24,7 @@ const useEditProfile = () => {
     ) {
       return false;
     }
+    if (data.phone === "") data.phone = null;
     console.log(data, preflightFile);
     setIsUpdating(true);
     console.log(authUser.jwt);

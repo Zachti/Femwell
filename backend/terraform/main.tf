@@ -36,7 +36,7 @@ data "aws_iam_role" "existing" {
 }
 
 resource "aws_s3_bucket" "bucket" {
-  bucket = "femwell-bucket"
+  bucket = "femwell-bucket-users"
 }
 
 
@@ -80,7 +80,7 @@ resource "aws_cognito_user_pool" "femwell_user_pool" {
   }
 
   auto_verified_attributes = ["email"]
-   mfa_configuration = "OFF"
+  mfa_configuration = "OFF"
 }
 
 resource "aws_cognito_user_pool_client" "femwell_client_pool" {
@@ -880,6 +880,51 @@ resource "aws_security_group" "service_security_group" {
     }
 }
 
+#  data "aws_key_pair" "existing_key_pair" {
+#    key_name = "my-key-pair" 
+#  }
+
+# resource "aws_instance" "frontend_ec2_instance" {
+#   ami           = "ami-0a3c3a20c09d6f377" #AZN LINUX
+#   instance_type = "t2.micro" 
+#   key_name      = data.aws_key_pair.existing_key_pair.key_name
+#   associate_public_ip_address = true
+#   subnet_id = module.vpc.public_subnets[0]
+#   security_groups = [aws_security_group.alb.id]
+
+#   user_data = <<-EOF
+#               #!/bin/bash
+#               sudo yum update -y
+#               sudo yum install -y git
+#               sudo yum install -y docker
+#               sudo service docker start
+#               sudo usermod -a -G docker ec2-user
+#               sudo yum install -y nginx
+
+#               # Install Node.js
+#               curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
+#               sudo yum install -y nodejs
+
+#               # Clone your repository
+#               sudo git clone https://github.com/BeBo1337/Femwell.git /home/ec2-user/Femwell
+
+#               # Install project dependencies and build the project
+#               cd /home/ec2-user/Femwell/frontend
+#               sudo npm install
+#               sudo npm run build
+
+#               # Copy the built files to Nginx's html directory
+#               sudo cp -R /home/ec2-user/Femwell/frontend/dist/* /usr/share/nginx/html
+
+#               #Start Nginx
+#               sudo service nginx start
+#               EOF
+
+#   tags = {
+#     Name = "Imagine?"
+#   }
+# }
+
 output "femwell_url" {
   value = aws_alb.femwell_load_balancer.dns_name
 }
@@ -890,5 +935,9 @@ output "s3_endpoint" {
 
 output "aurora_endpoint" {
   value = aws_rds_cluster.aurora_cluster.endpoint
+}
+
+output "front_ec2_public_ip" {
+  value = aws_instance.frontend_ec2_instance.public_ip
 }
 
