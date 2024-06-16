@@ -27,7 +27,7 @@ interface SideMenuProps {
 
 const SideMenu: FC<SideMenuProps> = ({ isOpen, onClose, onInputFormOpen }) => {
   const navigate = useNavigate();
-  const { logout, isLoggingOut } = useLogout();
+  const { logout } = useLogout();
   const authUser = useAuthStore((state) => state.user);
 
   return (
@@ -169,7 +169,6 @@ const SideMenu: FC<SideMenuProps> = ({ isOpen, onClose, onInputFormOpen }) => {
                 logout();
                 onClose();
               }}
-              isLoading={isLoggingOut}
             >
               Logout
             </Button>
