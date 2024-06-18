@@ -68,7 +68,8 @@ export class LiveChatResolver {
 
   @Subscription(() => User, {
     nullable: true,
-    resolve: (value) => value.liveChat.users.find((user: User) => user.id === value.userId),
+    resolve: (value) =>
+      value.liveChat.users.find((user: User) => user.id === value.userId),
   })
   padullaEnteredLiveChat(
     @Args('liveChatId', { type: () => GraphQLPositiveInt }) liveChatId: number,

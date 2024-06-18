@@ -87,35 +87,6 @@ export class LiveChatService {
       this.error.handleError(new InternalServerErrorException(e));
     }
   }
-
-  async getPreviousChatsForUser(userId: string): Promise<LiveChat[]> {
-    return this.cacheService.wrap(userId, async () => {
-      return this.prisma.liveChat.findMany({
-        where: {
-          users: {
-            some: {
-              id: userId,
-            },
-          },
-        }, // find all chat rooms that the user is in
-        include: {
-          users: {
-            orderBy: {
-              id: 'desc',
-            },
-          }, // show all users in the liveChat (padulla and client) order by id number.
-
-          messages: {
-            take: 1,
-            orderBy: {
-              createdAt: 'desc',
-            },
-          }, // display last message in the chat room
-        },
-      });
-    });
-  }
-
   async sendMessage(SendMessageInput: SendMessageInput) {
     const { userId, liveChatId, content } = SendMessageInput;
     try {
@@ -246,11 +217,20 @@ export class LiveChatService {
               id: padullaId,
             },
           },
-          messages: {
-            some: {
-              seen: false,
+          OR: [
+            {
+              messages: {
+                none: {},
+              },
             },
-          },
+            {
+              messages: {
+                some: {
+                  seen: false,
+                },
+              },
+            },
+          ],
         },
         include: {
           users: true,
@@ -268,17 +248,17 @@ export class LiveChatService {
       having: {
         liveChatId: {
           _count: {
-            equals: 1
-          }
-        }
+            equals: 1,
+          },
+        },
       },
     });
 
     const liveChatsWithOneUser = await this.prisma.liveChat.findMany({
       where: {
         id: {
-          in: liveChatsIdsWithOneUser.map(liveChat => liveChat.liveChatId)
-        }
+          in: liveChatsIdsWithOneUser.map((liveChat) => liveChat.liveChatId),
+        },
       },
       include: {
         users: true,
@@ -288,31 +268,5 @@ export class LiveChatService {
     });
 
     return [...liveChatsWithUnreadMessages, ...liveChatsWithOneUser];
-  }
-
-  async exitLiveChat(liveChatId: number, userId: string): Promise<boolean> {
-    try {
-      await this.prisma.liveChat.update({
-        where: {
-          id: liveChatId,
-        },
-        data: {
-          users: {
-            disconnect: {
-              id: userId,
-            },
-          },
-        },
-        include: {
-          users: true,
-        },
-      });
-      this.logger.info(
-        `User with id: ${userId} exited LiveChat with id: ${liveChatId}`,
-      );
-      return true;
-    } catch (e) {
-      this.error.handleError(new InternalServerErrorException(e));
-    }
   }
 }
