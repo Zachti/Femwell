@@ -68,8 +68,7 @@ export class LiveChatResolver {
 
   @Subscription(() => User, {
     nullable: true,
-    resolve: (value) =>
-      value.liveChat.users.find((user: User) => user.id === value.userId),
+    resolve: (value) => value.liveChat.users.find((user: User) => user.id === value.userId),
   })
   padullaEnteredLiveChat(
     @Args('liveChatId', { type: () => GraphQLPositiveInt }) liveChatId: number,
@@ -172,11 +171,10 @@ export class LiveChatResolver {
   async deleteLiveChat(
     @Args('liveChatId', { type: () => GraphQLPositiveInt }) liveChatId: number,
   ) {
-    const res = await this.liveChatService.deleteLiveChat(liveChatId);
     await this.pubSub.publish(`userExitLiveChat.${liveChatId}`, {
       id: liveChatId,
     });
-    return res;
+    return this.liveChatService.deleteLiveChat(liveChatId);
   }
 
   @Roles([Role.Padulla, Role.Premium, Role.User])

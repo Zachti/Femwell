@@ -262,32 +262,32 @@ export class LiveChatService {
     if (liveChatsWithUnreadMessages.length >= 10) {
       return liveChatsWithUnreadMessages;
     }
-    const limit = 10 - liveChatsWithUnreadMessages.length;
 
-    const liveChatsWithOneUser: LiveChat[] = await this.prisma.$queryRaw`
-      SELECT lc.*, u.*, m.*
-      FROM "LiveChat" lc
-      JOIN (
-        SELECT "liveChatId"
-        FROM "LiveChatUsers"
-        GROUP BY "liveChatId"
-        HAVING COUNT(*) = 1
-      ) c ON lc."id" = c."liveChatId"
-      JOIN "LiveChatUsers" lcu ON lc."id" = lcu."liveChatId"
-      JOIN "User" u ON lcu."userId" = u."id"
-      JOIN "Message" m ON m."liveChatId" = lc."id"
-      LIMIT ${limit}
-    `;
+    const liveChatsIdsWithOneUser = await this.prisma.liveChatUsers.groupBy({
+      by: ['liveChatId'],
+      having: {
+        liveChatId: {
+          _count: {
+            equals: 1
+          }
+        }
+      },
+    });
 
-    this.logger.log(
-      `${liveChatsWithUnreadMessages.concat(liveChatsWithOneUser)}`,
-    );
+    const liveChatsWithOneUser = await this.prisma.liveChat.findMany({
+      where: {
+        id: {
+          in: liveChatsIdsWithOneUser.map(liveChat => liveChat.liveChatId)
+        }
+      },
+      include: {
+        users: true,
+        messages: true,
+      },
+      take: 10 - liveChatsWithUnreadMessages.length,
+    });
 
-    this.logger.log(`${liveChatsWithUnreadMessages}`);
-
-    this.logger.log(`${liveChatsWithOneUser}`);
-
-    return liveChatsWithUnreadMessages.concat(liveChatsWithOneUser);
+    return [...liveChatsWithUnreadMessages, ...liveChatsWithOneUser];
   }
 
   async exitLiveChat(liveChatId: number, userId: string): Promise<boolean> {
