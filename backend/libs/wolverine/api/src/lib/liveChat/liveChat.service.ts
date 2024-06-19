@@ -52,6 +52,12 @@ export class LiveChatService {
           users: true, // show all users in the liveChat (padulla and client)
         },
       });
+      await this.prisma.liveChatUsers.create({
+        data: {
+          liveChatId: res.id,
+          userId: userId,
+        },
+      });
       this.logger.info(`New LiveChat created: ${JSON.stringify(res)}`);
       await this.cacheService.set(`${res.id}`, res);
       return res;
@@ -81,12 +87,19 @@ export class LiveChatService {
           messages: true,
         },
       });
+      await this.prisma.liveChatUsers.create({
+        data: {
+          liveChatId,
+          userId: padullaId,
+        },
+      });
       this.logger.info(`Padulla added to LiveChat. Padulla id: ${padullaId}`);
       return res;
     } catch (e) {
       this.error.handleError(new InternalServerErrorException(e));
     }
   }
+
   async sendMessage(SendMessageInput: SendMessageInput) {
     const { userId, liveChatId, content } = SendMessageInput;
     try {

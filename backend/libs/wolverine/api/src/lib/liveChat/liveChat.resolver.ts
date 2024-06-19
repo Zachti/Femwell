@@ -206,13 +206,13 @@ export class LiveChatResolver {
     return await this.liveChatService.setMessagesAsRead(liveChatId);
   }
 
-  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Roles([Role.Padulla])
   @Mutation(() => Message)
   async setMessageAsUnread(@Args('liveChatId') liveChatId: number) {
     return await this.liveChatService.setMessageAsUnread(liveChatId);
   }
 
-  @Roles([Role.Padulla, Role.Premium, Role.User])
+  @Roles([Role.Padulla])
   @Query(() => [LiveChat])
   async getLiveChatsForPadulla(
     @Args('userId', { type: () => GraphQLUUID }) userId: string,
