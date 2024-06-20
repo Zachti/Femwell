@@ -4,14 +4,14 @@ import Carousel from "react-multi-carousel";
 import CarouselItem from "./CarouselItem";
 import "react-multi-carousel/lib/styles.css";
 import "../assets/Carousel.css";
-import { faCircleArrowLeft, faDna } from "@fortawesome/free-solid-svg-icons";
+import { faCircleArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { faCircleArrowRight } from "@fortawesome/free-solid-svg-icons/faCircleArrowRight";
 
 interface CarouselProps {
   label?: string;
 }
 
-const CarouselComponent: FC<CarouselProps> = ({ label }) => {
+const CarouselComponent: FC<CarouselProps> = ({}) => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   useEffect(() => {

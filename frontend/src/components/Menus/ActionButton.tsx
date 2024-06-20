@@ -9,11 +9,15 @@ import {
 import { AddIcon, SettingsIcon, EditIcon, ChatIcon } from "@chakra-ui/icons";
 import LiveChat from "../LiveChat";
 import { useNavigate } from "react-router-dom";
-
+import useAuthStore from "../../store/authStore";
 const Fab = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const toggleIsOpen = () => setIsOpen(!isOpen);
+  const authUser = useAuthStore((state) => state.user);
+  const [isPadulla, _setIsPadulla] = useState<boolean>(
+    authUser?.role === "Padulla",
+  );
 
   const navigate = useNavigate();
   const ref = useRef(null);
@@ -23,10 +27,10 @@ const Fab = () => {
     handler: () => setIsOpen(false),
   });
 
-  const onLiveChatClose = () => {
-    setIsChatOpen(false);
-    setIsOpen(false);
-  };
+  // const onLiveChatClose = () => {
+  //   setIsChatOpen(false);
+  //   setIsOpen(false);
+  // };
 
   return (
     <Box
@@ -50,7 +54,10 @@ const Fab = () => {
 
       {isOpen && (
         <ScaleFade initialScale={0.9} in={isOpen}>
-          <Tooltip label="LiveChat" placement="left">
+          <Tooltip
+            label={isPadulla ? "Chat Center" : "LiveChat"}
+            placement="left"
+          >
             <IconButton
               color="white"
               colorScheme="fabColor"
@@ -59,7 +66,9 @@ const Fab = () => {
               isRound
               aria-label="LiveChat"
               style={{ position: "absolute", right: "60px", bottom: "0px" }}
-              onClick={() => setIsChatOpen(true)}
+              onClick={() =>
+                isPadulla ? navigate("/livechats") : setIsChatOpen(true)
+              }
             />
           </Tooltip>
 

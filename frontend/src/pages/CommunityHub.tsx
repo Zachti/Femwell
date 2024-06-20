@@ -46,76 +46,15 @@ const CommunityHub: FC<{}> = ({}) => {
                 <FeedPost
                   key={post.id}
                   id={post.id}
-                  username={post.username}
-                  avatarURL={post.profilePic}
+                  username={post.user.username}
+                  profilePic={post.user.profilePic}
                   content={post.content}
-                  imageURL={post.imageURL}
+                  imageUrl={post.imageUrl}
                   createdAt={post.createdAt}
-                  createdBy={post.createdBy}
+                  userId={post.userId}
                   likes={post.likes}
-                  comments={[
-                    {
-                      id: "1",
-                      username: "BeBo",
-                      content: "🚀 My comment! I'm here! 🚀",
-                    },
-                    {
-                      id: "2",
-                      username: "BeBo",
-                      content:
-                        "My comment! Hello! Lorem ipsum dolor sit amet consectetur adipisicing elit. Aspernatur iusto sapiente, numquam cum vero maiores, provident delectus itaque aliquam alias voluptatum eligendi tempore quas, fugit quae consequatur suscipit corrupti quo! ❤️❤️❤️",
-                    },
-                    {
-                      id: "3",
-                      username: "BeBo",
-                      content: "🚀 My comment! I'm here! 🚀",
-                    },
-                    {
-                      id: "4",
-                      username: "BeBo",
-                      content: "🚀 My comment! I'm here! 🚀",
-                    },
-                    {
-                      id: "5",
-                      username: "BeBo",
-                      content: "🚀 My comment! I'm here! 🚀",
-                    },
-                    {
-                      id: "6",
-                      username: "BeBo",
-                      content: "🚀 My comment! I'm here! 🚀",
-                    },
-                    {
-                      id: "7",
-                      username: "BeBo",
-                      content: "🚀 My comment! I'm here! 🚀",
-                    },
-                    {
-                      id: "8",
-                      username: "BeBo",
-                      content: "🚀 My comment! I'm here! 🚀",
-                    },
-                    {
-                      id: "9",
-                      username: "BeBo",
-                      content: "🚀 My comment! I'm here! 🚀",
-                    },
-                    {
-                      id: "10",
-                      username: "BeBo",
-                      content: "🚀 My comment! I'm here! 🚀",
-                    },
-                    {
-                      id: "11",
-                      username: "BeBo",
-                      content: "IM COMMENT 11 - OVER 10",
-                    },
-                    {
-                      id: "12",
-                      username: "BeBo",
-                      content: "IM COMMENT 12 - OVER 10 YAHHO HELLO YOGEV",
-                    },
-                  ]}
+                  comments={post.comments}
+                  isAnonymous={post.isAnonymous}
                 />
               ))}
             </>

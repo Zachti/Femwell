@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { FC } from "react";
 import "../assets/CarouselItem.css";
 
 interface CarouselItemProps {

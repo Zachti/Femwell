@@ -9,20 +9,22 @@ import { print } from "graphql";
 const useDeletePost = () => {
   const [isLoading, setIsLoading] = useState(false);
   const authUser = useAuthStore((state) => state.user);
+  const setUser = useAuthStore((state) => state.setUser);
+  // const posts = usePostStore((state) => state.posts);
   const deletePost = usePostStore((state) => state.deletePost);
   const showToast = useShowToast();
 
   const handleDeletePost = async (
     postId: string,
-    createdBy: string,
-    imageURL: string | undefined,
+    userId: string,
+    imageUrl: string | undefined,
   ) => {
     if (isLoading) return;
     if (postId && authUser) {
       setIsLoading(true);
 
       try {
-        if (createdBy !== authUser.id) {
+        if (userId !== authUser.id) {
           showToast(
             "Error",
             "You are not authorized to edit this post",
@@ -31,8 +33,18 @@ const useDeletePost = () => {
           return;
         }
 
-        if (imageURL) {
-          //go delete formData.append("path", `PostImages/${postId}`);
+        if (imageUrl) {
+          await axios.delete(
+            `${import.meta.env.VITE_HEIMDALL_ENDPOINT}/delete`,
+            {
+              data: {
+                path: `PostImages/${postId}`,
+              },
+              headers: {
+                authorization: authUser.jwt,
+              },
+            },
+          );
         }
 
         const deletePostResponse = await axios.post(
@@ -47,11 +59,16 @@ const useDeletePost = () => {
             },
           },
         );
-        const deleteResult = await deletePostResponse.data;
+        const deleteResult = await deletePostResponse.data.data.deletePost;
         console.log("uploadResult", deleteResult);
         console.log("--------------------");
 
         deletePost(postId);
+        setUser({
+          ...authUser,
+          posts:
+            authUser.posts?.filter((post: string) => post !== postId) || [],
+        });
         showToast("Success", "Post deleted successfully", "success");
       } catch (error: any) {
         showToast("Error", error.message, "error");

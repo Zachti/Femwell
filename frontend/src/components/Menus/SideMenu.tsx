@@ -17,7 +17,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import useAuthStore from "../../store/authStore";
 import useLogout from "../../hooks/useLogout";
-import { reloadPage } from "../../utils/genericFunctions";
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -26,14 +25,9 @@ interface SideMenuProps {
   onInputFormOpen: () => void;
 }
 
-const SideMenu: FC<SideMenuProps> = ({
-  isOpen,
-  onClose,
-  onOpen,
-  onInputFormOpen,
-}) => {
+const SideMenu: FC<SideMenuProps> = ({ isOpen, onClose, onInputFormOpen }) => {
   const navigate = useNavigate();
-  const { logout, isLoggingOut } = useLogout();
+  const { logout } = useLogout();
   const authUser = useAuthStore((state) => state.user);
 
   return (
@@ -72,7 +66,7 @@ const SideMenu: FC<SideMenuProps> = ({
             </>
           ) : (
             <>
-              <Box>Welcome to FemWell!</Box>
+              <Box>Welcome to Femwell!</Box>
             </>
           )}
         </DrawerHeader>
@@ -151,6 +145,18 @@ const SideMenu: FC<SideMenuProps> = ({
                 Account
               </Button>
             )}
+            {authUser?.role === "Padulla" && (
+              <Button
+                colorScheme="pink"
+                w="full"
+                onClick={() => {
+                  onClose();
+                  navigate("/livechats");
+                }}
+              >
+                Chat Center
+              </Button>
+            )}
           </VStack>
         </DrawerBody>
         {authUser && (
@@ -162,9 +168,7 @@ const SideMenu: FC<SideMenuProps> = ({
               onClick={() => {
                 logout();
                 onClose();
-                //reloadPage();
               }}
-              isLoading={isLoggingOut}
             >
               Logout
             </Button>

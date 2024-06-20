@@ -1,6 +1,6 @@
 export interface PostInput {
   username: string;
   content: string;
-  imageURL: File | null;
+  imageUrl: File | null;
   isAnonymous: boolean;
 }

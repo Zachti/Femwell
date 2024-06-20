@@ -57,7 +57,7 @@ import {
   validateConfirmPassword,
   validatePhone,
 } from "../../utils/formValidations";
-import useGoogleAuth from "../../hooks/useGoogleAuth";
+// import useGoogleAuth from "../../hooks/useGoogleAuth";
 import EmailCodeVerification from "./EmailCodeVerification";
 import useSignupEmailPassword from "../../hooks/useSignupEmailPassword";
 
@@ -72,17 +72,13 @@ const steps = [
   { title: "Second", description: "Create Account" },
 ];
 
-const QuestionnaireSignUp: FC<InputFormProps> = ({
-  isOpen,
-  onClose,
-  onOpen,
-}) => {
+const QuestionnaireSignUp: FC<InputFormProps> = ({ isOpen, onClose }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [passValue, setPassValue] = useState("");
   const [show, setShow] = useState(false);
   const handleShowClick = () => setShow(!show);
-  const { handleGoogleAuth } = useGoogleAuth();
+  // const { handleGoogleAuth } = useGoogleAuth();
 
   const {
     showEmailVerifyPage,
@@ -977,32 +973,32 @@ const QuestionnaireSignUp: FC<InputFormProps> = ({
                           w="full"
                           onClick={async () => {
                             goToNext();
-                            const responses = Object.keys(values)
-                              .filter((key) => key.startsWith("question")) // Only process keys that represent questions
-                              .map((key) => {
-                                const value = (values as Record<string, any>)[
-                                  key
-                                ];
-                                const answer = Array.isArray(value)
-                                  ? value.join(", ")
-                                  : value;
-                                return {
-                                  question: key,
-                                  answer,
-                                };
-                              });
-                            const data = {
-                              email: values.email,
-                              username: values.username,
-                              password: values.password,
-                              confirmPassword: values.confirmPassword,
-                              phone: values.phone,
-                              responses,
-                            };
-                            const success = await handleGoogleAuth(data);
-                            if (success) {
-                              onClose();
-                            }
+                            // const responses = Object.keys(values)
+                            //   .filter((key) => key.startsWith("question")) // Only process keys that represent questions
+                            //   .map((key) => {
+                            //     const value = (values as Record<string, any>)[
+                            //       key
+                            //     ];
+                            //     const answer = Array.isArray(value)
+                            //       ? value.join(", ")
+                            //       : value;
+                            //     return {
+                            //       question: key,
+                            //       answer,
+                            //     };
+                            //   });
+                            // const data = {
+                            //   email: values.email,
+                            //   username: values.username,
+                            //   password: values.password,
+                            //   confirmPassword: values.confirmPassword,
+                            //   phone: values.phone,
+                            //   responses,
+                            // };
+                            // const success = await handleGoogleAuth(data);
+                            // if (success) {
+                            //   onClose();
+                            // }
                           }}
                         >
                           <Image src="/google.png" alt="Google logo" w={5} />

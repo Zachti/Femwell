@@ -1,7 +1,6 @@
 import {
   Box,
   Heading,
-  Button,
   VStack,
   Divider,
   Text,
@@ -13,9 +12,7 @@ import {
   ModalCloseButton,
   ModalBody,
   useBreakpointValue,
-  Flex,
   useMediaQuery,
-  Skeleton,
   Fade,
   useColorModeValue,
 } from "@chakra-ui/react";
@@ -32,7 +29,7 @@ const ION = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedArticle, setSelectedArticle] = useState<ArticleModel>();
   const authUser = useAuthStore((state) => state.user);
-  const { isUpdating, editLaterArticles } = useUpdateLaterArticles();
+  const { editLaterArticles } = useUpdateLaterArticles();
   const modalBgColor = useColorModeValue("white", "#533142");
   const [allArticles, setAllArticles] = useState<ArticleModel[]>([]);
   const [laterArticles, setLaterArticles] = useState<ArticleModel[]>([]);
@@ -139,7 +136,7 @@ const ION = () => {
                   handle=".drag-handle"
                   animation={500}
                   group="articles"
-                  onChange={(order, sortable, evt) => {}}
+                  // onChange={(order, sortable, evt) => {}}
                   onEnd={onEnd}
                   forceFallback={true}
                   scroll={true}
@@ -196,7 +193,7 @@ const ION = () => {
                     group="articles"
                     handle=".drag-handle"
                     animation={500}
-                    onChange={(order, sortable, evt) => {}}
+                    // onChange={(order, sortable, evt) => {}}
                     onEnd={onEnd}
                     forceFallback={true}
                     scroll={true}

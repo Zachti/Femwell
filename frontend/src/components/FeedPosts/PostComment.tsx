@@ -23,14 +23,14 @@ const PostComment: FC<CommentProps> = ({ comment }) => {
         fontWeight={"bold"}
       >
         <Avatar
-          name={comment.username}
-          src={comment.avatarURL ? comment.avatarURL : ""}
+          name={comment.user.username}
+          src={comment.user.profilePic ? comment.user.profilePic : ""}
           size={"xs"}
           bgColor={"pink.300"}
           color={"white"}
           mr={2}
         />
-        {comment.username}
+        {comment.user.username}
       </Flex>
       <Text px={2} pb={2}>
         {comment.content}

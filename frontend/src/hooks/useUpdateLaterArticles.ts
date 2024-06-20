@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useAuthStore from "../store/authStore";
-import { firestore } from "../firebase/firebase";
-import { doc, updateDoc } from "firebase/firestore";
+// import { firestore } from "../firebase/firebase";
+// import { doc, updateDoc } from "firebase/firestore";
 
 const useUpdateLaterArticles = () => {
   const [isUpdating, setIsUpdating] = useState(false);
@@ -12,7 +12,7 @@ const useUpdateLaterArticles = () => {
     if (isUpdating || !authUser || !articleId) return false;
     setIsUpdating(true);
 
-    const userDocRef = doc(firestore, "users", authUser.id);
+    // const userDocRef = doc(firestore, "users", authUser.id);
 
     try {
       let updatedLaterArticles;
@@ -28,7 +28,7 @@ const useUpdateLaterArticles = () => {
         laterArticles: updatedLaterArticles,
       };
 
-      await updateDoc(userDocRef, updatedUser);
+      // await updateDoc(userDocRef, updatedUser);
       localStorage.setItem("user", JSON.stringify(updatedUser));
       setAuthUser(updatedUser);
 
