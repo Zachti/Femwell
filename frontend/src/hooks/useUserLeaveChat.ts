@@ -1,7 +1,7 @@
 import { useState } from "react";
 import useShowToast from "./useShowToast";
 import useAuthStore from "../store/authStore";
-import { USER_LEAVE_CHAT_MUTATION } from "../utils/wolverineRequests";
+import { DELETE_LIVE_CHAT_MUTATION } from "../utils/wolverineRequests";
 import axios from "axios";
 import { print } from "graphql";
 import useChatStore from "../store/chatStore";
@@ -21,8 +21,8 @@ const useUserLeaveChat = () => {
       const leaveChatResponse = await axios.post(
         `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
         {
-          query: print(USER_LEAVE_CHAT_MUTATION),
-          variables: { liveChatId: chatId, userId: authUser.id },
+          query: print(DELETE_LIVE_CHAT_MUTATION),
+          variables: { liveChatId: chatId },
         },
         {
           headers: {

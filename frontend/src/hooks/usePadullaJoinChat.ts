@@ -9,12 +9,11 @@ import useChatStore from "../store/chatStore";
 const usePadullaJoinChat = () => {
   const [isLoadingJoinChat, setIsLoadingJoinChat] = useState(false);
   const authUser = useAuthStore((state) => state.user);
-  const setChats = useChatStore((state) => state.setChats);
+  const addUserToChat = useChatStore((state) => state.addUserToChat);
   const showToast = useShowToast();
 
   const handleJoinChat = async (liveChatId: number) => {
     if (isLoadingJoinChat || !authUser || authUser?.role !== "Padulla") return;
-    console.log("joining chat...", liveChatId);
     setIsLoadingJoinChat(true);
     liveChatId = +liveChatId;
     try {
@@ -36,8 +35,7 @@ const usePadullaJoinChat = () => {
       console.log("joinChatsResult", joinChatsResult);
       console.log("--------------------");
 
-      setChats([joinChatsResult]);
-
+      addUserToChat(liveChatId, joinChatsResult.users);
       setIsLoadingJoinChat(false);
       showToast("Success", "Chat Joined successfully", "success");
     } catch (error: any) {

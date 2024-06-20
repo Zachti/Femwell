@@ -47,13 +47,12 @@ const useCreateChatMessage = () => {
         console.log("--------------------");
         if (createMessageResult) {
           setIsLoading(false);
-          showToast("Success", "Post created successfully", "success");
           return true;
         }
 
         return false;
       } catch (error: any) {
-        showToast("Error", error.message, "error");
+        showToast("Error", "Current chat unavailable", "error");
         setIsLoading(false);
         return false;
       }

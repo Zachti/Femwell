@@ -100,7 +100,13 @@ const App: FC<{}> = () => {
           />
           <Route
             path="/livechats"
-            element={authUser ? <LiveChatCenter /> : <Navigate to="/" />} //should only be padulla user
+            element={
+              authUser?.role === "Padulla" ? (
+                <LiveChatCenter />
+              ) : (
+                <Navigate to="/" />
+              )
+            } //should only be padulla user
           />
           <Route path="/ION" element={<ION />} />
         </Routes>

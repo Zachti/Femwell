@@ -41,6 +41,7 @@ import {
   PADULLA_ENTERED_LIVE_CHAT_SUBSCRIPTION,
 } from "../utils/wolverineSubscriptions";
 import useUserLeaveChat from "../hooks/useUserLeaveChat";
+import { set } from "date-fns";
 
 interface LiveChatProps {
   isOpen: boolean;
@@ -54,6 +55,8 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoadingPadulla, setIsLoadingPadulla] = useState(true);
+  const [padullaUsername, setPadullaUsername] = useState<string>("");
+  const [padullaProfilePic, setPadullaProfilePic] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const bgColor = useColorModeValue("white", Colors.color5);
   const msgBgColor1 = useColorModeValue("pink.200", "pink.700");
@@ -123,17 +126,27 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
   }, [chats]);
 
   useEffect(() => {
-    console.log("received message", messageData, messageError);
     if (messageData?.newMessage) {
-      createMessage(messageData.newMessage, chatId);
+      console.log("received message", messageData, messageError);
+      const newMessage = {
+        id: messageData?.newMessage.id,
+        userId: messageData?.newMessage.user.id,
+        username: messageData?.newMessage.user.username,
+        content: messageData?.newMessage.content,
+        seen: messageData?.newMessage.seen,
+        createdAt: messageData?.newMessage.createdAt,
+      };
+      createMessage(newMessage, chatId);
     }
   }, [messageData]);
 
   //HERE HERE HERE ITS NOT .NEWMESSAGE ALSO NEED TO CHECK WHAT IS THE PROFILE PIC AND USERNAME OF THE PADULLA
   useEffect(() => {
-    console.log("padulla joined", padullaData, padullaError);
-    if (padullaData?.newMessage) {
+    console.log("padulla trying to join...", padullaData, padullaError);
+    if (padullaData?.padullaEnteredLiveChat) {
       setIsLoadingPadulla(false);
+      setPadullaProfilePic(padullaData.padullaEnteredLiveChat.profilePic);
+      setPadullaUsername(padullaData.padullaEnteredLiveChat.username);
     }
   }, [padullaData]);
 
@@ -222,14 +235,10 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
             </Flex>
           ) : (
             <Flex align="center">
-              <Avatar
-                size="sm"
-                name="John Doe"
-                //   src="link"
-              >
+              <Avatar size="sm" name={padullaUsername} src={padullaProfilePic}>
                 <AvatarBadge boxSize="1.25em" bg="green.500" />
               </Avatar>
-              <Text ml="2">John Doe</Text>
+              <Text ml="2">{padullaUsername}</Text>
             </Flex>
           )}
 
@@ -270,19 +279,19 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
             <Box
               key={index}
               bg={
-                msg.username === authUser?.username
+                msg.userId === authUser?.id
                   ? `${msgBgColor1}`
                   : `${msgBgColor2}`
               }
               alignSelf={
-                msg.username === authUser?.username ? "flex-start" : "flex-end"
+                msg.userId === authUser?.id ? "flex-start" : "flex-end"
               }
               borderRadius="lg"
               p="2"
               mt="2"
               maxW="80%"
             >
-              <Text>{msg.content}</Text>
+              <Text>{`${msg.content}`}</Text>
             </Box>
           ))}
         </Flex>

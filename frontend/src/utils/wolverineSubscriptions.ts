@@ -17,9 +17,7 @@ export const NEW_MESSAGE_SUBSCRIPTION = gql`
 
 export const USER_EXIT_LIVE_CHAT_SUBSCRIPTION = gql`
   subscription OnUserExitLiveChat($liveChatId: PositiveInt!) {
-    userExitLiveChat(liveChatId: $liveChatId) {
-      userId
-    }
+    userExitLiveChat(liveChatId: $liveChatId)
   }
 `;
 
@@ -54,7 +52,8 @@ export const USER_STOPPED_TYPING_SUBSCRIPTION = gql`
 export const PADULLA_ENTERED_LIVE_CHAT_SUBSCRIPTION = gql`
   subscription OnPadullaEnteredLiveChat($liveChatId: PositiveInt!) {
     padullaEnteredLiveChat(liveChatId: $liveChatId) {
-      liveChatId
+      username
+      profilePic
     }
   }
 `;

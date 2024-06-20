@@ -880,9 +880,9 @@ resource "aws_security_group" "service_security_group" {
     }
 }
 
- data "aws_key_pair" "existing_key_pair" {
-   key_name = "my-key-pair" 
- }
+#  data "aws_key_pair" "existing_key_pair" {
+#    key_name = "my-key-pair" 
+#  }
 
 # resource "aws_instance" "frontend_ec2_instance" {
 #   ami           = "ami-0a3c3a20c09d6f377" #AZN LINUX
@@ -921,7 +921,7 @@ resource "aws_security_group" "service_security_group" {
 #               EOF
 
 #   tags = {
-#     Name = "Frontend"
+#     Name = "femwell-frontend"
 #   }
 # }
 

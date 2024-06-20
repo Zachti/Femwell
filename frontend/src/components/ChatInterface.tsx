@@ -38,19 +38,25 @@ interface ChatProps {
   chatId?: number;
   showEmojiPicker?: boolean;
   user: string;
+  profilePic?: string;
   msgs?: ChatMsg[];
   avatars?: AvatarProps[];
   selectedUser?: string;
   handleSelectUser: (username: string, chatId: number) => void;
+  handleUserLeft: (chatId: number) => void;
+  handleSeenMsg: (chatId: number, status: string) => void;
   addMessage: (data: any) => void;
 }
 
 const ChatInterface: FC<ChatProps> = ({
   chat,
   user,
+  profilePic,
   avatars,
   selectedUser,
   handleSelectUser,
+  handleUserLeft,
+  handleSeenMsg,
   addMessage,
 }) => {
   const [isLargerThan650] = useMediaQuery("(min-width: 650px)");
@@ -59,6 +65,7 @@ const ChatInterface: FC<ChatProps> = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
   const bgColor = useColorModeValue("white", Colors.color5);
+  const [userConnected, setUserConnected] = useState(true);
   const msgBgColor1 = useColorModeValue("pink.200", "pink.700");
   const msgBgColor2 = useColorModeValue("gray.200", "gray.500");
 
@@ -103,10 +110,6 @@ const ChatInterface: FC<ChatProps> = ({
     setCursorPosition(cursorPosition + emoji.length);
   };
 
-  //this will be different since there will be more than one chat
-  //I probably need to create a chatStore...
-
-  //this will later on be a hook ofc
   const onSendMessage = async () => {
     if (!(inputValue.trim() === "" || inputValue.length > 200)) {
       addMessage({ chatId: chat.id, content: inputValue });
@@ -115,7 +118,6 @@ const ChatInterface: FC<ChatProps> = ({
   };
 
   useEffect(() => {
-    console.log("something was received");
     if (messageData?.newMessage) {
       console.log("received message", messageData, messageError);
       const newMessage = {
@@ -128,14 +130,19 @@ const ChatInterface: FC<ChatProps> = ({
       };
 
       createMessage(newMessage, chat.id);
+      console.log(selectedUser, user);
+      if (selectedUser === user) {
+        console.log("hello?");
+        handleSeenMsg(chat.id, "Seen");
+      }
     }
   }, [messageData, messageError]);
 
   useEffect(() => {
-    console.log("user has left");
-    if (exitData?.newMessage) {
-      console.log("user", exitData, messageError);
-      //set the color of the user that left to gray
+    if (exitData) {
+      console.log("user has left", exitData, exitError);
+      setUserConnected(false);
+      handleUserLeft(chat.id);
     }
   }, [exitData, exitError]);
 
@@ -160,8 +167,11 @@ const ChatInterface: FC<ChatProps> = ({
         justifyContent="space-between"
       >
         <Flex alignItems={"center"}>
-          <Avatar size="sm" name={user}>
-            <AvatarBadge boxSize="1.25em" bg="green.500" />
+          <Avatar size="sm" name={user} src={profilePic ? profilePic : ""}>
+            <AvatarBadge
+              boxSize="1.25em"
+              bg={userConnected ? "green.500" : "gray.500"}
+            />
           </Avatar>
           <Text ml="2">{user}</Text>
         </Flex>
@@ -211,6 +221,13 @@ const ChatInterface: FC<ChatProps> = ({
             <Text>{msg.content}</Text>
           </Box>
         ))}
+        {!userConnected && (
+          <Text
+            fontSize={"xl"}
+            fontStyle={"italic"}
+            pt={2}
+          >{`${user} has left the chat`}</Text>
+        )}
       </Flex>
 
       <Flex

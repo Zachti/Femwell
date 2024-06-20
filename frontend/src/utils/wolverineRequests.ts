@@ -401,36 +401,16 @@ export const CREATE_LIVE_CHAT_MUTATION = gql`
 `;
 
 export const DELETE_LIVE_CHAT_MUTATION = gql`
-  mutation DeleteLiveChat($id: UUID!) {
-    deleteLiveChat(id: $id) {
+  mutation DeleteLiveChat($liveChatId: PositiveInt!) {
+    deleteLiveChat(liveChatId: $liveChatId) {
       id
       createdAt
-      updatedAt
-      users {
-        id
-        email
-        username
-        phoneNumber
-      }
-      messages {
-        id
-        content
-        userId
-        user {
-          email
-          username
-          phoneNumber
-        }
-        seen
-        createdAt
-        updatedAt
-      }
     }
   }
 `;
 
 export const GET_LIVE_CHAT_QUERY = gql`
-  query GetLiveChat($liveChatId: Float!) {
+  query GetLiveChat($liveChatId: PositiveInt!) {
     getLiveChat(liveChatId: $liveChatId) {
       id
       createdAt
@@ -505,7 +485,7 @@ export interface SendMessageInput {
 }
 
 export const ADD_PADULLA_TO_LIVE_CHAT_MUTATION = gql`
-  mutation AddPadullaToLiveChat($liveChatId: Float!, $userId: UUID!) {
+  mutation AddPadullaToLiveChat($liveChatId: PositiveInt!, $userId: UUID!) {
     addPadullaToLiveChat(liveChatId: $liveChatId, userId: $userId) {
       id
       createdAt
@@ -552,8 +532,10 @@ export const GET_MESSAGES_FOR_LIVE_CHAT_QUERY = gql`
 `;
 
 export const SET_MESSAGE_SEEN_MUTATION = gql`
-  mutation setMessagesAsRead($messageId: PositiveInt!) {
-    setMessageSeen(messageId: $messageId)
+  mutation setMessagesAsRead($liveChatId: PositiveInt!) {
+    setMessagesAsRead(liveChatId: $liveChatId) {
+      id
+    }
   }
 `;
 
