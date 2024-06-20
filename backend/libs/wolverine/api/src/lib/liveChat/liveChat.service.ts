@@ -52,6 +52,12 @@ export class LiveChatService {
           users: true, // show all users in the liveChat (padulla and client)
         },
       });
+      await this.prisma.liveChatUsers.create({
+        data: {
+          liveChatId: res.id,
+          userId: userId,
+        },
+      });
       this.logger.info(`New LiveChat created: ${JSON.stringify(res)}`);
       await this.cacheService.set(`${res.id}`, res);
       return res;
@@ -81,6 +87,12 @@ export class LiveChatService {
           messages: true,
         },
       });
+      await this.prisma.liveChatUsers.create({
+        data: {
+          liveChatId,
+          userId: padullaId,
+        },
+      });
       this.logger.info(`Padulla added to LiveChat. Padulla id: ${padullaId}`);
       return res;
     } catch (e) {
@@ -88,42 +100,15 @@ export class LiveChatService {
     }
   }
 
-  async getPreviousChatsForUser(userId: string): Promise<LiveChat[]> {
-    return this.cacheService.wrap(userId, async () => {
-      return this.prisma.liveChat.findMany({
-        where: {
-          users: {
-            some: {
-              id: userId,
-            },
-          },
-        }, // find all chat rooms that the user is in
-        include: {
-          users: {
-            orderBy: {
-              id: 'desc',
-            },
-          }, // show all users in the liveChat (padulla and client) order by id number.
-
-          messages: {
-            take: 1,
-            orderBy: {
-              createdAt: 'desc',
-            },
-          }, // display last message in the chat room
-        },
-      });
-    });
-  }
-
   async sendMessage(SendMessageInput: SendMessageInput) {
-    const { userId, liveChatId, content } = SendMessageInput;
+    const { userId, liveChatId, content, isPadullaSent } = SendMessageInput;
     try {
       const res = await this.prisma.message.create({
         data: {
           content,
           liveChatId,
           userId,
+          seen: isPadullaSent ?? false
         },
         include: {
           liveChat: {
@@ -246,11 +231,20 @@ export class LiveChatService {
               id: padullaId,
             },
           },
-          messages: {
-            some: {
-              seen: false,
+          OR: [
+            {
+              messages: {
+                none: {},
+              },
             },
-          },
+            {
+              messages: {
+                some: {
+                  seen: false,
+                },
+              },
+            },
+          ],
         },
         include: {
           users: true,
@@ -263,46 +257,30 @@ export class LiveChatService {
       return liveChatsWithUnreadMessages;
     }
 
-    const liveChatsWithOneUser: LiveChat[] = await this.prisma.$queryRaw`
-      SELECT lc.*, u.*
-      FROM "LiveChat" lc
-      JOIN (
-        SELECT "liveChatId"
-        FROM "LiveChatUsers"
-        GROUP BY "liveChatId"
-        HAVING COUNT(*) = 1
-      ) c ON lc."id" = c."liveChatId"
-      JOIN "LiveChatUsers" lcu ON lc."id" = lcu."liveChatId"
-      JOIN "User" u ON lcu."userId" = u."id"
-      LIMIT ${10 - liveChatsWithUnreadMessages.length}
-    `;
-
-    return [...liveChatsWithUnreadMessages, ...liveChatsWithOneUser];
-  }
-
-  async exitLiveChat(liveChatId: number, userId: string): Promise<boolean> {
-    try {
-      await this.prisma.liveChat.update({
-        where: {
-          id: liveChatId,
-        },
-        data: {
-          users: {
-            disconnect: {
-              id: userId,
-            },
+    const liveChatsIdsWithOneUser = await this.prisma.liveChatUsers.groupBy({
+      by: ['liveChatId'],
+      having: {
+        liveChatId: {
+          _count: {
+            equals: 1,
           },
         },
-        include: {
-          users: true,
+      },
+    });
+
+    const liveChatsWithOneUser = await this.prisma.liveChat.findMany({
+      where: {
+        id: {
+          in: liveChatsIdsWithOneUser.map((liveChat) => liveChat.liveChatId),
         },
-      });
-      this.logger.info(
-        `User with id: ${userId} exited LiveChat with id: ${liveChatId}`,
-      );
-      return true;
-    } catch (e) {
-      this.error.handleError(new InternalServerErrorException(e));
-    }
+      },
+      include: {
+        users: true,
+        messages: true,
+      },
+      take: 10 - liveChatsWithUnreadMessages.length,
+    });
+
+    return [...liveChatsWithUnreadMessages, ...liveChatsWithOneUser];
   }
 }

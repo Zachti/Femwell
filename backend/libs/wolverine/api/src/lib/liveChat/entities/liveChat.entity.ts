@@ -1,6 +1,5 @@
 import { Field, ObjectType, ID } from '@nestjs/graphql';
 import { GraphQLDate } from 'graphql-scalars';
-import { GraphQLString } from 'graphql/type';
 import { Message } from './message.entity';
 import { User } from '../../user/entities/user.entity';
 
