@@ -1,65 +1,227 @@
-import { useEffect, useState } from "react";
+// import { useEffect, useState } from "react";
+// import usePostStore from "../store/postStore";
+// import useShowToast from "./useShowToast";
+// import { Post } from "../models";
+// import useProfileStore from "../store/profileStore";
+// import { queryTypes, userPostQueries } from "../utils/userPostQueries";
+// import { GET_POSTS_QUERY, PostsFilter } from "../utils/wolverineRequests";
+// import axios from "axios";
+// import { print } from "graphql";
+// import useAuthStore from "../store/authStore";
+
+// const useGetUserPost = () => {
+//   const [isLoading, setIsLoading] = useState(false);
+//   const { setPosts, queryType } = usePostStore();
+//   const userProfile = useProfileStore((state) => state.userProfile);
+//   const authUser = useAuthStore((state) => state.user);
+//   const prevQueryType = usePostStore((state) => state.prevQueryType);
+//   const setPrevPostsQuery = usePostStore((state) => state.setPrevPostsQuery);
+//   const showToast = useShowToast();
+
+//     const getPosts = async () => {
+//       if (!userProfile || !queryType || !authUser) return;
+//       console.log("queryType", queryType, "userProfile", userProfile);
+//       setIsLoading(true);
+//       setPosts([]);
+//       try {
+//         let q;
+//         if (queryType === queryTypes.USER_POSTS) {
+//           const filter: PostsFilter = {
+//             ids: [userProfile.id],
+//           };
+//           const userPostsResponse = await axios.post(
+//             `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+//             {
+//               query: print(GET_POSTS_QUERY),
+//               variables: { filter },
+//             },
+//             {
+//               headers: {
+//                 authorization: authUser.jwt,
+//               },
+//             },
+//           );
+//         } else if (queryType === queryTypes.MY_POSTS) {
+//           q = userPostQueries.getMyPosts(userProfile);
+//         } else if (queryType === queryTypes.LIKED_POSTS) {
+//           q = await userPostQueries.getLikedPosts(userProfile);
+//         } else if (queryType === queryTypes.RANDOM_POSTS) {
+//           q = userPostQueries.getRandomPosts();
+//         }
+
+//         if (!q) return;
+
+//         const posts: Post[] = [];
+
+//         qSnapshot.forEach((doc) => {
+//           posts.push({
+//             ...(doc.data() as Post),
+//             id: doc.id,
+//             profilePic:
+//               doc.data().username == "Anonymous" ? "" : userProfile.profilePic,
+//           });
+//         });
+
+//         // posts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+//         setPosts(posts);
+//         setPrevPostsQuery(queryType);
+//       } catch (error: any) {
+//         showToast("Error", error.message, "error");
+//         setPosts([]);
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
+//     // if (queryType !== prevQueryType) getPosts();
+//   }, [setPosts, userProfile, queryType]);
+
+//   return { isLoading };
+// };
+
+// export default useGetUserPost;
+
+import { useState } from "react";
 import usePostStore from "../store/postStore";
 import useShowToast from "./useShowToast";
-import { getDocs } from "firebase/firestore";
-import { Post } from "../models";
-import useProfileStore from "../store/profileStore";
-import { queryTypes, userPostQueries } from "../utils/userPostQueries";
+// import useProfileStore from "../store/profileStore";
+import { queryTypes } from "../utils/userPostQueries";
+import { GET_POSTS_QUERY, PostsFilter } from "../utils/wolverineRequests";
+import axios from "axios";
+import { print } from "graphql";
+import useAuthStore from "../store/authStore";
 
 const useGetUserPost = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const { setPosts, queryType } = usePostStore();
-  const userProfile = useProfileStore((state) => state.userProfile);
-  const prevQueryType = usePostStore((state) => state.prevQueryType);
+
+  // const userProfile = useProfileStore((state) => state.userProfile);
+  const authUser = useAuthStore((state) => state.user);
   const setPrevPostsQuery = usePostStore((state) => state.setPrevPostsQuery);
+  const queryType = usePostStore((state) => state.queryType);
+  const setPosts = usePostStore((state) => state.setPosts);
+  // const posts = usePostStore((state) => state.posts);
   const showToast = useShowToast();
 
-  useEffect(() => {
-    const getPosts = async () => {
-      if (!userProfile || !queryType) return;
-      console.log("queryType", queryType, "userProfile", userProfile);
-      setIsLoading(true);
-      setPosts([]);
-      try {
-        let q;
-        if (queryType === queryTypes.USER_POSTS) {
-          q = userPostQueries.getUserPosts(userProfile);
-        } else if (queryType === queryTypes.MY_POSTS) {
-          q = userPostQueries.getMyPosts(userProfile);
-        } else if (queryType === queryTypes.LIKED_POSTS) {
-          q = await userPostQueries.getLikedPosts(userProfile);
-        } else if (queryType === queryTypes.RANDOM_POSTS) {
-          q = userPostQueries.getRandomPosts();
-        }
+  const getPosts = async (data: any) => {
+    if (!data.queryType || !authUser) return;
 
-        if (!q) return;
+    setIsLoading(true);
+    setPosts([]);
+    try {
+      let postLen;
+      if (data.queryType === queryTypes.USER_POSTS) {
+        const filter: PostsFilter = {
+          usernames: [data.username],
+        };
+        const userPostsResponse = await axios.post(
+          `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+          {
+            query: print(GET_POSTS_QUERY),
+            variables: { filter },
+          },
+          {
+            headers: {
+              authorization: authUser.jwt,
+            },
+          },
+        );
 
-        const qSnapshot = await getDocs(q);
-        const posts: Post[] = [];
-
-        qSnapshot.forEach((doc) => {
-          posts.push({
-            ...(doc.data() as Post),
-            id: doc.id,
-            profilePic:
-              doc.data().username == "Anonymous" ? "" : userProfile.profilePic,
-          });
-        });
-
-        posts.sort((a, b) => b.createdAt.toMillis() - a.createdAt.toMillis());
-        setPosts(posts);
-        setPrevPostsQuery(queryType);
-      } catch (error: any) {
-        showToast("Error", error.message, "error");
-        setPosts([]);
-      } finally {
-        setIsLoading(false);
+        const userPostsResult = await userPostsResponse.data;
+        console.log("userPostsResult", userPostsResult.data.getPosts);
+        console.log("--------------------");
+        const filteredPosts = userPostsResult.data.getPosts.filter(
+          (post: any) => !post.isAnonymous,
+        );
+        console.log("Filtered posts", filteredPosts);
+        setPosts(filteredPosts);
+        postLen = filteredPosts.length;
+      } else if (data.queryType === queryTypes.MY_POSTS) {
+        if (!authUser.posts || authUser.posts.length <= 0) return;
+        const filter: PostsFilter = {
+          ids: authUser.posts,
+        };
+        console.log("filter", filter);
+        const myPostsResponse = await axios.post(
+          `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+          {
+            query: print(GET_POSTS_QUERY),
+            variables: { filter },
+          },
+          {
+            headers: {
+              authorization: authUser.jwt,
+            },
+          },
+        );
+        const myPostsResult = await myPostsResponse.data;
+        console.log("myPostsResult", myPostsResult.data.getPosts);
+        console.log("--------------------");
+        setPosts(myPostsResult.data.getPosts);
+        postLen = myPostsResult.data.getPosts.length;
+      } else if (data.queryType === queryTypes.LIKED_POSTS) {
+        if (!authUser.likes || authUser.likes.length <= 0) return;
+        const filter: PostsFilter = {
+          ids: authUser.likes,
+        };
+        console.log("filter", filter);
+        const likedPostsResponse = await axios.post(
+          `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+          {
+            query: print(GET_POSTS_QUERY),
+            variables: { filter },
+          },
+          {
+            headers: {
+              authorization: authUser.jwt,
+            },
+          },
+        );
+        const likedPostsResult = await likedPostsResponse.data;
+        console.log("likedPostsResult", likedPostsResult.data.getPosts);
+        console.log("--------------------");
+        setPosts(likedPostsResult.data.getPosts);
+        postLen = likedPostsResult.data.getPosts.length;
+      } else if (data.queryType === queryTypes.RANDOM_POSTS) {
+        const filter: PostsFilter = {
+          ids: [],
+        };
+        console.log("filter", filter);
+        const randomPostsResponse = await axios.post(
+          `${import.meta.env.VITE_WOLVERINE_ENDPOINT}/graphql`,
+          {
+            query: print(GET_POSTS_QUERY),
+            variables: { filter },
+          },
+          {
+            headers: {
+              authorization: authUser.jwt,
+            },
+          },
+        );
+        const randomPostsResult = await randomPostsResponse.data;
+        console.log("randomPostsResult", randomPostsResult.data.getPosts);
+        console.log("--------------------");
+        setPosts(randomPostsResult.data.getPosts);
       }
-    };
-    if (queryType !== prevQueryType) getPosts();
-  }, [setPosts, userProfile, queryType]);
 
-  return { isLoading };
+      if (postLen <= 0) {
+        showToast("Error", "User doesn't exist or has no posts", "error");
+        return;
+      }
+
+      // posts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+      setPrevPostsQuery(queryType);
+    } catch (error: any) {
+      console.log(error);
+      showToast("Error", error.message, "error");
+      setPosts([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { isLoading, getPosts };
 };
 
 export default useGetUserPost;

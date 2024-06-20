@@ -5,12 +5,25 @@ export interface User {
   id: string;
   email: string;
   username: string;
-  jwt: string;
-  refreshToken: string;
   phoneNumber?: string;
   posts?: Post[];
-  likedPosts?: Post[];
+  likes?: Post[];
   questionnaire?: Questionnare;
   profilePic?: string;
   laterArticles?: string[];
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  username: string;
+  jwt: string;
+  refreshToken: string;
+  phoneNumber?: string;
+  posts?: string[];
+  likes?: string[];
+  questionnaire?: Questionnare;
+  profilePic?: string;
+  laterArticles?: string[];
+  role: string;
 }

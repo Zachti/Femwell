@@ -31,6 +31,16 @@ import { emojis } from "../utils/emojis";
 import { MimeType } from "../utils/mimeTypes";
 import { Colors } from "../utils/colorsConstants";
 import "../assets/App.css";
+import useCreateLiveChat from "../hooks/useCreateLiveChat";
+import useAuthStore from "../store/authStore";
+import useChatStore from "../store/chatStore";
+import useCreateChatMessage from "../hooks/useCreateChatMessage";
+import { useSubscription } from "@apollo/client";
+import {
+  NEW_MESSAGE_SUBSCRIPTION,
+  PADULLA_ENTERED_LIVE_CHAT_SUBSCRIPTION,
+} from "../utils/wolverineSubscriptions";
+import useUserLeaveChat from "../hooks/useUserLeaveChat";
 
 interface LiveChatProps {
   isOpen: boolean;
@@ -39,15 +49,26 @@ interface LiveChatProps {
 
 const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
   const [isLargerThan650] = useMediaQuery("(min-width: 650px)");
-  const [messages, setMessages] = useState<ChatMsg[]>([]);
+
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [inputValue, setInputValue] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingPadulla, setIsLoadingPadulla] = useState(true);
+  const [padullaUsername, setPadullaUsername] = useState<string>("");
+  const [padullaProfilePic, setPadullaProfilePic] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const bgColor = useColorModeValue("white", Colors.color5);
   const msgBgColor1 = useColorModeValue("pink.200", "pink.700");
   const msgBgColor2 = useColorModeValue("gray.200", "gray.500");
+
+  const { isLoadingChat, handleCreateChat } = useCreateLiveChat();
+  const { isLoading, handleCreateChatMessage } = useCreateChatMessage();
+  const { handleLeaveChat } = useUserLeaveChat();
+  const authUser = useAuthStore((state) => state.user);
+  const chats = useChatStore((state) => state.chats);
+  const createMessage = useChatStore((state) => state.createMessage);
+  const [chatId, setChatId] = useState<number>(0);
+  const [messages, setMessages] = useState<ChatMsg[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -67,31 +88,74 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
     setCursorPosition(cursorPosition + emoji.length);
   };
 
+  const {
+    data: messageData,
+    // loading: messageLoading,
+    error: messageError,
+  } = useSubscription(NEW_MESSAGE_SUBSCRIPTION, {
+    variables: { liveChatId: chatId },
+    skip: !chatId,
+  });
+
+  const {
+    data: padullaData,
+    // loading: padullaLoading,
+    error: padullaError,
+  } = useSubscription(PADULLA_ENTERED_LIVE_CHAT_SUBSCRIPTION, {
+    variables: { liveChatId: chatId },
+    skip: !chatId,
+  });
+
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => {
-        setIsLoading(false);
-        setTimeout(() => {
-          handleSndRcvMessage({
-            sender: "them",
-            message: "Hello there Zachary!",
-          });
-        }, 1000);
-      }, 3000);
+      const createChatAndSetData = async () => {
+        await handleCreateChat();
+      };
+
+      createChatAndSetData();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    if (chats.length > 0) {
+      const newChat = chats[0];
+      setMessages(newChat.messages);
+      setChatId(newChat.id);
+    }
+  }, [chats]);
+
+  useEffect(() => {
+    if (messageData?.newMessage) {
+      console.log("received message", messageData, messageError);
+      const newMessage = {
+        id: messageData?.newMessage.id,
+        userId: messageData?.newMessage.user.id,
+        username: messageData?.newMessage.user.username,
+        content: messageData?.newMessage.content,
+        seen: messageData?.newMessage.seen,
+        createdAt: messageData?.newMessage.createdAt,
+      };
+      createMessage(newMessage, chatId);
+    }
+  }, [messageData]);
+
+  //HERE HERE HERE ITS NOT .NEWMESSAGE ALSO NEED TO CHECK WHAT IS THE PROFILE PIC AND USERNAME OF THE PADULLA
+  useEffect(() => {
+    console.log("padulla trying to join...", padullaData, padullaError);
+    if (padullaData?.padullaEnteredLiveChat) {
+      setIsLoadingPadulla(false);
+      setPadullaProfilePic(padullaData.padullaEnteredLiveChat.profilePic);
+      setPadullaUsername(padullaData.padullaEnteredLiveChat.username);
+    }
+  }, [padullaData]);
 
   const onExpand = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const handleSndRcvMessage = (msg: ChatMsg) => {
-    setMessages([...messages, msg]);
-  };
-
-  const onSendMessage = (msg: ChatMsg) => {
+  const onSendMessage = async () => {
     if (!(inputValue.trim() === "" || inputValue.length > 200)) {
-      handleSndRcvMessage(msg);
+      await handleCreateChatMessage({ chatId, content: inputValue });
       setInputValue("");
     }
   };
@@ -107,6 +171,12 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
     if (file && Object.values(MimeType).includes(file.type)) {
       setSelectedFile(file);
     }
+  };
+
+  const onLeaveChat = async () => {
+    console.log("leaving chat");
+    await handleLeaveChat(chatId);
+    onClose();
   };
 
   const chat = (
@@ -149,7 +219,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
           pb="2"
           borderBottom="2px solid var(--secondary-color)"
         >
-          {isLoading ? (
+          {isLoadingChat || isLoadingPadulla ? (
             <Flex align="center">
               <Spinner
                 thickness="2px"
@@ -164,14 +234,10 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
             </Flex>
           ) : (
             <Flex align="center">
-              <Avatar
-                size="sm"
-                name="John Doe"
-                //   src="link"
-              >
+              <Avatar size="sm" name={padullaUsername} src={padullaProfilePic}>
                 <AvatarBadge boxSize="1.25em" bg="green.500" />
               </Avatar>
-              <Text ml="2">John Doe</Text>
+              <Text ml="2">{padullaUsername}</Text>
             </Flex>
           )}
 
@@ -195,8 +261,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
               aria-label="Close"
               icon={<SmallCloseIcon />}
               onClick={() => {
-                setIsLoading(true);
-                onClose();
+                onLeaveChat();
               }}
             />
           </Flex>
@@ -212,14 +277,20 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
           {messages.map((msg, index) => (
             <Box
               key={index}
-              bg={msg.sender === "You" ? `${msgBgColor1}` : `${msgBgColor2}`}
-              alignSelf={msg.sender === "You" ? "flex-start" : "flex-end"}
+              bg={
+                msg.userId === authUser?.id
+                  ? `${msgBgColor1}`
+                  : `${msgBgColor2}`
+              }
+              alignSelf={
+                msg.userId === authUser?.id ? "flex-start" : "flex-end"
+              }
               borderRadius="lg"
               p="2"
               mt="2"
               maxW="80%"
             >
-              <Text>{msg.message}</Text>
+              <Text>{`${msg.content}`}</Text>
             </Box>
           ))}
         </Flex>
@@ -234,7 +305,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
           <VStack w="100%">
             <Textarea
               ref={textAreaRef}
-              isDisabled={isLoading}
+              isDisabled={isLoadingChat}
               placeholder="Type a message"
               variant="filled"
               flex="1"
@@ -254,7 +325,7 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
               <Flex>
                 <IconButton
                   aria-label="Emoji"
-                  isDisabled={isLoading}
+                  isDisabled={isLoadingChat}
                   variant="ghost"
                   icon={<FontAwesomeIcon icon={faSmile} />}
                   onClick={() => setShowEmojiPicker(!showEmojiPicker)}
@@ -325,8 +396,10 @@ const LiveChat: FC<LiveChatProps> = ({ isOpen, onClose }) => {
                   variant="ghost"
                   leftIcon={<FontAwesomeIcon icon={faPaperPlane} />}
                   ml="2"
+                  isLoading={isLoading}
+                  isDisabled={isLoadingChat}
                   onClick={() => {
-                    onSendMessage({ sender: "You", message: inputValue });
+                    if (authUser) onSendMessage();
                   }}
                 >
                   Send

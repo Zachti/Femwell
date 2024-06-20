@@ -2,12 +2,12 @@ import { Box, Flex, Text, useMediaQuery } from "@chakra-ui/react";
 import { FC } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark } from "@fortawesome/free-solid-svg-icons";
-import useSearchUser from "../../../hooks/useSearchUser";
 import useAuthStore from "../../../store/authStore";
-import useProfileStore from "../../../store/profileStore";
+// import useProfileStore from "../../../store/profileStore";
 import { queryTypes } from "../../../utils/userPostQueries";
 import useShowToast from "../../../hooks/useShowToast";
 import usePostStore from "../../../store/postStore";
+import useGetUserPost from "../../../hooks/useGetUserPost";
 
 interface SideBarProps {
   btnText?: string;
@@ -20,15 +20,16 @@ const MyPosts: FC<SideBarProps> = ({}) => {
   const [isLargerThan400] = useMediaQuery("(min-width: 400px)");
   const [isLargerThan760] = useMediaQuery("(min-width: 760px)");
   const authUser = useAuthStore((state) => state.user);
-  const userProfile = useProfileStore((state) => state.userProfile);
+  // const userProfile = useProfileStore((state) => state.userProfile);
   const queryType = usePostStore((state) => state.queryType);
-  const { getUserProfile } = useSearchUser();
+  // const { getUserProfile } = useSearchUser();
+  const { getPosts } = useGetUserPost();
   const showToast = useShowToast();
 
   const handleMyPosts = async () => {
     if (authUser) {
-      if (!userProfile || queryType !== queryTypes.MY_POSTS) {
-        await getUserProfile(authUser.username, queryTypes.MY_POSTS);
+      if (queryType !== queryTypes.MY_POSTS) {
+        await getPosts({ queryType: queryTypes.MY_POSTS });
       }
     } else {
       showToast("Error", "Please Login to use this feature", "error");

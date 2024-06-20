@@ -7,6 +7,7 @@ export const CREATE_USER_MUTATION = gql`
       email
       username
       phoneNumber
+      role
     }
   }
 `;
@@ -23,17 +24,11 @@ export const GET_USER_PROFILE_QUERY = gql`
       }
       posts {
         id
-        username
-        content
-        comments {
-          username
-          content
-          postId
-        }
       }
       phoneNumber
       readLater
       profilePic
+      role
     }
   }
 `;
@@ -170,29 +165,29 @@ export const FIND_QUESTIONNAIRE_BY_USER_QUERY = gql`
 
 // questionnaire dtos -
 
-interface Response {
-  id: string;
+// interface Response {
+//   id: string;
 
-  question: string;
+//   question: string;
 
-  answer?: string;
+//   answer?: string;
 
-  questionnaireId: string;
-}
+//   questionnaireId: string;
+// }
 
-interface CreateQuestionnaireInput {
-  userId: string;
+// interface CreateQuestionnaireInput {
+//   userId: string;
 
-  responses: Response[];
+//   responses: Response[];
 
-  username: string;
-}
+//   username: string;
+// }
 
-interface createResponseInput {
-  question: string;
+// interface createResponseInput {
+//   question: string;
 
-  answer?: string;
-}
+//   answer?: string;
+// }
 
 // COMMENT RESOLVER REQUESTS -
 
@@ -203,7 +198,6 @@ export const CREATE_COMMENT_MUTATION = gql`
       content
       userId
       postId
-      username
     }
   }
 `;
@@ -215,7 +209,6 @@ export const UPDATE_COMMENT_MUTATION = gql`
       content
       userId
       postId
-      username
     }
   }
 `;
@@ -226,8 +219,6 @@ export const DELETE_COMMENT_MUTATION = gql`
       id
       content
       userId
-      postId
-      username
     }
   }
 `;
@@ -239,22 +230,24 @@ export const GET_COMMENTS_QUERY = gql`
       content
       userId
       postId
-      username
+      user {
+        username
+        profilePic
+      }
       createdAt
-      userProfilePic
     }
   }
 `;
 
 // comment dtos -
 
-interface CreateCommentInput {
-  content: string;
+export interface CreateCommentInput {
   userId: string;
   postId: string;
+  content: string;
 }
 
-interface UpdateCommentInput {
+export interface UpdateCommentInput {
   id: number;
   content: string;
 }
@@ -279,18 +272,19 @@ export const UPDATE_POST_MUTATION = gql`
       id
       content
       userId
-      username
       imageUrl
       isAnonymous
       createdAt
       comments {
+        user {
+          username
+          profilePic
+        }
         id
         content
-        username
       }
       likes {
         id
-        username
       }
     }
   }
@@ -311,25 +305,29 @@ export const GET_POSTS_QUERY = gql`
       id
       content
       userId
-      username
       imageUrl
+      user {
+        username
+        profilePic
+      }
       isAnonymous
       createdAt
       comments {
         id
         content
-        username
+        user {
+          username
+          profilePic
+        }
       }
       likes {
         id
-        username
       }
     }
   }
 `;
 
 // post dtos -
-
 export interface CreatePostInput {
   id: string;
   content: string;
@@ -343,29 +341,28 @@ export interface UpdatePostInput {
   content: string;
   userId: string;
   imageUrl?: string;
+  deleteImage: boolean;
 }
 
 export interface PostsFilter {
-  ids: string[];
-  usernames: string[];
+  ids?: string[];
+  usernames?: string[];
 }
 
 // LIKES RESOLVER REQUESTS -
 
 export const CREATE_LIKE_MUTATION = gql`
-  mutation CreateLike($createLikeInput: CreateOrDeleteLikeInput!) {
-    createLike(createLikeInput: $createLikeInput) {
-      id
+  mutation CreateLike($CreateOrDeleteLikeInput: CreateOrDeleteLikeInput!) {
+    createLike(CreateOrDeleteLikeInput: $CreateOrDeleteLikeInput) {
       postId
       userId
-      username
     }
   }
 `;
 
 export const DELETE_LIKE_MUTATION = gql`
-  mutation DeleteLike($deleteLikeInput: CreateOrDeleteLikeInput!) {
-    deleteLike(deleteLikeInput: $deleteLikeInput)
+  mutation DeleteLike($CreateOrDeleteLikeInput: CreateOrDeleteLikeInput!) {
+    deleteLike(CreateOrDeleteLikeInput: $CreateOrDeleteLikeInput)
   }
 `;
 
@@ -375,77 +372,39 @@ export const GET_LIKES_QUERY = gql`
       id
       postId
       userId
-      username
     }
   }
 `;
 
 // like dtos -
 
-interface CreateOrDeleteLikeInput {
+export interface CreateOrDeleteLikeInput {
   postId: string;
   userId: string;
-  username: string;
 }
 
 // LIVE CHAT RESOLVER REQUESTS -
 
 export const CREATE_LIVE_CHAT_MUTATION = gql`
-  mutation CreateLiveChat($name: String!, $userId: UUID!) {
-    createLiveChat(name: $name, userId: $userId) {
+  mutation CreateLiveChat($userId: UUID!) {
+    createLiveChat(userId: $userId) {
       id
-      name
       createdAt
       updatedAt
       users {
         id
-        email
         username
-        phoneNumber
-      }
-      messages {
-        id
-        content
-        userId
-        user {
-          email
-          username
-          phoneNumber
-        }
-        seen
-        createdAt
-        updatedAt
+        profilePic
       }
     }
   }
 `;
 
 export const DELETE_LIVE_CHAT_MUTATION = gql`
-  mutation DeleteLiveChat($id: UUID!) {
-    deleteLiveChat(id: $id) {
+  mutation DeleteLiveChat($liveChatId: PositiveInt!) {
+    deleteLiveChat(liveChatId: $liveChatId) {
       id
-      name
       createdAt
-      updatedAt
-      users {
-        id
-        email
-        username
-        phoneNumber
-      }
-      messages {
-        id
-        content
-        userId
-        user {
-          email
-          username
-          phoneNumber
-        }
-        seen
-        createdAt
-        updatedAt
-      }
     }
   }
 `;
@@ -454,24 +413,17 @@ export const GET_LIVE_CHAT_QUERY = gql`
   query GetLiveChat($liveChatId: PositiveInt!) {
     getLiveChat(liveChatId: $liveChatId) {
       id
-      name
       createdAt
       updatedAt
       users {
         id
         email
         username
-        phoneNumber
       }
       messages {
         id
         content
         userId
-        user {
-          email
-          username
-          phoneNumber
-        }
         seen
         createdAt
         updatedAt
@@ -511,19 +463,13 @@ export const GET_PREVIOUS_CHATS_FOR_USER_QUERY = gql`
 `;
 
 export const SEND_MESSAGE_MUTATION = gql`
-  mutation SendMessage(
-    $liveChatId: PositiveInt!
-    $content: String!
-    $userId: UUID!
-  ) {
-    sendMessage(liveChatId: $liveChatId, content: $content, userId: $userId) {
+  mutation SendMessage($sendMessageInput: SendMessageInput!) {
+    sendMessage(sendMessageInput: $sendMessageInput) {
       id
       content
       userId
       user {
-        email
         username
-        phoneNumber
       }
       seen
       createdAt
@@ -532,33 +478,38 @@ export const SEND_MESSAGE_MUTATION = gql`
   }
 `;
 
+export interface SendMessageInput {
+  userId: string;
+  liveChatId: number;
+  content: string;
+}
+
 export const ADD_PADULLA_TO_LIVE_CHAT_MUTATION = gql`
   mutation AddPadullaToLiveChat($liveChatId: PositiveInt!, $userId: UUID!) {
     addPadullaToLiveChat(liveChatId: $liveChatId, userId: $userId) {
       id
-      name
       createdAt
       updatedAt
       users {
         id
-        email
         username
-        phoneNumber
+        profilePic
       }
       messages {
         id
         content
         userId
-        user {
-          email
-          username
-          phoneNumber
-        }
         seen
         createdAt
         updatedAt
       }
     }
+  }
+`;
+
+export const USER_LEAVE_CHAT_MUTATION = gql`
+  mutation ExitLiveChat($liveChatId: PositiveInt!, $userId: UUID!) {
+    exitLiveChat(liveChatId: $liveChatId, userId: $userId)
   }
 `;
 
@@ -581,13 +532,51 @@ export const GET_MESSAGES_FOR_LIVE_CHAT_QUERY = gql`
 `;
 
 export const SET_MESSAGE_SEEN_MUTATION = gql`
-  mutation setMessagesAsRead($messageId: PositiveInt!) {
-    setMessageSeen(messageId: $messageId)
+  mutation setMessagesAsRead($liveChatId: PositiveInt!) {
+    setMessagesAsRead(liveChatId: $liveChatId) {
+      id
+    }
   }
 `;
 
 export const SET_MESSAGES_UNSEEN_MUTATION = gql`
   mutation setMessageAsUnread($liveChatId: PositiveInt!) {
     setMessagesUnseen(liveChatId: $liveChatId)
+  }
+`;
+
+export const GET_CHATS_FOR_PADULLA = gql`
+  query getLiveChatsForPadulla($userId: UUID!) {
+    getLiveChatsForPadulla(userId: $userId) {
+      id
+      createdAt
+      users {
+        id
+        username
+        profilePic
+      }
+      messages {
+        id
+        userId
+        content
+        seen
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;
+
+export const NEW_MESSAGE_SUBSCRIPTION = gql`
+  subscription OnNewMessage($liveChatId: Int!) {
+    newMessage(liveChatId: $liveChatId) {
+      id
+      content
+      user {
+        id
+        username
+      }
+      createdAt
+    }
   }
 `;

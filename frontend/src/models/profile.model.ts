@@ -4,6 +4,6 @@ export interface Profile {
   id: string;
   username: string;
   posts?: Post[];
-  likedPosts?: Post[];
+  likes?: Post[];
   profilePic?: string;
 }

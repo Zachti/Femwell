@@ -2,7 +2,6 @@ import { useState } from "react";
 import useShowToast from "./useShowToast";
 import useAuthStore from "../store/authStore";
 import usePostStore from "../store/postStore";
-import { useLocation } from "react-router-dom";
 import { PostInput } from "../models/postInput.model";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -16,9 +15,9 @@ const useCreatePost = () => {
   const [isLoadingPost, setIsLoadingPost] = useState(false);
   const authUser = useAuthStore((state) => state.user);
   const createPost = usePostStore((state) => state.createPost);
+  // const posts = usePostStore((state) => state.posts);
+  const setUser = useAuthStore((state) => state.setUser);
   const showToast = useShowToast();
-
-  const { pathname } = useLocation();
 
   const handleCreatePost = async (post: PostInput) => {
     if (isLoadingPost) return;
@@ -28,9 +27,9 @@ const useCreatePost = () => {
       try {
         let URL = "";
         const postId = uuidv4();
-        if (post.imageURL) {
+        if (post.imageUrl) {
           const formData = new FormData();
-          formData.append("file", post.imageURL);
+          formData.append("file", post.imageUrl);
           formData.append("path", `PostImages/${postId}`);
 
           const uploadResponse = await axios.post(
@@ -78,13 +77,15 @@ const useCreatePost = () => {
 
         const newPost = {
           id: createPostResult.id,
-          imageURL: URL || "",
+          imageUrl: URL || "",
           content: post.content,
-          username: post.username,
-          createdBy: authUser.id,
-          profilePic: createPostResult.isAnonymous ? "" : authUser.profilePic,
+          user: {
+            username: post.username,
+            profilePic: createPostResult.isAnonymous ? "" : authUser.profilePic,
+          },
+          userId: authUser.id,
           createdAt: createPostResult.createdAt,
-          likes: 0,
+          likes: [],
           comments: [],
           isAnonymous: createPostResult.isAnonymous,
         };
@@ -92,6 +93,10 @@ const useCreatePost = () => {
         console.log("newPost", newPost);
 
         createPost(newPost);
+        setUser({
+          ...authUser,
+          posts: [createPostResult.id, ...(authUser.posts || [])],
+        });
 
         setIsLoadingPost(false);
         showToast("Success", "Post created successfully", "success");

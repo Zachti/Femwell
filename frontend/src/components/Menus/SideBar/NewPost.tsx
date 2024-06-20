@@ -6,7 +6,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPenToSquare } from "@fortawesome/free-regular-svg-icons";
 
 import CreateOrUpdatePost from "./createOrUpdatePost";
-import useCreatePost from "../../../hooks/useCreatePost";
+import useAuthStore from "../../../store/authStore";
+import useShowToast from "../../../hooks/useShowToast";
 
 interface SideBarProps {
   btnText?: string;
@@ -18,6 +19,8 @@ interface SideBarProps {
 const NewPost: FC<SideBarProps> = ({}) => {
   const [isLargerThan400] = useMediaQuery("(min-width: 400px)");
   const [isLargerThan760] = useMediaQuery("(min-width: 760px)");
+  const authUser = useAuthStore((state) => state.user);
+  const showToast = useShowToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <>
@@ -28,7 +31,11 @@ const NewPost: FC<SideBarProps> = ({}) => {
         cursor={"pointer"}
         borderRadius={6}
         _hover={{ bg: "var(--hover-color-dim)" }}
-        onClick={onOpen}
+        onClick={() => {
+          authUser
+            ? onOpen()
+            : showToast("Error", "Please Login to use this feature", "error");
+        }}
       >
         <Flex
           p={2}

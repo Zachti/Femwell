@@ -1,4 +1,4 @@
-import { useState, FC, useEffect } from "react";
+import { FC } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -6,7 +6,7 @@ import {
   useLocation,
   Navigate,
 } from "react-router-dom";
-import { ChakraProvider, extendTheme, list } from "@chakra-ui/react";
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import Navbar from "./components/Menus/Navbar";
 import "./index.css";
 import "./assets/App.css";
@@ -17,6 +17,7 @@ import useAuthStore from "./store/authStore";
 import AccountSettings from "./pages/AccountSettings";
 import ION from "./pages/ION";
 import Welcome from "./pages/Welcome";
+import LiveChatCenter from "./pages/LiveChatCenter";
 
 const config = {
   initialColorMode: "light",
@@ -74,7 +75,11 @@ const App: FC<{}> = () => {
   const FabWithLocation = () => {
     const location = useLocation();
 
-    return authUser && location.pathname !== "/account" ? <Fab /> : null;
+    return authUser &&
+      location.pathname !== "/account" &&
+      location.pathname !== "/livechats" ? (
+      <Fab />
+    ) : null;
   };
 
   return (
@@ -92,6 +97,16 @@ const App: FC<{}> = () => {
           <Route
             path="/account"
             element={authUser ? <AccountSettings /> : <Navigate to="/" />}
+          />
+          <Route
+            path="/livechats"
+            element={
+              authUser?.role === "Padulla" ? (
+                <LiveChatCenter />
+              ) : (
+                <Navigate to="/" />
+              )
+            } //should only be padulla user
           />
           <Route path="/ION" element={<ION />} />
         </Routes>

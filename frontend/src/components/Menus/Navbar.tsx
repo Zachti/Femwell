@@ -1,25 +1,15 @@
-import { useState, useEffect, FC } from "react";
+import { FC } from "react";
 import { Link } from "react-router-dom";
-import {
-  useColorModeValue,
-  useDisclosure,
-  useMediaQuery,
-  Text,
-} from "@chakra-ui/react";
+import { useDisclosure, useMediaQuery, Text } from "@chakra-ui/react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import "../../assets/Navbar.css";
-import {
-  faBars,
-  faHeartCircleCheck,
-  faTimes,
-} from "@fortawesome/free-solid-svg-icons";
-import InputForm from "../Forms/InputForm";
+import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 import SideMenu from "./SideMenu";
 import useAuthStore from "../../store/authStore";
 import useLogout from "../../hooks/useLogout";
 import ColorModeSwitch from "../ColorModeSwitch";
-import { Colors } from "../../utils/colorsConstants";
 import LogoSvg from "./LogoSvg";
+import LoginForm from "../Forms/LoginForm";
 
 const Navbar: FC<{}> = () => {
   const {
@@ -33,13 +23,13 @@ const Navbar: FC<{}> = () => {
     onClose: onInputFormClose,
   } = useDisclosure();
   const authUser = useAuthStore((state) => state.user);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const { logout, isLoggingOut } = useLogout();
+  // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const { logout } = useLogout();
   const [isLargerThan500] = useMediaQuery("(min-width: 500px)");
-  const navFadeColor = useColorModeValue(
-    Colors.primaryColor,
-    Colors.secondaryColor,
-  );
+  // const navFadeColor = useColorModeValue(
+  //   Colors.primaryColor,
+  //   Colors.secondaryColor,
+  // );
 
   const handleClick = (): void => {
     if (!isSideMenuOpen) {
@@ -133,7 +123,7 @@ const Navbar: FC<{}> = () => {
           </div>
         </div>
       </nav>
-      <InputForm
+      <LoginForm
         isOpen={isInputFormOpen}
         onClose={onInputFormClose}
         onOpen={onInputFormOpen}

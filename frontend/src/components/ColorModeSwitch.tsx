@@ -1,9 +1,7 @@
-import { SunIcon } from "@chakra-ui/icons";
 import {
   Flex,
   Text,
   Switch,
-  VStack,
   useColorMode,
   useColorModeValue,
 } from "@chakra-ui/react";

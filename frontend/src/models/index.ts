@@ -7,3 +7,5 @@ export * from "./questionnaire.model";
 export * from "./comment.model";
 export * from "./postInput.model";
 export * from "./profile.model";
+export * from "./avatarProps.model";
+export * from "./chat.model";
