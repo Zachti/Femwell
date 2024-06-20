@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { Chat, ChatMsg, User } from "../models";
+import { Chat, ChatMsg } from "../models";
 
 type State = {
   chats: Chat[];

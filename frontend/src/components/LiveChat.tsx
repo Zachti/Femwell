@@ -41,7 +41,6 @@ import {
   PADULLA_ENTERED_LIVE_CHAT_SUBSCRIPTION,
 } from "../utils/wolverineSubscriptions";
 import useUserLeaveChat from "../hooks/useUserLeaveChat";
-import { set } from "date-fns";
 
 interface LiveChatProps {
   isOpen: boolean;

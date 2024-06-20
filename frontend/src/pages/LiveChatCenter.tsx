@@ -25,7 +25,7 @@ import useChatStore from "../store/chatStore";
 import useGetLiveChats from "../hooks/useGetLiveChats";
 import useCreateChatMessage from "../hooks/useCreateChatMessage";
 import usePadullaJoinChat from "../hooks/usePadullaJoinChat";
-import useSetMessagesSeen from "../hooks/useSetMessagesSeen";
+// import useSetMessagesSeen from "../hooks/useSetMessagesSeen";
 
 const LiveChatCenter: FC<{}> = () => {
   const [isLargerThan650] = useMediaQuery("(min-width: 650px)");
@@ -50,7 +50,7 @@ const LiveChatCenter: FC<{}> = () => {
   const { handleGetChats } = useGetLiveChats();
   const { handleJoinChat } = usePadullaJoinChat();
   const { handleCreateChatMessage } = useCreateChatMessage();
-  const { handleSetMessageSeen } = useSetMessagesSeen();
+  // const { handleSetMessageSeen } = useSetMessagesSeen();
   const chats = useChatStore((state) => state.chats);
 
   const panelBackgoundColor = useColorModeValue("white", "#533142");
