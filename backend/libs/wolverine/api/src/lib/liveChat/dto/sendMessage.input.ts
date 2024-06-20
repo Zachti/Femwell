@@ -12,4 +12,7 @@ export class SendMessageInput {
 
   @Field(() => GraphQLString)
   content!: string;
+
+  @Field(() => Boolean, { nullable: true })
+  isPadullaSent?: boolean
 }

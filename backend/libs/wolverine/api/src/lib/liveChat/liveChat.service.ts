@@ -101,13 +101,14 @@ export class LiveChatService {
   }
 
   async sendMessage(SendMessageInput: SendMessageInput) {
-    const { userId, liveChatId, content } = SendMessageInput;
+    const { userId, liveChatId, content, isPadullaSent } = SendMessageInput;
     try {
       const res = await this.prisma.message.create({
         data: {
           content,
           liveChatId,
           userId,
+          seen: isPadullaSent ?? false
         },
         include: {
           liveChat: {
