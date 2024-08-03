@@ -48,6 +48,9 @@ export class LiveChatService {
             },
           },
         },
+        include: {
+          users: true,
+        },
       });
       if (liveChat) {
         this.logger.info(`LiveChat already exists: ${liveChat}`);
