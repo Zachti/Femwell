@@ -50,6 +50,7 @@ export class LiveChatService {
         },
         include: {
           users: true,
+          messages: true,
         },
       });
       if (liveChat) {
